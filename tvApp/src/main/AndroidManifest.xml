@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature
         android:name="android.software.leanback"
@@ -10,7 +11,9 @@
 
     <application
         android:label="MediaCCC TV"
-        android:theme="@style/Theme.Leanback">
+        android:theme="@style/Theme.Leanback"
+        android:banner="@drawable/app_banner"
+        tools:replace="android:label,android:theme">
         <activity
             android:name=".TvActivity"
             android:exported="true"
