@@ -4,6 +4,7 @@ import com.jaeckel.mediaccc.api.model.Conference
 import com.jaeckel.mediaccc.api.model.ConferencesResponse
 import com.jaeckel.mediaccc.api.model.Event
 import com.jaeckel.mediaccc.api.model.EventsResponse
+import com.jaeckel.mediaccc.api.model.Recording
 import com.jaeckel.mediaccc.api.model.RecordingsResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -72,11 +73,7 @@ class MediaCCCApi {
         return client.get("$baseUrl/recordings").body()
     }
 
-    suspend fun getRecording(id: String): com.jaeckel.mediaccc.api.model.Recording {
-        // Hinweis: Der Return-Typ vom Server für ein einzelnes Recording könnte je nach API
-        // leicht variieren oder direkt das Objekt sein.
-        // Falls die API hier auch Wrapped antwortet oder direkt das Objekt, muss das ggf. angepasst werden.
-        // Basierend auf REST-Standard meist direkt das Objekt.
+    suspend fun getRecording(id: String): Recording {
         return client.get("$baseUrl/recordings/$id").body()
     }
 }
