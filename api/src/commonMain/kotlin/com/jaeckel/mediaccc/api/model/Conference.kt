@@ -13,11 +13,15 @@ data class ConferencesResponse(
 data class Conference(
     val acronym: String,
     @SerialName("aspect_ratio") val aspectRatio: String? = null,
-    @SerialName("updated_at") val updatedAt: Instant? = null,
+    @SerialName("updated_at")
+    @Serializable(with = KtxInstantSerializer::class)
+    val updatedAt: Instant? = null,
     val title: String,
     @SerialName("schedule_url") val scheduleUrl: String? = null,
     val slug: String,
-    @SerialName("event_last_released_at") val eventLastReleasedAt: Instant? = null,
+    @SerialName("event_last_released_at")
+    @Serializable(with = KtxInstantSerializer::class)
+    val eventLastReleasedAt: Instant? = null,
     val link: String? = null,
     val description: String? = null,
     @SerialName("webgen_location") val webgenLocation: String? = null,

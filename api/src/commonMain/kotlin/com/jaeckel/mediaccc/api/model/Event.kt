@@ -17,9 +17,14 @@ data class Event(
     val tags: List<String>? = emptyList(),
     @SerialName("view_count") val viewCount: Int? = 0,
     val promoted: Boolean? = false,
+    @Serializable(with = KtxInstantSerializer::class)
     val date: Instant? = null,
-    @SerialName("release_date") val releaseDate: Instant? = null,
-    @SerialName("updated_at") val updatedAt: Instant? = null,
+    @SerialName("release_date")
+    @Serializable(with = KtxInstantSerializer::class)
+    val releaseDate: Instant? = null,
+    @SerialName("updated_at")
+    @Serializable(with = KtxInstantSerializer::class)
+    val updatedAt: Instant? = null,
     val length: Long? = 0,
     val duration: Long? = 0,
     @SerialName("thumb_url") val thumbUrl: String? = null,

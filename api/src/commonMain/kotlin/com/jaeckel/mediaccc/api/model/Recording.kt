@@ -16,7 +16,9 @@ data class Recording(
     @SerialName("high_quality") val highQuality: Boolean? = false,
     val width: Int? = 0,
     val height: Int? = 0,
-    @SerialName("updated_at") val updatedAt: Instant? = null,
+    @SerialName("updated_at")
+    @Serializable(with = KtxInstantSerializer::class)
+    val updatedAt: Instant? = null,
     @SerialName("recording_url") val recordingUrl: String? = null,
     val url: String,
     @SerialName("event_url") val eventUrl: String? = null,
