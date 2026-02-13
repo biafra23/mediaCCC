@@ -31,3 +31,4 @@ dependencyResolutionManagement {
 include(":composeApp")
 include(":tvApp")
 include(":mobileApp")
+include(":api")
