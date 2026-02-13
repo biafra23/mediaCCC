@@ -43,6 +43,8 @@ data class Conference(
     @SerialName("recordings_url")
     val recordingsUrl: String? = null,
 
-    val url: String
+    val url: String,
+
+    val events: List<Event>? = emptyList()
 )
 

@@ -29,9 +29,25 @@ class JsonParsingTest {
         }
     }
 
+    @Test
+    fun testConferenceDetailDeserialization() {
+        val jsonString = readResource("public.conferences.39c3.json")
+        val conference = json.decodeFromString<com.jaeckel.mediaccc.api.model.Conference>(jsonString)
+
+        assertNotNull(conference)
+        println("Conference: ${conference.title}")
+        assertNotNull(conference.events)
+        println("Found ${conference.events?.size} events")
+
+        if (!conference.events.isNullOrEmpty()) {
+            val firstEvent = conference.events!!.first()
+            println("First Event: ${firstEvent.title}")
+            assertNotNull(firstEvent.guid)
+        }
+    }
+
     private fun readResource(fileName: String): String {
         return javaClass.classLoader?.getResource(fileName)?.readText()
             ?: throw IllegalArgumentException("Resource not found: $fileName")
     }
 }
-
