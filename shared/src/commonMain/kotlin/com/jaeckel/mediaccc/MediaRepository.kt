@@ -35,6 +35,15 @@ class MediaRepository(private val api: MediaCCCApi) {
         }
     }
 
+    fun getUnPopularEvents(year: Int): Flow<Result<EventsResponse>> = flow {
+        try {
+            val result = api.getUnPopularEvents(year)
+            emit(Result.success(result))
+        } catch (e: Exception) {
+            emit(Result.failure(e))
+        }
+    }
+
     fun getRecentEvents(): Flow<Result<EventsResponse>> = flow {
         try {
             val result = api.getRecentEvents()

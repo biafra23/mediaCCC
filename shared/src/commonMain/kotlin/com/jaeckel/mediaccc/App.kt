@@ -56,7 +56,7 @@ fun App() {
 
         LaunchedEffect(Unit) {
             statusMessage = "Loading..."
-            repository.getPopularEvents(2026).collect { result ->
+            repository.getPopularEvents(2025).collect { result ->
                 result.fold(
                     onSuccess = { response ->
                         recentEvents = response.events

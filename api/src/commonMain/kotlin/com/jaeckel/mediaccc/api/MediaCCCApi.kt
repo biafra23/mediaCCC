@@ -52,6 +52,12 @@ class MediaCCCApi {
         }.body()
     }
 
+    suspend fun getUnPopularEvents(year: Int): EventsResponse {
+        return client.get("$baseUrl/events/unpopular") {
+            parameter("year", year)
+        }.body()
+    }
+
     suspend fun getPromotedEvents(): EventsResponse {
         return client.get("$baseUrl/events/promoted").body()
     }
