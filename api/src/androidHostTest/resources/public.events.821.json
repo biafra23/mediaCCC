@@ -1,0 +1,223 @@
+{
+    "guid": "import-a1a1cc355460e393a5",
+    "title": "Kampagne Fair Sharing",
+    "subtitle": null,
+    "slug": "117_Kampagne_Fair_Sharing",
+    "link": "http://www.ccc.de/congress/2004/fahrplan/event/117.en.html",
+    "description": "Die Musikindustrie setzt gerade alles daran, ihre Kunden und potentiellen Kunden zu verklagen und sieht keine Alternative um den Kampf gegen Tauschb\u00f6rsen zu gewinnen. Dabei ist die Kriminalisierung einer ganzen Generation weder Sinnvoll noch w\u00fcnschenswert. Die Kulturflatrate zeigt einen Ausweg...\n",
+    "original_language": "eng",
+    "persons": [
+        "Matthias Mehldau",
+        "Oliver Moldenhauer",
+        "Volker Grassmuck",
+        "Julian 'hds' Finn",
+        "Markus Beckedahl"
+    ],
+    "tags": [
+        "21c3",
+        " Society"
+    ],
+    "view_count": 3,
+    "promoted": false,
+    "date": "2004-12-28T01:00:00.000+01:00",
+    "release_date": "2008-01-05T01:00:00.000+01:00",
+    "updated_at": "2019-09-29T01:24:52.239+02:00",
+    "length": 3299,
+    "duration": 3299,
+    "thumb_url": "https://static.media.ccc.de/media/congress/2004/117 Kampagne Fair Sharing.jpg",
+    "poster_url": "https://static.media.ccc.de/media/congress/2004/117 Kampagne Fair Sharing_preview.jpg",
+    "timeline_url": "https://static.media.ccc.de/media/congress/2004/import-a1a1cc355460e393a5-timeline.jpg",
+    "thumbnails_url": "https://static.media.ccc.de/media/congress/2004/import-a1a1cc355460e393a5-thumbnails.vtt",
+    "frontend_link": "https://media.ccc.de/v/117_Kampagne_Fair_Sharing",
+    "url": "https://api.media.ccc.de/public/events/import-a1a1cc355460e393a5",
+    "conference_title": "21C3: The Usual Suspects",
+    "conference_url": "https://api.media.ccc.de/public/conferences/21c3",
+    "related": [
+        {
+            "event_id": 805,
+            "event_guid": "import-a7100f85ea482235a4",
+            "weight": 1
+        },
+        {
+            "event_id": 811,
+            "event_guid": "import-57ec6bf04e9a6b0c37",
+            "weight": 1
+        },
+        {
+            "event_id": 813,
+            "event_guid": "import-c37d6e2bd9f4f412fa",
+            "weight": 1
+        },
+        {
+            "event_id": 814,
+            "event_guid": "import-52afc66c4fe5654a0d",
+            "weight": 1
+        },
+        {
+            "event_id": 831,
+            "event_guid": "import-d31ef9384f4b7266c8",
+            "weight": 1
+        },
+        {
+            "event_id": 834,
+            "event_guid": "import-a5e037ae18a0585a58",
+            "weight": 1
+        },
+        {
+            "event_id": 837,
+            "event_guid": "import-36a3b6a2ff3909dcad",
+            "weight": 1
+        },
+        {
+            "event_id": 844,
+            "event_guid": "import-243f70505a86f78f5f",
+            "weight": 1
+        },
+        {
+            "event_id": 845,
+            "event_guid": "import-9aa26412eb8a583273",
+            "weight": 1
+        },
+        {
+            "event_id": 847,
+            "event_guid": "import-3aae12cacdafcdcae7",
+            "weight": 1
+        },
+        {
+            "event_id": 853,
+            "event_guid": "import-d5b993915f58107a0b",
+            "weight": 1
+        },
+        {
+            "event_id": 858,
+            "event_guid": "import-0fa6485c220df5e791",
+            "weight": 1
+        },
+        {
+            "event_id": 862,
+            "event_guid": "import-0f3021b09bdc4b986b",
+            "weight": 1
+        },
+        {
+            "event_id": 867,
+            "event_guid": "import-951b951bbc36e5c5d7",
+            "weight": 1
+        },
+        {
+            "event_id": 869,
+            "event_guid": "import-76a88a1e7144ed0e8b",
+            "weight": 1
+        },
+        {
+            "event_id": 879,
+            "event_guid": "import-7d27a5ec4fcd8ee9be",
+            "weight": 1
+        },
+        {
+            "event_id": 885,
+            "event_guid": "import-21a7d876450c6cf8e6",
+            "weight": 1
+        },
+        {
+            "event_id": 893,
+            "event_guid": "import-e848aa3a18f08fcdfa",
+            "weight": 1
+        },
+        {
+            "event_id": 906,
+            "event_guid": "import-2fe8f5f454423d73a8",
+            "weight": 1
+        },
+        {
+            "event_id": 910,
+            "event_guid": "import-94276250016fb6922a",
+            "weight": 1
+        },
+        {
+            "event_id": 932,
+            "event_guid": "import-ac419b4bf7a1293785",
+            "weight": 1
+        },
+        {
+            "event_id": 937,
+            "event_guid": "import-a5b28e74fa416095e9",
+            "weight": 1
+        },
+        {
+            "event_id": 945,
+            "event_guid": "import-c8564d288716d88de3",
+            "weight": 1
+        },
+        {
+            "event_id": 968,
+            "event_guid": "import-2c717701c0484bd4cd",
+            "weight": 1
+        },
+        {
+            "event_id": 971,
+            "event_guid": "import-f8d674bfb833cf8fe0",
+            "weight": 1
+        },
+        {
+            "event_id": 976,
+            "event_guid": "import-53997037a1b9e9ceb3",
+            "weight": 1
+        },
+        {
+            "event_id": 981,
+            "event_guid": "import-f40727e65f49ca9683",
+            "weight": 1
+        },
+        {
+            "event_id": 1028,
+            "event_guid": "import-f46b9a6a2d546305c8",
+            "weight": 1
+        },
+        {
+            "event_id": 1037,
+            "event_guid": "import-d36e7bab6f1646de7f",
+            "weight": 1
+        },
+        {
+            "event_id": 1039,
+            "event_guid": "import-f31ce8e8ede86842b2",
+            "weight": 1
+        }
+    ],
+    "recordings": [
+        {
+            "size": 157,
+            "length": 3299,
+            "mime_type": "video/mp4",
+            "language": "eng",
+            "filename": "117 Kampagne Fair Sharing.mp4",
+            "state": "downloaded",
+            "folder": "video",
+            "high_quality": true,
+            "width": 496,
+            "height": 368,
+            "updated_at": "2016-01-27T11:03:12.805+01:00",
+            "recording_url": "https://cdn.media.ccc.de/congress/2004/video/117 Kampagne Fair Sharing.mp4",
+            "url": "https://api.media.ccc.de/public/recordings/1391",
+            "event_url": "https://api.media.ccc.de/public/events/import-a1a1cc355460e393a5",
+            "conference_url": "https://api.media.ccc.de/public/conferences/21c3"
+        },
+        {
+            "size": 157,
+            "length": 3299,
+            "mime_type": "audio/mpeg",
+            "language": "eng",
+            "filename": "117 Kampagne Fair Sharing.mp3",
+            "state": "downloaded",
+            "folder": "audio",
+            "high_quality": true,
+            "width": 496,
+            "height": 368,
+            "updated_at": "2014-05-10T15:26:32.230+02:00",
+            "recording_url": "https://cdn.media.ccc.de/congress/2004/audio/117 Kampagne Fair Sharing.mp3",
+            "url": "https://api.media.ccc.de/public/recordings/1392",
+            "event_url": "https://api.media.ccc.de/public/events/import-a1a1cc355460e393a5",
+            "conference_url": "https://api.media.ccc.de/public/conferences/21c3"
+        }
+    ]
+}

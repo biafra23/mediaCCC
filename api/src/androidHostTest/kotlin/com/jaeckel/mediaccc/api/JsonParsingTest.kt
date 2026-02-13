@@ -69,6 +69,26 @@ class JsonParsingTest {
         }
     }
 
+    @Test
+    fun testEventDetailDeserialization() {
+        val jsonString = readResource("public.events.821.json")
+        val event = json.decodeFromString<com.jaeckel.mediaccc.api.model.Event>(jsonString)
+
+        assertNotNull(event)
+        println("Event: ${event.title}")
+        assertNotNull(event.guid)
+
+        // Check recordings
+        assertNotNull(event.recordings)
+        println("Found ${event.recordings?.size} recordings")
+        if (!event.recordings.isNullOrEmpty()) {
+            val recording = event.recordings!!.first()
+            println("First recording URL: ${recording.recordingUrl}")
+            assertNotNull(recording.recordingUrl)
+            assertNotNull(recording.mimeType)
+        }
+    }
+
     private fun readResource(fileName: String): String {
         return javaClass.classLoader?.getResource(fileName)?.readText()
             ?: throw IllegalArgumentException("Resource not found: $fileName")
