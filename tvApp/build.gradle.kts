@@ -41,8 +41,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 }
 
 dependencies {
-    implementation(project(":composeApp"))
 
+    implementation(project(":shared"))
     implementation("androidx.leanback:leanback:1.2.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
 
