@@ -7,33 +7,18 @@ import kotlinx.serialization.Serializable
 data class Recording(
     val size: Long? = 0,
     val length: Long? = 0,
-
-    @SerialName("mime_type")
-    val mimeType: String? = null,
-
+    @SerialName("mime_type") val mimeType: String? = null,
     val language: String? = null,
     val filename: String? = null,
     val state: String? = null,
     val folder: String? = null,
-
-    @SerialName("high_quality")
-    val highQuality: Boolean? = false,
-
+    @SerialName("high_quality") val highQuality: Boolean? = false,
     val width: Int? = 0,
     val height: Int? = 0,
-
-    @SerialName("updated_at")
-    val updatedAt: String? = null,
-
-    @SerialName("recording_url")
-    val recordingUrl: String? = null,
-
+    @SerialName("updated_at") val updatedAt: String? = null,
+    @SerialName("recording_url") val recordingUrl: String? = null,
     val url: String,
-
-    @SerialName("event_url")
-    val eventUrl: String? = null,
-
-    @SerialName("conference_url")
-    val conferenceUrl: String? = null
+    @SerialName("event_url") val eventUrl: String? = null,
+    @SerialName("conference_url") val conferenceUrl: String? = null
 )
 

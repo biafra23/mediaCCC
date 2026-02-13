@@ -11,64 +11,31 @@ data class Event(
     val slug: String,
     val link: String? = null,
     val description: String? = null,
-
-    @SerialName("original_language")
-    val originalLanguage: String? = null,
-
+    @SerialName("original_language") val originalLanguage: String? = null,
     val persons: List<String>? = emptyList(),
     val tags: List<String>? = emptyList(),
-
-    @SerialName("view_count")
-    val viewCount: Int? = 0,
-
+    @SerialName("view_count") val viewCount: Int? = 0,
     val promoted: Boolean? = false,
     val date: String? = null,
-
-    @SerialName("release_date")
-    val releaseDate: String? = null,
-
-    @SerialName("updated_at")
-    val updatedAt: String? = null,
-
+    @SerialName("release_date") val releaseDate: String? = null,
+    @SerialName("updated_at") val updatedAt: String? = null,
     val length: Long? = 0,
     val duration: Long? = 0,
-
-    @SerialName("thumb_url")
-    val thumbUrl: String? = null,
-
-    @SerialName("poster_url")
-    val posterUrl: String? = null,
-
-    @SerialName("timeline_url")
-    val timelineUrl: String? = null,
-
-    @SerialName("thumbnails_url")
-    val thumbnailsUrl: String? = null,
-
-    @SerialName("frontend_link")
-    val frontendLink: String? = null,
-
+    @SerialName("thumb_url") val thumbUrl: String? = null,
+    @SerialName("poster_url") val posterUrl: String? = null,
+    @SerialName("timeline_url") val timelineUrl: String? = null,
+    @SerialName("thumbnails_url") val thumbnailsUrl: String? = null,
+    @SerialName("frontend_link") val frontendLink: String? = null,
     val url: String,
-
-    @SerialName("conference_title")
-    val conferenceTitle: String? = null,
-
-    @SerialName("conference_url")
-    val conferenceUrl: String? = null,
-
+    @SerialName("conference_title") val conferenceTitle: String? = null,
+    @SerialName("conference_url") val conferenceUrl: String? = null,
     val related: List<RelatedEvent>? = emptyList(),
-
     val recordings: List<Recording>? = emptyList()
 )
 
-
 @Serializable
 data class RelatedEvent(
-    @SerialName("event_id")
-    val eventId: Int,
-
-    @SerialName("event_guid")
-    val eventGuid: String,
-
+    @SerialName("event_id") val eventId: Int,
+    @SerialName("event_guid") val eventGuid: String,
     val weight: Int? = null
 )
