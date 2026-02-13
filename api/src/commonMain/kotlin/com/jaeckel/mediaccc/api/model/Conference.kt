@@ -1,5 +1,6 @@
 package com.jaeckel.mediaccc.api.model
 
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -12,11 +13,11 @@ data class ConferencesResponse(
 data class Conference(
     val acronym: String,
     @SerialName("aspect_ratio") val aspectRatio: String? = null,
-    @SerialName("updated_at") val updatedAt: String? = null,
+    @SerialName("updated_at") val updatedAt: Instant? = null,
     val title: String,
     @SerialName("schedule_url") val scheduleUrl: String? = null,
     val slug: String,
-    @SerialName("event_last_released_at") val eventLastReleasedAt: String? = null,
+    @SerialName("event_last_released_at") val eventLastReleasedAt: Instant? = null,
     val link: String? = null,
     val description: String? = null,
     @SerialName("webgen_location") val webgenLocation: String? = null,

@@ -3,7 +3,6 @@ package com.jaeckel.mediaccc.api
 import kotlinx.serialization.json.Json
 import org.junit.Test
 import kotlin.test.assertNotNull
-import kotlin.test.fail
 
 class JsonParsingTest {
 
@@ -13,7 +12,7 @@ class JsonParsingTest {
     }
 
     @Test
-    fun testDeserialization() {
+    fun testConferencesDeserialization() {
         val jsonString = readResource("public.conferences.json")
         val response = json.decodeFromString<com.jaeckel.mediaccc.api.model.ConferencesResponse>(jsonString)
 

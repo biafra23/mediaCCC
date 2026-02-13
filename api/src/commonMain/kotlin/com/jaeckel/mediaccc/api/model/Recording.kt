@@ -1,5 +1,6 @@
 package com.jaeckel.mediaccc.api.model
 
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -15,7 +16,7 @@ data class Recording(
     @SerialName("high_quality") val highQuality: Boolean? = false,
     val width: Int? = 0,
     val height: Int? = 0,
-    @SerialName("updated_at") val updatedAt: String? = null,
+    @SerialName("updated_at") val updatedAt: Instant? = null,
     @SerialName("recording_url") val recordingUrl: String? = null,
     val url: String,
     @SerialName("event_url") val eventUrl: String? = null,

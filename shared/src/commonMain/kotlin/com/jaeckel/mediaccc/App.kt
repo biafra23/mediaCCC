@@ -18,6 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.jaeckel.mediaccc.api.MediaCCCApi
 import com.jaeckel.mediaccc.api.model.Event
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.painterResource
 
 import mediaccc.shared.generated.resources.Res
@@ -33,6 +38,21 @@ fun App() {
         val repository = remember { MediaRepository(api) }
         var recentEvents by remember { mutableStateOf<List<Event>>(emptyList()) }
         var statusMessage by remember { mutableStateOf("Waiting...") }
+
+        // Define a simple format: "DD.MM.YYYY hh:mm"
+        val dateTimeFormat = remember {
+            LocalDateTime.Format {
+                dayOfMonth()
+                char('.')
+                monthNumber()
+                char('.')
+                year()
+                char(' ')
+                hour()
+                char(':')
+                minute()
+            }
+        }
 
         LaunchedEffect(Unit) {
             statusMessage = "Loading..."
@@ -75,6 +95,12 @@ fun App() {
             LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
                 items(recentEvents) { event ->
                     Text(text = event.title, modifier = Modifier.background(MaterialTheme.colorScheme.surface))
+
+                    // Convert Instant to LocalDateTime in System TimeZone, then format
+                    val formattedDate = event.date?.toLocalDateTime(TimeZone.currentSystemDefault())
+                        ?.format(dateTimeFormat) ?: "No Date"
+
+                    Text(text = formattedDate, modifier = Modifier.background(MaterialTheme.colorScheme.surface))
                 }
             }
         }
