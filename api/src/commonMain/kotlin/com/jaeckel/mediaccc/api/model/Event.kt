@@ -54,6 +54,18 @@ data class Event(
     val conferenceTitle: String? = null,
 
     @SerialName("conference_url")
-    val conferenceUrl: String? = null
+    val conferenceUrl: String? = null,
+
+    val related: List<RelatedEvent>? = emptyList()
 )
 
+@Serializable
+data class RelatedEvent(
+    @SerialName("event_id")
+    val eventId: Int,
+
+    @SerialName("event_guid")
+    val eventGuid: String,
+
+    val weight: Int? = null
+)
