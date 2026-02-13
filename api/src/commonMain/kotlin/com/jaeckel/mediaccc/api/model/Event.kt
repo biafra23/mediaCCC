@@ -29,8 +29,8 @@ data class Event(
     val url: String,
     @SerialName("conference_title") val conferenceTitle: String? = null,
     @SerialName("conference_url") val conferenceUrl: String? = null,
-    val related: List<RelatedEvent>? = emptyList(),
-    val recordings: List<Recording>? = emptyList()
+    val related: List<RelatedEvent> = emptyList(),
+    val recordings: List<Recording> = emptyList()
 )
 
 @Serializable

@@ -37,10 +37,10 @@ class JsonParsingTest {
         assertNotNull(conference)
         println("Conference: ${conference.title}")
         assertNotNull(conference.events)
-        println("Found ${conference.events?.size} events")
+        println("Found ${conference.events.size} events")
 
-        if (!conference.events.isNullOrEmpty()) {
-            val firstEvent = conference.events!!.first()
+        if (conference.events.isNotEmpty()) {
+            val firstEvent = conference.events.first()
             println("First Event: ${firstEvent.title}")
             assertNotNull(firstEvent.guid)
         }
@@ -61,8 +61,8 @@ class JsonParsingTest {
             assertNotNull(first.guid)
 
             // Check for related events
-            if (!first.related.isNullOrEmpty()) {
-                val firstRelated = first.related!!.first()
+            if (first.related.isNotEmpty()) {
+                val firstRelated = first.related.first()
                 println("First related event guid: ${firstRelated.eventGuid}")
                 assertNotNull(firstRelated.eventGuid)
             }
@@ -80,9 +80,9 @@ class JsonParsingTest {
 
         // Check recordings
         assertNotNull(event.recordings)
-        println("Found ${event.recordings?.size} recordings")
-        if (!event.recordings.isNullOrEmpty()) {
-            val recording = event.recordings!!.first()
+        println("Found ${event.recordings.size} recordings")
+        if (event.recordings.isNotEmpty()) {
+            val recording = event.recordings.first()
             println("First recording URL: ${recording.recordingUrl}")
             assertNotNull(recording.recordingUrl)
             assertNotNull(recording.mimeType)
