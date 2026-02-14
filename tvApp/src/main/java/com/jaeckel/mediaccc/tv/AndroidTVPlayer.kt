@@ -30,33 +30,94 @@ fun AndroidTVPlayer(videoUrl: String) {
     val playerHost = remember {
         MediaPlayerHost(videoUrl)
     }
+    // We strictly rely on this state variable because the library doesn't expose a getter for time
     var currentTime by remember { mutableFloatStateOf(0f) }
+    var currentVolume by remember { mutableFloatStateOf(0f) }
+
+    // Defined locally to capture 'currentTime' and 'playerHost' without passing them as arguments
+    fun handleKeyEvent(keyEvent: androidx.compose.ui.input.key.KeyEvent): Boolean {
+        if (keyEvent.type == KeyEventType.KeyDown) {
+            when (keyEvent.nativeKeyEvent.keyCode) {
+                KeyEvent.KEYCODE_DPAD_CENTER,
+                KeyEvent.KEYCODE_ENTER,
+                KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
+                    playerHost.togglePlayPause()
+                    return true
+                }
+
+                KeyEvent.KEYCODE_MEDIA_PLAY -> {
+                    playerHost.play()
+                    playerHost.unmute()
+                    return true
+                }
+
+                KeyEvent.KEYCODE_MEDIA_PAUSE -> {
+                    playerHost.pause()
+                    playerHost.mute()
+                    return true
+                }
+
+                KeyEvent.KEYCODE_DPAD_LEFT -> {
+                    // Safe seek preventing negative values
+                    playerHost.seekTo((currentTime - 10.0f).coerceAtLeast(0f))
+                    return true
+                }
+
+                KeyEvent.KEYCODE_DPAD_RIGHT -> {
+                    playerHost.seekTo(currentTime + 10.0f)
+                    return true
+                }
+
+                KeyEvent.KEYCODE_DPAD_UP -> {
+                    currentVolume += 0.1f
+                    currentVolume = currentVolume.coerceAtMost(1f)
+                    println("Increase Volume: $currentVolume")
+                    playerHost.unmute()
+                    playerHost.setVolume(currentVolume)
+                    return true
+                }
+
+                KeyEvent.KEYCODE_DPAD_DOWN -> {
+                    currentVolume -= 0.1f
+                    currentVolume = currentVolume.coerceAtLeast(0f)
+                    println("Decrease Volume: $currentVolume")
+                    playerHost.setVolume(currentVolume)
+                    return true
+                }
+
+                else -> {
+                    // Swallow other D-Pad events if necessary or allow default focus handling
+                    return false
+                }
+            }
+        }
+        return false
+    }
 
     playerHost.onEvent = { event ->
         when (event) {
-            is MediaPlayerEvent.MuteChange -> println("Mute status changed: ${event.isMuted}")
-            is MediaPlayerEvent.PauseChange -> println("Pause status changed: ${event.isPaused}")
-            is MediaPlayerEvent.BufferChange -> println("Buffering status: ${event.isBuffering}")
             is MediaPlayerEvent.CurrentTimeChange -> {
-                println("Current time: ${event.currentTime}s")
                 currentTime = event.currentTime
             }
-            is MediaPlayerEvent.TotalTimeChange -> println("Total duration: ${event.totalTime}s")
-            is MediaPlayerEvent.FullScreenChange -> println("FullScreen status: ${event.isFullScreen}")
-            MediaPlayerEvent.MediaEnd -> println("Playback ended")
-            else -> {
-                println("Unhandled event: $event")
+
+            is MediaPlayerEvent.MuteChange -> {
+                println("Mute change: ${event.isMuted}")
             }
+
+            is MediaPlayerEvent.PauseChange -> {
+                println("Pause change, isPaused: ${event.isPaused}")
+            }
+
+            else -> {}
         }
     }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
             .focusable() // Crucial for receiving key events on Android TV
-            .onKeyEvent { keyEvent ->
-                onKeyEvent(keyEvent, playerHost, currentTime)
-            }
+            .onKeyEvent(::handleKeyEvent)
     ) {
         Button(onClick = { /*TODO*/ }) {
             Text("Press me")
@@ -78,68 +139,8 @@ fun AndroidTVPlayer(videoUrl: String) {
                 isAutoHideControlEnabled = true,
                 controlHideIntervalSeconds = 5,
                 isFastForwardBackwardEnabled = true,
-//                playIconResource = ComposeResourceDrawable(Res.drawable.icn_play),
-//                pauseIconResource = ComposeResourceDrawable(Res.drawable.icn_pause),
             )
         )
     }
-}
-
-fun onKeyEvent(
-    keyEvent: androidx.compose.ui.input.key.KeyEvent,
-    playerHost: MediaPlayerHost,
-    currentTime: Float
-): Boolean {
-    if (keyEvent.type == KeyEventType.KeyDown) {
-        when (keyEvent.nativeKeyEvent.keyCode) {
-            KeyEvent.KEYCODE_DPAD_CENTER,
-            KeyEvent.KEYCODE_ENTER,
-            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
-                println("KEYCODE_DPAD_CENTER")
-                playerHost.togglePlayPause()
-                return true
-            }
-
-            KeyEvent.KEYCODE_MEDIA_PLAY -> {
-                println("KEYCODE_MEDIA_PLAY")
-                playerHost.play()
-                return true
-            }
-
-            KeyEvent.KEYCODE_MEDIA_PAUSE -> {
-                println("KEYCODE_MEDIA_PAUSE")
-                playerHost.pause()
-                return true
-            }
-
-            KeyEvent.KEYCODE_DPAD_UP -> {
-                println("KEYCODE_DPAD_UP")
-                return true
-            }
-
-            KeyEvent.KEYCODE_DPAD_DOWN -> {
-                println("KEYCODE_DPAD_DOWN")
-                return true
-            }
-
-            KeyEvent.KEYCODE_DPAD_LEFT -> {
-                println("KEYCODE_DPAD_LEFT")
-                playerHost.seekTo(currentTime - 10.0f)
-                return true
-            }
-
-            KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                println("KEYCODE_DPAD_RIGHT")
-                playerHost.seekTo(currentTime + 10.0f)
-                return true
-            }
-
-            else -> {
-                println(keyEvent.nativeKeyEvent.keyCode)
-                return true
-            }
-        }
-    }
-    return false
 }
 
