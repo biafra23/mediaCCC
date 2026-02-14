@@ -143,7 +143,11 @@ fun Debug() {
             }
         }
     }
+}
+
+@Composable
+fun DebugVideoPlayer() {
+    val url = "https://ffmuc.media.ccc.de/congress/2006/video/23C3-1457-en-credit_card_security.m4v"
 
 
 }
-
