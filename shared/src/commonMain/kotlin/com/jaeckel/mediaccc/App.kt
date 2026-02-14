@@ -21,6 +21,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import chaintech.videoplayer.host.MediaPlayerHost
+import chaintech.videoplayer.ui.video.VideoPlayerComposable
 import com.jaeckel.mediaccc.api.MediaCCCApi
 import com.jaeckel.mediaccc.api.model.Event
 import kotlinx.datetime.LocalDateTime
@@ -43,18 +45,26 @@ fun App() {
 
 @Composable
 fun MediaPlayerDebugScreen() {
-    val url = "https://ffmuc.media.ccc.de/congress/2006/video/23C3-1457-en-credit_card_security.m4v"
-//    val greeting = remember { Greeting().greet() }
-//    Column(
-//        modifier = Modifier.fillMaxWidth(),
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//    ) {
-//        Image(painterResource(Res.drawable.compose_multiplatform), null)
-//        Text("Compose: $greeting")
-//    }
+    MaterialTheme {
+        val url =
+            "https://ffmuc.media.ccc.de/congress/2006/video/23C3-1457-en-credit_card_security.m4v"
 
+        Column {
+            Text("Running on TV", color = androidx.compose.ui.graphics.Color.White)
+            val playerHost = remember {
+                MediaPlayerHost(
+                    mediaUrl = url
+                )
+            }
+            VideoPlayerComposable(
+                modifier = Modifier.fillMaxSize(),
+                playerHost = playerHost
+            )
 
+        }
+    }
 }
+
 
 @Composable
 fun ApiDebugScreen() {

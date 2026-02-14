@@ -3,6 +3,8 @@ package com.jaeckel.mediaccc.tv
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +27,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import chaintech.videoplayer.host.MediaPlayerHost
+import chaintech.videoplayer.ui.video.VideoPlayerComposable
 import com.jaeckel.mediaccc.Greeting
 import com.jaeckel.mediaccc.MediaRepository
 import com.jaeckel.mediaccc.api.MediaCCCApi
@@ -42,18 +47,31 @@ class TvActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
 //            TvEntryScreen()
-            Debug()
+//            Debug()
+            DebugVideoPlayer()
         }
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
-fun TvEntryScreen() {
+fun DebugVideoPlayer() {
     MaterialTheme {
-        val greeting = remember { Greeting().greet() }
-        Text("Compose: $greeting", color = androidx.compose.ui.graphics.Color.White)
+        val url = "https://ffmuc.media.ccc.de/congress/2006/video/23C3-1457-en-credit_card_security.m4v"
+
+        Column {
+            Text("Running on TV", color = androidx.compose.ui.graphics.Color.White)
+            val playerHost = remember {
+                MediaPlayerHost(
+                    mediaUrl = url
+                )
+            }
+            VideoPlayerComposable(
+                modifier = Modifier.fillMaxSize(),
+                playerHost = playerHost
+            )
+
+        }
     }
 }
 
@@ -143,11 +161,4 @@ fun Debug() {
             }
         }
     }
-}
-
-@Composable
-fun DebugVideoPlayer() {
-    val url = "https://ffmuc.media.ccc.de/congress/2006/video/23C3-1457-en-credit_card_security.m4v"
-
-
 }
