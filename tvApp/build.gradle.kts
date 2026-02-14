@@ -43,6 +43,10 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 dependencies {
 
     implementation(project(":shared"))
+    implementation(project(":api"))
+
+    implementation(libs.compose.components.resources)
+
     implementation("androidx.leanback:leanback:1.2.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
 

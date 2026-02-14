@@ -42,7 +42,7 @@ fun App() {
         // Define a simple format: "DD.MM.YYYY hh:mm"
         val dateTimeFormat = remember {
             LocalDateTime.Format {
-                dayOfMonth()
+                day()
                 char('.')
                 monthNumber()
                 char('.')

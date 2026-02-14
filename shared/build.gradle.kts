@@ -53,7 +53,6 @@ android {
 
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
     }
     packaging {
         resources {
@@ -73,4 +72,9 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
+}
+
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "mediaccc.shared.generated.resources"
 }
