@@ -3,11 +3,11 @@ package com.jaeckel.mediaccc.tv
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +18,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,8 +25,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import chaintech.videoplayer.host.MediaPlayerHost
+import chaintech.videoplayer.model.VideoPlayerConfig
 import chaintech.videoplayer.ui.video.VideoPlayerComposable
 import com.jaeckel.mediaccc.Greeting
 import com.jaeckel.mediaccc.MediaRepository
@@ -61,16 +66,7 @@ fun DebugVideoPlayer() {
 
         Column {
             Text("Running on TV", color = androidx.compose.ui.graphics.Color.White)
-            val playerHost = remember {
-                MediaPlayerHost(
-                    mediaUrl = url
-                )
-            }
-            VideoPlayerComposable(
-                modifier = Modifier.fillMaxSize(),
-                playerHost = playerHost
-            )
-
+            AndroidTVPlayer(videoUrl = url)
         }
     }
 }
