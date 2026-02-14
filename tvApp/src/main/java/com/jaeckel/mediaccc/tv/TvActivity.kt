@@ -23,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.jaeckel.mediaccc.Greeting
 import com.jaeckel.mediaccc.MediaRepository
@@ -36,16 +35,20 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import mediaccc.shared.generated.resources.Res
 import mediaccc.shared.generated.resources.compose_multiplatform
+import org.jetbrains.compose.resources.painterResource
 
 class TvActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+//            TvEntryScreen()
             Debug()
         }
     }
 }
 
+
+@Preview(showBackground = true)
 @Composable
 fun TvEntryScreen() {
     MaterialTheme {
@@ -54,6 +57,7 @@ fun TvEntryScreen() {
     }
 }
 
+@Preview(showBackground = true)
 @Composable
 fun Debug() {
 
@@ -117,10 +121,12 @@ fun Debug() {
 
         Text(text = statusMessage)
 
-        LazyColumn(modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f)) {
-            items(recentEvents) { event : Event ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
+            items(recentEvents) { event: Event ->
                 Text(
                     text = event.title,
                     modifier = Modifier.background(MaterialTheme.colorScheme.surface)
@@ -141,15 +147,3 @@ fun Debug() {
 
 }
 
-@Preview
-@Composable
-fun DebugPreview() {
-    Debug()
-}
-
-
-@Preview
-@Composable
-fun AppAndroidPreview() {
-    TvEntryScreen()
-}
