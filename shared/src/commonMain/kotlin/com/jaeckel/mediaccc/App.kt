@@ -42,7 +42,7 @@ fun App() {
         MediaPlayerDebugScreen()
     }
 }
-
+@Preview(showBackground = true)
 @Composable
 fun MediaPlayerDebugScreen() {
     MaterialTheme {
@@ -65,7 +65,7 @@ fun MediaPlayerDebugScreen() {
     }
 }
 
-
+@Preview(showBackground = true)
 @Composable
 fun ApiDebugScreen() {
     var showContent by remember { mutableStateOf(false) }

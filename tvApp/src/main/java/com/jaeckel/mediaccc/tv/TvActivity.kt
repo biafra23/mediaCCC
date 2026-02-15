@@ -6,8 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,16 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import chaintech.videoplayer.host.MediaPlayerHost
-import chaintech.videoplayer.model.VideoPlayerConfig
-import chaintech.videoplayer.ui.video.VideoPlayerComposable
 import com.jaeckel.mediaccc.Greeting
+import com.jaeckel.mediaccc.MediaPlayerDebugScreen
 import com.jaeckel.mediaccc.MediaRepository
 import com.jaeckel.mediaccc.api.MediaCCCApi
 import com.jaeckel.mediaccc.api.model.Event
@@ -51,9 +42,10 @@ class TvActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-//            TvEntryScreen()
-//            Debug()
-            DebugVideoPlayer()
+            MaterialTheme {
+                MediaPlayerDebugScreen()
+                AndroidTVPlayer(videoUrl = "https://ffmuc.media.ccc.de/congress/2006/video/23C3-1457-en-credit_card_security.m4v")
+            }
         }
     }
 }
@@ -62,12 +54,7 @@ class TvActivity : ComponentActivity() {
 @Composable
 fun DebugVideoPlayer() {
     MaterialTheme {
-        val url = "https://ffmuc.media.ccc.de/congress/2006/video/23C3-1457-en-credit_card_security.m4v"
-
-        Column {
-            Text("Running on TV", color = androidx.compose.ui.graphics.Color.White)
-            AndroidTVPlayer(videoUrl = url)
-        }
+        AndroidTVPlayer(videoUrl = "https://ffmuc.media.ccc.de/congress/2006/video/23C3-1457-en-credit_card_security.m4v")
     }
 }
 
