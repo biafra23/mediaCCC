@@ -3,6 +3,7 @@ package com.jaeckel.mediaccc
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import chaintech.videoplayer.host.MediaPlayerHost
 import chaintech.videoplayer.ui.video.VideoPlayerComposable
@@ -49,18 +52,36 @@ fun MediaPlayerDebugScreen() {
         val url =
             "https://ffmuc.media.ccc.de/congress/2006/video/23C3-1457-en-credit_card_security.m4v"
 
+        val isPreview = LocalInspectionMode.current
+
         Column {
-            Text("Running on TV", color = androidx.compose.ui.graphics.Color.White)
-            val playerHost = remember {
-                MediaPlayerHost(
-                    mediaUrl = url
+            Text("Running on TV", color = Color.White)
+
+            if (isPreview) {
+                // Show placeholder in preview mode since ExoPlayer cannot be initialized
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.DarkGray),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Video Player\n(Preview not available)",
+                        color = Color.White,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                }
+            } else {
+                val playerHost = remember {
+                    MediaPlayerHost(
+                        mediaUrl = url
+                    )
+                }
+                VideoPlayerComposable(
+                    modifier = Modifier.fillMaxSize(),
+                    playerHost = playerHost
                 )
             }
-            VideoPlayerComposable(
-                modifier = Modifier.fillMaxSize(),
-                playerHost = playerHost
-            )
-
         }
     }
 }
@@ -68,10 +89,34 @@ fun MediaPlayerDebugScreen() {
 @Preview(showBackground = true)
 @Composable
 fun ApiDebugScreen() {
+    val isPreview = LocalInspectionMode.current
+
+    // In preview mode, show static placeholder content
+    if (isPreview) {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .safeContentPadding()
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Button(onClick = { }) {
+                Text("Click me!")
+            }
+            Text(text = "Preview Mode - No Network")
+            Text(text = "Event 1 Title", modifier = Modifier.background(MaterialTheme.colorScheme.surface))
+            Text(text = "01.01.2025 12:00", modifier = Modifier.background(MaterialTheme.colorScheme.surface))
+            Text(text = "Event 2 Title", modifier = Modifier.background(MaterialTheme.colorScheme.surface))
+            Text(text = "02.01.2025 14:00", modifier = Modifier.background(MaterialTheme.colorScheme.surface))
+        }
+        return
+    }
+
+    // Real implementation for runtime
     var showContent by remember { mutableStateOf(false) }
 
     val api = remember { MediaCCCApi() }
-    val repository = remember { MediaRepository(api) }
+    val repository = remember(api) { MediaRepository(api) }
     var recentEvents by remember { mutableStateOf<List<Event>>(emptyList()) }
     var statusMessage by remember { mutableStateOf("Waiting...") }
 

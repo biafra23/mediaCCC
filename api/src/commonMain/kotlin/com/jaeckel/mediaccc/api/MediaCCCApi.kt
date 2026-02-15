@@ -7,6 +7,8 @@ import com.jaeckel.mediaccc.api.model.EventsResponse
 import com.jaeckel.mediaccc.api.model.Recording
 import com.jaeckel.mediaccc.api.model.RecordingsResponse
 import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
@@ -14,14 +16,30 @@ import io.ktor.client.request.parameter
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-class MediaCCCApi {
+class MediaCCCApi(
+    engine: HttpClientEngine? = null,
+    config: HttpClientConfig<*>.() -> Unit = {}
+) {
 
-    private val client = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-            })
+    private val client = if (engine != null) {
+        HttpClient(engine) {
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                })
+            }
+            config()
+        }
+    } else {
+        HttpClient {
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                })
+            }
+            config()
         }
     }
 
