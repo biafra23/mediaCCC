@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.kotlinSerialization)
 }
 
 android {
@@ -48,22 +49,45 @@ dependencies {
     implementation(libs.compose.components.resources)
 
     implementation("androidx.leanback:leanback:1.2.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
 
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.activity:activity-compose:1.8.2")
-    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
+    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.activity:activity-compose:1.9.3")
+
+    // Use JetBrains Compose (from shared module) instead of AndroidX Compose BOM
+    // to avoid version conflicts
+    implementation(libs.compose.ui)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.uiToolingPreview)
+
+    // Explicit AndroidX Compose Foundation for runtime classes like BringIntoViewResponder
+    implementation("androidx.compose.foundation:foundation:1.8.2")
 
     implementation(libs.compose.multiplatform.media.player)
 
-    // TV-specific dependencies
-    implementation("androidx.tv:tv-foundation:1.0.0-alpha10")
-    implementation("androidx.tv:tv-material:1.0.0-alpha10")
+    // TV-specific dependencies - using stable 1.0.1 for Compose 1.10+ compatibility
+    implementation("androidx.tv:tv-foundation:1.0.0-alpha12")
+    implementation("androidx.tv:tv-material:1.0.1")
 
-    // Koin Android (for Android-specific features like WorkManager integration if needed)
+    // Navigation 3
+    implementation(libs.navigation3.ui)
+
+    // Koin for Dependency Injection
     implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
+
+    // Coil for image loading
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // Ktor client (required at runtime by compose-multiplatform-media-player)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+
+    // Lifecycle
+    implementation(libs.androidx.lifecycle.viewmodelCompose)
+    implementation(libs.androidx.lifecycle.runtimeCompose)
 }
+

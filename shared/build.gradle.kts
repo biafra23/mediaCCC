@@ -58,6 +58,7 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.koin.test)
         }
     }
 }
@@ -93,3 +94,4 @@ compose.resources {
     publicResClass = true
     packageOfResClass = "mediaccc.shared.generated.resources"
 }
+
