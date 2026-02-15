@@ -16,15 +16,11 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
-import androidx.tv.material3.Button
-import androidx.tv.material3.ExperimentalTvMaterial3Api
-import androidx.tv.material3.Text
 import chaintech.videoplayer.host.MediaPlayerEvent
 import chaintech.videoplayer.host.MediaPlayerHost
 import chaintech.videoplayer.model.VideoPlayerConfig
 import chaintech.videoplayer.ui.video.VideoPlayerComposable
 
-@OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun AndroidTVPlayer(videoUrl: String) {
     val playerHost = remember {
@@ -119,9 +115,6 @@ fun AndroidTVPlayer(videoUrl: String) {
             .focusable() // Crucial for receiving key events on Android TV
             .onKeyEvent(::handleKeyEvent)
     ) {
-        Button(onClick = { /*TODO*/ }) {
-            Text("Press me")
-        }
         VideoPlayerComposable(
             modifier = Modifier.fillMaxSize(),
             playerHost = playerHost,
