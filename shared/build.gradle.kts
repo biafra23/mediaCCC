@@ -29,6 +29,9 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+
+            // AndroidX Navigation 3 extensions (Android only)
+            api(libs.androidx.lifecycle.viewmodel.navigation3)
         }
         commonMain.dependencies {
             implementation(project(":api"))
@@ -42,6 +45,16 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.compose.multiplatform.media.player)
             implementation(libs.ktor.client.mock)
+
+            // Navigation 3 (JetBrains KMP compatible)
+//            api(libs.navigation3.runtime)
+            api(libs.navigation3.ui)
+
+            // Koin DI (KMP compatible)
+            api(libs.koin.core)
+            api(libs.koin.compose)
+            api(libs.koin.compose.viewmodel)
+            api(libs.koin.compose.viewmodel.navigation)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -63,4 +63,7 @@ dependencies {
     // TV-specific dependencies
     implementation("androidx.tv:tv-foundation:1.0.0-alpha10")
     implementation("androidx.tv:tv-material:1.0.0-alpha10")
+
+    // Koin Android (for Android-specific features like WorkManager integration if needed)
+    implementation(libs.koin.core)
 }
