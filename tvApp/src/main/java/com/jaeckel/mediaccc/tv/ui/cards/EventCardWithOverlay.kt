@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.jaeckel.mediaccc.api.model.Event
 
 /**

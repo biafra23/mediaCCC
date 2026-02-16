@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.jaeckel.mediaccc.api.model.Event
 import com.jaeckel.mediaccc.api.model.Recording
 import com.jaeckel.mediaccc.viewmodel.EventDetailViewModel

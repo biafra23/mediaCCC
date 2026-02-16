@@ -37,7 +37,7 @@ import androidx.tv.material3.Carousel
 import androidx.tv.material3.CarouselDefaults
 import androidx.tv.material3.CarouselState
 import androidx.tv.material3.ExperimentalTvMaterial3Api
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.jaeckel.mediaccc.api.model.Conference
 import com.jaeckel.mediaccc.api.model.Event
 import com.jaeckel.mediaccc.tv.ui.cards.ConferenceCard

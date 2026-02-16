@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
-import coil.ImageLoader
-import coil.compose.SubcomposeAsyncImage
-import coil.decode.SvgDecoder
+import coil3.ImageLoader
+import coil3.compose.SubcomposeAsyncImage
+import coil3.svg.SvgDecoder
 import com.jaeckel.mediaccc.api.model.Conference
 
 @OptIn(ExperimentalTvMaterial3Api::class)
