@@ -51,5 +51,12 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
+
+    // Koin for Android
+    implementation(libs.koin.android)
+
+    // Coil for image loading with SVG support
+    implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
 }
 

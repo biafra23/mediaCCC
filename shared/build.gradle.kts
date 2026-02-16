@@ -49,6 +49,10 @@ kotlin {
             implementation(libs.compose.multiplatform.media.player)
             implementation(libs.ktor.client.mock)
 
+            // Coil 3 for KMP image loading
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
+
             // Navigation 3 (JetBrains KMP compatible)
 //            api(libs.navigation3.runtime)
             api(libs.navigation3.ui)
