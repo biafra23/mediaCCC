@@ -10,6 +10,9 @@ data object HomeRoute : NavKey
 data class EventDetailRoute(val eventGuid: String) : NavKey
 
 @Serializable
+data class ConferenceDetailRoute(val acronym: String) : NavKey
+
+@Serializable
 data class PlayerRoute(
     val videoUrl: String,
     val title: String = "",

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -34,13 +33,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Card
-import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.Carousel
 import androidx.tv.material3.CarouselDefaults
 import androidx.tv.material3.CarouselState
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import coil.compose.AsyncImage
+import com.jaeckel.mediaccc.api.model.Conference
 import com.jaeckel.mediaccc.api.model.Event
+import com.jaeckel.mediaccc.tv.ui.cards.ConferenceCard
+import com.jaeckel.mediaccc.tv.ui.cards.EventCard
 import com.jaeckel.mediaccc.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -48,7 +49,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun TvHomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
-    onEventClick: (Event) -> Unit
+    onEventClick: (Event) -> Unit,
+    onConferenceClick: (Conference) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -126,6 +128,31 @@ fun TvHomeScreen(
                                 EventRow(
                                     events = uiState.recentEvents,
                                     onEventClick = onEventClick
+                                )
+                            }
+                        }
+                    }
+
+                    // Conferences Section
+                    if (uiState.conferences.isNotEmpty()) {
+                        item {
+                            Spacer(modifier = Modifier.height(24.dp))
+                        }
+
+                        item {
+                            Column {
+                                Text(
+                                    text = "Conferences",
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(horizontal = 48.dp)
+                                )
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                ConferenceRow(
+                                    conferences = uiState.conferences,
+                                    onConferenceClick = onConferenceClick
                                 )
                             }
                         }
@@ -247,59 +274,20 @@ fun EventRow(
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun EventCard(
-    event: Event,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+fun ConferenceRow(
+    conferences: List<Conference>,
+    onConferenceClick: (Conference) -> Unit
 ) {
-    Card(
-        onClick = onClick,
-        modifier = modifier
-            .width(280.dp)
-            .height(200.dp),
-        colors = CardDefaults.colors(
-            containerColor = Color(0xFF2A2A4E)
-        )
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 48.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column {
-            // Thumbnail
-            AsyncImage(
-                model = event.thumbUrl ?: event.posterUrl,
-                contentDescription = event.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp)
+        items(conferences, key = { it.acronym }) { conference ->
+            ConferenceCard(
+                conference = conference,
+                onClick = { onConferenceClick(conference) }
             )
-
-            // Event info
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Text(
-                    text = event.title,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                event.conferenceTitle?.let { conference ->
-                    Text(
-                        text = conference,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.6f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            }
         }
     }
 }
-
-
-
-
 

@@ -10,9 +10,11 @@ import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.jaeckel.mediaccc.tv.navigation.ConferenceDetailRoute
 import com.jaeckel.mediaccc.tv.navigation.EventDetailRoute
 import com.jaeckel.mediaccc.tv.navigation.HomeRoute
 import com.jaeckel.mediaccc.tv.navigation.PlayerRoute
+import com.jaeckel.mediaccc.tv.ui.ConferenceDetailScreen
 import com.jaeckel.mediaccc.tv.ui.EventDetailScreen
 import com.jaeckel.mediaccc.tv.ui.TvHomeScreen
 
@@ -31,6 +33,7 @@ class TvActivity : ComponentActivity() {
 fun TvNavHost() {
     val backStack = remember { mutableStateListOf<NavKey>(HomeRoute) }
 
+    // Note: NavDisplay handles system back button automatically
     NavDisplay(
         backStack = backStack,
         entryProvider = entryProvider {
@@ -38,6 +41,23 @@ fun TvNavHost() {
                 TvHomeScreen(
                     onEventClick = { event ->
                         backStack.add(EventDetailRoute(event.guid))
+                    },
+                    onConferenceClick = { conference ->
+                        backStack.add(ConferenceDetailRoute(conference.acronym))
+                    }
+                )
+            }
+
+            entry<ConferenceDetailRoute> { route ->
+                ConferenceDetailScreen(
+                    acronym = route.acronym,
+                    onEventClick = { event ->
+                        backStack.add(EventDetailRoute(event.guid))
+                    },
+                    onBackClick = {
+                        if (backStack.size > 1) {
+                            backStack.removeAt(backStack.lastIndex)
+                        }
                     }
                 )
             }
