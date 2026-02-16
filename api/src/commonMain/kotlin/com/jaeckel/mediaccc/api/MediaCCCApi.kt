@@ -11,6 +11,10 @@ import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.serialization.kotlinx.json.json
@@ -18,6 +22,7 @@ import kotlinx.serialization.json.Json
 
 class MediaCCCApi(
     engine: HttpClientEngine? = null,
+    logLevel: LogLevel = LogLevel.INFO,
     config: HttpClientConfig<*>.() -> Unit = {}
 ) {
 
@@ -29,6 +34,10 @@ class MediaCCCApi(
                     isLenient = true
                 })
             }
+            install(Logging) {
+                logger = Logger.SIMPLE
+                level = logLevel
+            }
             config()
         }
     } else {
@@ -38,6 +47,10 @@ class MediaCCCApi(
                     ignoreUnknownKeys = true
                     isLenient = true
                 })
+            }
+            install(Logging) {
+                logger = Logger.SIMPLE
+                level = logLevel
             }
             config()
         }

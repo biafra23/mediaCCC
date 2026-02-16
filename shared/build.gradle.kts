@@ -32,6 +32,9 @@ kotlin {
 
             // AndroidX Navigation 3 extensions (Android only)
             api(libs.androidx.lifecycle.viewmodel.navigation3)
+
+            // SLF4J simple provider for Ktor logging output
+            implementation("org.slf4j:slf4j-simple:2.0.9")
         }
         commonMain.dependencies {
             implementation(project(":api"))
