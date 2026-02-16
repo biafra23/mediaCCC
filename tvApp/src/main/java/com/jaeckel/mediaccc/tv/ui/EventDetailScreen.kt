@@ -32,14 +32,17 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import coil.compose.AsyncImage
-import com.jaeckel.mediaccc.MediaRepository
 import com.jaeckel.mediaccc.api.model.Event
+import com.jaeckel.mediaccc.api.model.Recording
+import com.jaeckel.mediaccc.viewmodel.EventDetailViewModel
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
-import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
+import androidx.compose.runtime.collectAsState
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -48,10 +51,12 @@ fun EventDetailScreen(
     onPlayClick: (videoUrl: String, title: String, speakers: String, date: String, conference: String) -> Unit,
     onBackClick: () -> Unit
 ) {
-    val repository: MediaRepository = koinInject()
-    var event by remember { mutableStateOf<Event?>(null) }
-    var isLoading by remember { mutableStateOf(true) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
+    // Use eventGuid as key to ensure we get a fresh ViewModel for each event
+    val viewModel: EventDetailViewModel = koinViewModel(
+        key = eventGuid,
+        parameters = { parametersOf(eventGuid) }
+    )
+    val uiState by viewModel.uiState.collectAsState()
 
     val dateTimeFormat = remember {
         LocalDateTime.Format {
@@ -67,41 +72,26 @@ fun EventDetailScreen(
         }
     }
 
-    LaunchedEffect(eventGuid) {
-        repository.getEvent(eventGuid).collect { result ->
-            result.fold(
-                onSuccess = {
-                    event = it
-                    isLoading = false
-                },
-                onFailure = {
-                    errorMessage = it.message
-                    isLoading = false
-                }
-            )
-        }
-    }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF1A1A2E))
     ) {
         when {
-            isLoading -> {
+            uiState.isLoading -> {
                 Text(
                     text = "Loading...",
                     color = Color.White,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
-            errorMessage != null -> {
+            uiState.errorMessage != null -> {
                 Column(
                     modifier = Modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Error: $errorMessage",
+                        text = "Error: ${uiState.errorMessage}",
                         color = Color.White
                     )
                     Spacer(modifier = Modifier.height(16.dp))
@@ -110,9 +100,10 @@ fun EventDetailScreen(
                     }
                 }
             }
-            event != null -> {
+            uiState.event != null -> {
                 EventDetailContent(
-                    event = event!!,
+                    event = uiState.event!!,
+                    bestRecording = uiState.bestRecording,
                     dateTimeFormat = dateTimeFormat,
                     onPlayClick = onPlayClick,
                     onBackClick = onBackClick
@@ -126,6 +117,7 @@ fun EventDetailScreen(
 @Composable
 private fun EventDetailContent(
     event: Event,
+    bestRecording: Recording?,
     dateTimeFormat: DateTimeFormat<LocalDateTime>,
     onPlayClick: (videoUrl: String, title: String, speakers: String, date: String, conference: String) -> Unit,
     onBackClick: () -> Unit
@@ -229,25 +221,11 @@ private fun EventDetailContent(
 
                 // Action buttons
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    // Find the best recording to play
-                    // Preference order: video/mp4 > video/mpeg > video/webm > any video
-                    val videoRecording = event.recordings
-                        .filter { it.mimeType?.startsWith("video/") == true }
-                        .sortedBy { recording ->
-                            when (recording.mimeType) {
-                                "video/mp4" -> 0
-                                "video/mpeg" -> 1
-                                "video/webm" -> 2
-                                else -> 3
-                            }
-                        }
-                        .firstOrNull()
-
-                    if (videoRecording != null) {
+                    if (bestRecording != null) {
                         Button(
                             onClick = {
                                 onPlayClick(
-                                    videoRecording.recordingUrl ?: "",
+                                    bestRecording.recordingUrl ?: "",
                                     event.title,
                                     event.persons?.joinToString(", ") ?: "",
                                     event.date?.toString() ?: "",
