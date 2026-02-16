@@ -1,5 +1,6 @@
 package com.jaeckel.mediaccc.tv.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -228,10 +229,19 @@ private fun EventDetailContent(
 
                 // Action buttons
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    // Find a  recording to play
-                    val videoRecording = event.recordings.firstOrNull {
-                        it.mimeType?.contains("video") == true
-                    }
+                    // Find the best recording to play
+                    // Preference order: video/mp4 > video/mpeg > video/webm > any video
+                    val videoRecording = event.recordings
+                        .filter { it.mimeType?.startsWith("video/") == true }
+                        .sortedBy { recording ->
+                            when (recording.mimeType) {
+                                "video/mp4" -> 0
+                                "video/mpeg" -> 1
+                                "video/webm" -> 2
+                                else -> 3
+                            }
+                        }
+                        .firstOrNull()
 
                     if (videoRecording != null) {
                         Button(
