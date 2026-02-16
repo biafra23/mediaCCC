@@ -52,6 +52,7 @@ kotlin {
             // Coil 3 for KMP image loading
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
+            implementation(libs.coil.svg)
 
             // Navigation 3 (JetBrains KMP compatible)
 //            api(libs.navigation3.runtime)
