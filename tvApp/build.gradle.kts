@@ -82,8 +82,9 @@ dependencies {
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
 
-    // Coil for image loading
+    // Coil for image loading (including SVG support)
     implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("io.coil-kt:coil-svg:2.5.0")
 
     // Ktor client (required at runtime by compose-multiplatform-media-player)
     implementation(libs.ktor.client.core)
