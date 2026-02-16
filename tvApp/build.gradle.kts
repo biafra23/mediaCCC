@@ -61,6 +61,9 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.uiToolingPreview)
 
+    // Material Icons for player controls
+    implementation("androidx.compose.material:material-icons-extended:1.7.6")
+
     // Explicit AndroidX Compose Foundation for runtime classes like BringIntoViewResponder
     implementation("androidx.compose.foundation:foundation:1.8.2")
 

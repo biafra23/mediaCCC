@@ -45,8 +45,14 @@ fun TvNavHost() {
             entry<EventDetailRoute> { route ->
                 EventDetailScreen(
                     eventGuid = route.eventGuid,
-                    onPlayClick = { videoUrl ->
-                        backStack.add(PlayerRoute(videoUrl))
+                    onPlayClick = { videoUrl, title, speakers, date, conference ->
+                        backStack.add(PlayerRoute(
+                            videoUrl = videoUrl,
+                            title = title,
+                            speakers = speakers,
+                            date = date,
+                            conference = conference
+                        ))
                     },
                     onBackClick = {
                         if (backStack.size > 1) {
@@ -57,7 +63,13 @@ fun TvNavHost() {
             }
 
             entry<PlayerRoute> { route ->
-                AndroidTVPlayer(videoUrl = route.videoUrl)
+                AndroidTVPlayer(
+                    videoUrl = route.videoUrl,
+                    title = route.title,
+                    speakers = route.speakers,
+                    date = route.date,
+                    conference = route.conference
+                )
             }
         }
     )

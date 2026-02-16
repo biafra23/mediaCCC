@@ -44,7 +44,7 @@ import org.koin.compose.koinInject
 @Composable
 fun EventDetailScreen(
     eventGuid: String,
-    onPlayClick: (String) -> Unit,
+    onPlayClick: (videoUrl: String, title: String, speakers: String, date: String, conference: String) -> Unit,
     onBackClick: () -> Unit
 ) {
     val repository: MediaRepository = koinInject()
@@ -126,7 +126,7 @@ fun EventDetailScreen(
 private fun EventDetailContent(
     event: Event,
     dateTimeFormat: DateTimeFormat<LocalDateTime>,
-    onPlayClick: (String) -> Unit,
+    onPlayClick: (videoUrl: String, title: String, speakers: String, date: String, conference: String) -> Unit,
     onBackClick: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -228,14 +228,22 @@ private fun EventDetailContent(
 
                 // Action buttons
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    // Find the best recording to play
+                    // Find a  recording to play
                     val videoRecording = event.recordings.firstOrNull {
                         it.mimeType?.contains("video") == true
                     }
 
                     if (videoRecording != null) {
                         Button(
-                            onClick = { onPlayClick(videoRecording.recordingUrl ?: "") },
+                            onClick = {
+                                onPlayClick(
+                                    videoRecording.recordingUrl ?: "",
+                                    event.title,
+                                    event.persons?.joinToString(", ") ?: "",
+                                    event.date?.toString() ?: "",
+                                    event.conferenceTitle ?: ""
+                                )
+                            },
                             colors = ButtonDefaults.colors(
                                 containerColor = Color(0xFF6366F1)
                             )
