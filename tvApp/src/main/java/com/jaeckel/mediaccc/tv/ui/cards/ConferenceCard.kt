@@ -50,7 +50,7 @@ fun ConferenceCard(
             .width(200.dp)
             .height(200.dp),
         colors = CardDefaults.colors(
-            containerColor = Color(0xFF2A2A4E)
+            containerColor = Color(0xFFDDDDDD)
         )
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
