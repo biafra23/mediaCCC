@@ -156,8 +156,9 @@ private fun EventDetailContent(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .verticalScroll(rememberScrollState())
+
             ) {
+                // Fixed header section (title, metadata, buttons)
                 Text(
                     text = event.title,
                     style = MaterialTheme.typography.displaySmall,
@@ -252,7 +253,7 @@ private fun EventDetailContent(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Description
+                // Scrollable description section
                 event.description?.let { description ->
                     if (description.isNotBlank()) {
                         Text(
@@ -261,11 +262,17 @@ private fun EventDetailContent(
                             color = Color.White
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = description,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White.copy(alpha = 0.8f)
-                        )
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            Text(
+                                text = description,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.White.copy(alpha = 0.8f)
+                            )
+                        }
                     }
                 }
             }
