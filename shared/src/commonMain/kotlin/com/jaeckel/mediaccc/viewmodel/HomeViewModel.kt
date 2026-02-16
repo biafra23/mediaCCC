@@ -1,4 +1,4 @@
-package com.jaeckel.mediaccc.tv.viewmodel
+package com.jaeckel.mediaccc.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,7 +16,7 @@ data class HomeScreenUiState(
     val errorMessage: String? = null
 )
 
-class TvHomeViewModel(
+class HomeViewModel(
     private val repository: MediaRepository
 ) : ViewModel() {
 

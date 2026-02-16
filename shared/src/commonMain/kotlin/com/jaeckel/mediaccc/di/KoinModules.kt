@@ -3,6 +3,7 @@ package com.jaeckel.mediaccc.di
 import com.jaeckel.mediaccc.MediaRepository
 import com.jaeckel.mediaccc.api.MediaCCCApi
 import com.jaeckel.mediaccc.viewmodel.EventDetailViewModel
+import com.jaeckel.mediaccc.viewmodel.HomeViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -16,6 +17,7 @@ val sharedModule = module {
     single { MediaCCCApi() }
     single { MediaRepository(get()) }
     viewModel { (eventGuid: String) -> EventDetailViewModel(get(), eventGuid) }
+    viewModel { HomeViewModel(get()) }
 }
 
 

@@ -41,13 +41,13 @@ import androidx.tv.material3.CarouselState
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import coil.compose.AsyncImage
 import com.jaeckel.mediaccc.api.model.Event
-import com.jaeckel.mediaccc.tv.viewmodel.TvHomeViewModel
+import com.jaeckel.mediaccc.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun TvHomeScreen(
-    viewModel: TvHomeViewModel = koinViewModel(),
+    viewModel: HomeViewModel = koinViewModel(),
     onEventClick: (Event) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
