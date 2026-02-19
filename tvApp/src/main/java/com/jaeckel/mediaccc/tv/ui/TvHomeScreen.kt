@@ -1,5 +1,7 @@
 package com.jaeckel.mediaccc.tv.ui
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +29,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -47,13 +53,6 @@ import com.jaeckel.mediaccc.tv.ui.cards.ConferenceCard
 import com.jaeckel.mediaccc.tv.ui.cards.EventCard
 import com.jaeckel.mediaccc.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
-
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.focus.focusRequester
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -76,6 +75,7 @@ fun TvHomeScreen(
                     color = Color.White
                 )
             }
+
             uiState.errorMessage != null && uiState.promotedEvents.isEmpty() -> {
                 Text(
                     text = "Error: ${uiState.errorMessage}",
@@ -83,6 +83,7 @@ fun TvHomeScreen(
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
+
             else -> {
                 val lazyListState = rememberLazyListState()
                 var recentEventsFocused by remember { mutableStateOf(false) }
@@ -104,7 +105,7 @@ fun TvHomeScreen(
                     // Hero Carousel for promoted events
                     if (uiState.promotedEvents.isNotEmpty()) {
                         item {
-                            HeroCarousel(
+                            PromotedCarousel(
                                 events = uiState.promotedEvents,
                                 onEventClick = onEventClick,
                                 modifier = Modifier
@@ -180,7 +181,7 @@ fun TvHomeScreen(
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun HeroCarousel(
+fun PromotedCarousel(
     events: List<Event>,
     onEventClick: (Event) -> Unit,
     modifier: Modifier = Modifier
@@ -210,7 +211,7 @@ fun HeroCarousel(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(if (isFocused) 8.dp else 0.dp)
-                .onFocusChanged { isFocused = it.isFocused }
+                .onFocusChanged { isFocused = it.hasFocus }
                 .scale(scale),
             border = CardDefaults.border(
                 focusedBorder = Border(BorderStroke(4.dp, Color.White)),

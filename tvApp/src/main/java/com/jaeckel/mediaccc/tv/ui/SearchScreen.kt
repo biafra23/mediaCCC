@@ -63,7 +63,13 @@ fun SearchScreen(
         OutlinedTextField(
             value = uiState.query,
             onValueChange = { viewModel.onQueryChanged(it) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusProperties {
+                    if (focusRequesters.isNotEmpty()) {
+                        down = focusRequesters[0]
+                    }
+                },
             placeholder = { Text("Enter at least 3 characters...", color = Color.Gray) },
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(

@@ -42,7 +42,18 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import org.koin.core.parameter.parametersOf
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import org.koin.compose.viewmodel.koinViewModel
+
+import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -71,6 +82,8 @@ fun EventDetailScreen(
             minute()
         }
     }
+
+    val playButtonFocusRequester = remember { FocusRequester() }
 
     Box(
         modifier = Modifier
@@ -106,8 +119,12 @@ fun EventDetailScreen(
                     bestRecording = uiState.bestRecording,
                     dateTimeFormat = dateTimeFormat,
                     onPlayClick = onPlayClick,
-                    onBackClick = onBackClick
+                    playButtonFocusRequester = playButtonFocusRequester
                 )
+
+                LaunchedEffect(Unit) {
+                    playButtonFocusRequester.requestFocus()
+                }
             }
         }
     }
@@ -120,8 +137,11 @@ private fun EventDetailContent(
     bestRecording: Recording?,
     dateTimeFormat: DateTimeFormat<LocalDateTime>,
     onPlayClick: (videoUrl: String, title: String, speakers: String, date: String, conference: String) -> Unit,
-    onBackClick: () -> Unit
+    playButtonFocusRequester: FocusRequester
 ) {
+    val descriptionScrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Background image
         AsyncImage(
@@ -233,21 +253,39 @@ private fun EventDetailContent(
                                     event.conferenceTitle ?: ""
                                 )
                             },
+                            modifier = Modifier
+                                .focusRequester(playButtonFocusRequester)
+                                .onKeyEvent { keyEvent ->
+                                    if (keyEvent.type == KeyEventType.KeyDown) {
+                                        when (keyEvent.key) {
+                                            Key.DirectionDown -> {
+                                                coroutineScope.launch {
+                                                    descriptionScrollState.animateScrollBy(100f)
+                                                }
+                                                true
+                                            }
+                                            Key.DirectionUp -> {
+                                                if (descriptionScrollState.value > 0) {
+                                                    coroutineScope.launch {
+                                                        descriptionScrollState.animateScrollBy(-100f)
+                                                    }
+                                                    true
+                                                } else {
+                                                    false
+                                                }
+                                            }
+                                            else -> false
+                                        }
+                                    } else {
+                                        false
+                                    }
+                                },
                             colors = ButtonDefaults.colors(
                                 containerColor = Color(0xFF6366F1)
                             )
                         ) {
-                            Text("Play")
+                            Text("▶ Play")
                         }
-                    }
-
-                    Button(
-                        onClick = onBackClick,
-                        colors = ButtonDefaults.colors(
-                            containerColor = Color(0xFF4A4A6E)
-                        )
-                    ) {
-                        Text("Back")
                     }
                 }
 
@@ -265,7 +303,7 @@ private fun EventDetailContent(
                         Column(
                             modifier = Modifier
                                 .weight(1f)
-                                .verticalScroll(rememberScrollState())
+                                .verticalScroll(descriptionScrollState)
                         ) {
                             Text(
                                 text = description,
@@ -291,8 +329,3 @@ private fun EventDetailContent(
         }
     }
 }
-
-
-
-
-
