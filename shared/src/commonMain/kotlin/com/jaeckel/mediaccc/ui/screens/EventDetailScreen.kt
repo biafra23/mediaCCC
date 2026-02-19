@@ -49,6 +49,7 @@ import com.jaeckel.mediaccc.viewmodel.EventDetailViewModel
 import io.github.kdroidfilter.composemediaplayer.VideoPlayerSurface
 import io.github.kdroidfilter.composemediaplayer.VideoPlayerState
 import io.github.kdroidfilter.composemediaplayer.rememberVideoPlayerState
+import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.char
@@ -166,8 +167,17 @@ fun EventDetailScreen(
                                 modifier = Modifier.fillMaxSize(),
                                 overlay = {
                                     if (playerState.isFullscreen) {
+                                        val formattedDate = event.date?.let {
+                                            dateTimeFormat.format(it.toLocalDateTime(TimeZone.currentSystemDefault()))
+                                        } ?: ""
+                                        val speakers = event.persons?.joinToString(", ") ?: ""
+                                        
                                         PlayerControlsOverlay(
                                             playerState = playerState,
+                                            title = event.title,
+                                            speakers = speakers,
+                                            conference = event.conferenceTitle ?: "",
+                                            date = formattedDate,
                                             onExitFullscreen = {
                                                 playerState.toggleFullscreen()
                                                 isPlaying = false
@@ -324,9 +334,25 @@ private fun MetaInfoRow(
 @Composable
 private fun PlayerControlsOverlay(
     playerState: VideoPlayerState,
+    title: String,
+    speakers: String,
+    conference: String,
+    date: String,
     onExitFullscreen: () -> Unit
 ) {
     var showControls by remember { mutableStateOf(true) }
+    var interactionCount by remember { mutableStateOf(0) }
+
+    LaunchedEffect(showControls, interactionCount) {
+        if (showControls) {
+            delay(10_000)
+            showControls = false
+        }
+    }
+
+    fun onInteract() {
+        interactionCount++
+    }
 
     Box(
         modifier = Modifier
@@ -334,43 +360,91 @@ private fun PlayerControlsOverlay(
             .clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
-            ) { showControls = !showControls }
+            ) { 
+                showControls = !showControls
+                if (showControls) onInteract()
+            }
     ) {
         if (showControls) {
-            // Top bar with close button
-            Box(
+            // Top bar with close button and metadata
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.Black.copy(alpha = 0.5f))
                     .padding(8.dp)
-                    .align(Alignment.TopStart)
+                    .align(Alignment.TopStart),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = "✕",
                     color = Color.White,
                     fontSize = 24.sp,
                     modifier = Modifier
-                        .clickable { onExitFullscreen() }
+                        .clickable { 
+                            onInteract()
+                            onExitFullscreen() 
+                        }
                         .padding(8.dp)
                 )
+
+                Column(
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = title,
+                        color = Color.White,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    
+                    val metaText = buildString {
+                        if (speakers.isNotBlank()) append(speakers)
+                        val metaParts = listOfNotNull(
+                            conference.takeIf { it.isNotBlank() },
+                            date.takeIf { it.isNotBlank() }
+                        )
+                        if (metaParts.isNotEmpty()) {
+                            if (isNotEmpty()) append(" • ")
+                            append(metaParts.joinToString(" • "))
+                        }
+                    }
+                    
+                    if (metaText.isNotBlank()) {
+                         Text(
+                            text = metaText,
+                            color = Color.White.copy(alpha = 0.7f),
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
             }
 
             // Center play/pause
+            val isPlaying = playerState.isPlaying
+            val buttonColor = if (isPlaying) Color.Black.copy(alpha = 0.6f) else MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
+            val iconColor = if (isPlaying) Color.White else MaterialTheme.colorScheme.onPrimary
+            
             Box(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(Color.Black.copy(alpha = 0.6f))
+                    .background(buttonColor)
                     .clickable {
-                        if (playerState.isPlaying) playerState.pause() else playerState.play()
+                        onInteract()
+                        if (isPlaying) playerState.pause() else playerState.play()
                     },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = if (playerState.isPlaying) "⏸" else "▶",
-                    color = Color.White,
-                    fontSize = 28.sp
+                    text = if (isPlaying) "⏸" else "▶",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = iconColor
                 )
             }
 
@@ -385,10 +459,12 @@ private fun PlayerControlsOverlay(
                 Slider(
                     value = playerState.sliderPos,
                     onValueChange = {
+                        onInteract()
                         playerState.sliderPos = it
                         playerState.userDragging = true
                     },
                     onValueChangeFinished = {
+                        onInteract()
                         playerState.userDragging = false
                         playerState.seekTo(playerState.sliderPos)
                     },
