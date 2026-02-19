@@ -10,6 +10,9 @@ data object HomeRoute : NavKey
 data object SearchRoute : NavKey
 
 @Serializable
+data object ConferencesRoute : NavKey
+
+@Serializable
 data object FavoritesRoute : NavKey
 
 @Serializable

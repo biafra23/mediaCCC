@@ -30,6 +30,12 @@ import com.jaeckel.mediaccc.viewmodel.ConferenceDetailViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.runtime.remember
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun ConferenceDetailScreen(
@@ -42,6 +48,9 @@ fun ConferenceDetailScreen(
         parameters = { parametersOf(acronym) }
     )
     val uiState by viewModel.uiState.collectAsState()
+    val focusRequesters = remember(uiState.events) {
+        List(uiState.events.size) { FocusRequester() }
+    }
 
     Box(
         modifier = Modifier
@@ -106,16 +115,27 @@ fun ConferenceDetailScreen(
 
                     // Events grid
                     LazyVerticalGrid(
-                        columns = GridCells.Adaptive(minSize = 280.dp),
+                        columns = GridCells.Fixed(4),
                         contentPadding = PaddingValues(bottom = 32.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(uiState.events, key = { it.guid }) { event ->
+                        itemsIndexed(uiState.events, key = { _, event -> event.guid }) { index, event ->
                             EventCardWithOverlay(
                                 event = event,
-                                onClick = { onEventClick(event) }
+                                onClick = { onEventClick(event) },
+                                modifier = Modifier
+                                    .focusRequester(focusRequesters[index])
+                                    .focusProperties {
+                                        if (index + 1 < focusRequesters.size) {
+                                            right = focusRequesters[index + 1]
+                                        }
+                                        // Only override left if NOT at the start of a row (4 columns)
+                                        if (index % 4 != 0) {
+                                            left = focusRequesters[index - 1]
+                                        }
+                                    }
                             )
                         }
                     }

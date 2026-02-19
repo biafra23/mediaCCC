@@ -49,6 +49,10 @@ import com.jaeckel.mediaccc.tv.ui.SettingsScreen
 import com.jaeckel.mediaccc.tv.ui.TvHomeScreen
 import androidx.tv.material3.MaterialTheme as TvMaterialTheme
 
+import androidx.compose.material.icons.filled.VideoLibrary
+import com.jaeckel.mediaccc.tv.navigation.ConferencesRoute
+import com.jaeckel.mediaccc.tv.ui.ConferencesScreen
+
 class TvActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,8 +74,11 @@ fun TvNavHost() {
     val backStack = remember { mutableStateListOf<NavKey>(HomeRoute) }
     val currentRoute by remember { derivedStateOf { backStack.lastOrNull() } }
 
-    val topLevelRoutes = listOf(HomeRoute, SearchRoute, FavoritesRoute, HistoryRoute, SettingsRoute)
-    val isTopLevel = currentRoute in topLevelRoutes
+    val isTopLevel = when (currentRoute) {
+        HomeRoute, SearchRoute, ConferencesRoute, FavoritesRoute, HistoryRoute, SettingsRoute -> true
+        is ConferenceDetailRoute -> true
+        else -> false
+    }
 
     if (isTopLevel) {
         NavigationDrawer(
@@ -115,6 +122,20 @@ fun TvNavHost() {
                         colors = drawerItemColors
                     ) {
                         Text("Search")
+                    }
+                    NavigationDrawerItem(
+                        selected = currentRoute == ConferencesRoute,
+                        onClick = {
+                            if (currentRoute != ConferencesRoute) {
+                                backStack.clear()
+                                backStack.add(HomeRoute)
+                                backStack.add(ConferencesRoute)
+                            }
+                        },
+                        leadingContent = { Icon(Icons.Default.VideoLibrary, contentDescription = null) },
+                        colors = drawerItemColors
+                    ) {
+                        Text("Conferences")
                     }
                     NavigationDrawerItem(
                         selected = currentRoute == FavoritesRoute,
@@ -187,7 +208,20 @@ fun TvNavDisplay(backStack: MutableList<NavKey>) {
                 )
             }
 
-            entry<SearchRoute> { SearchScreen() }
+            entry<SearchRoute> {
+                SearchScreen(
+                    onEventClick = { event ->
+                        backStack.add(EventDetailRoute(event.guid))
+                    }
+                )
+            }
+            entry<ConferencesRoute> {
+                ConferencesScreen(
+                    onConferenceClick = { conference ->
+                        backStack.add(ConferenceDetailRoute(conference.acronym))
+                    }
+                )
+            }
             entry<FavoritesRoute> { FavoritesScreen() }
             entry<HistoryRoute> { HistoryScreen() }
             entry<SettingsRoute> { SettingsScreen() }

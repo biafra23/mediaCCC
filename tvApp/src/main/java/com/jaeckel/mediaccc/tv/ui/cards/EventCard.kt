@@ -29,8 +29,8 @@ fun EventCard(
     Card(
         onClick = onClick,
         modifier = modifier
-            .width(280.dp)
-            .height(200.dp),
+            .width(210.dp)
+            .height(180.dp),
         colors = CardDefaults.colors(
             containerColor = Color(0xFF2A2A4E)
         )
@@ -43,7 +43,7 @@ fun EventCard(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(140.dp)
+                    .height(120.dp)
             )
 
             // Event info

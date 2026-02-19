@@ -5,6 +5,7 @@ import com.jaeckel.mediaccc.api.MediaCCCApi
 import com.jaeckel.mediaccc.viewmodel.ConferenceDetailViewModel
 import com.jaeckel.mediaccc.viewmodel.EventDetailViewModel
 import com.jaeckel.mediaccc.viewmodel.HomeViewModel
+import com.jaeckel.mediaccc.viewmodel.SearchViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -20,6 +21,7 @@ val sharedModule = module {
     viewModel { (eventGuid: String) -> EventDetailViewModel(get(), eventGuid) }
     viewModel { (acronym: String) -> ConferenceDetailViewModel(get(), acronym) }
     viewModel { HomeViewModel(get()) }
+    viewModel { SearchViewModel(get()) }
 }
 
 
