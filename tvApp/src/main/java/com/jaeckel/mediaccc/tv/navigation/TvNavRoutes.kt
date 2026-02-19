@@ -7,6 +7,18 @@ import kotlinx.serialization.Serializable
 data object HomeRoute : NavKey
 
 @Serializable
+data object SearchRoute : NavKey
+
+@Serializable
+data object FavoritesRoute : NavKey
+
+@Serializable
+data object HistoryRoute : NavKey
+
+@Serializable
+data object SettingsRoute : NavKey
+
+@Serializable
 data class EventDetailRoute(val eventGuid: String) : NavKey
 
 @Serializable
@@ -20,5 +32,3 @@ data class PlayerRoute(
     val date: String = "",
     val conference: String = ""
 ) : NavKey
-
-

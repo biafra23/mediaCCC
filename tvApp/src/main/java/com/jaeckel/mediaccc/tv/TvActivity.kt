@@ -3,27 +3,63 @@ package com.jaeckel.mediaccc.tv
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import androidx.tv.material3.Icon
+import androidx.tv.material3.NavigationDrawer
+import androidx.tv.material3.NavigationDrawerItem
+import androidx.tv.material3.NavigationDrawerItemDefaults
+import androidx.tv.material3.Surface
+import androidx.tv.material3.Text
+import androidx.tv.material3.darkColorScheme
 import com.jaeckel.mediaccc.tv.navigation.ConferenceDetailRoute
 import com.jaeckel.mediaccc.tv.navigation.EventDetailRoute
+import com.jaeckel.mediaccc.tv.navigation.FavoritesRoute
+import com.jaeckel.mediaccc.tv.navigation.HistoryRoute
 import com.jaeckel.mediaccc.tv.navigation.HomeRoute
 import com.jaeckel.mediaccc.tv.navigation.PlayerRoute
+import com.jaeckel.mediaccc.tv.navigation.SearchRoute
+import com.jaeckel.mediaccc.tv.navigation.SettingsRoute
 import com.jaeckel.mediaccc.tv.ui.ConferenceDetailScreen
 import com.jaeckel.mediaccc.tv.ui.EventDetailScreen
+import com.jaeckel.mediaccc.tv.ui.FavoritesScreen
+import com.jaeckel.mediaccc.tv.ui.HistoryScreen
+import com.jaeckel.mediaccc.tv.ui.SearchScreen
+import com.jaeckel.mediaccc.tv.ui.SettingsScreen
 import com.jaeckel.mediaccc.tv.ui.TvHomeScreen
+import androidx.tv.material3.MaterialTheme as TvMaterialTheme
 
 class TvActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
-                TvNavHost()
+            TvMaterialTheme(colorScheme = darkColorScheme()) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    shape = RectangleShape
+                ) {
+                    TvNavHost()
+                }
             }
         }
     }
@@ -32,8 +68,111 @@ class TvActivity : ComponentActivity() {
 @Composable
 fun TvNavHost() {
     val backStack = remember { mutableStateListOf<NavKey>(HomeRoute) }
+    val currentRoute by remember { derivedStateOf { backStack.lastOrNull() } }
 
-    // Note: NavDisplay handles system back button automatically
+    val topLevelRoutes = listOf(HomeRoute, SearchRoute, FavoritesRoute, HistoryRoute, SettingsRoute)
+    val isTopLevel = currentRoute in topLevelRoutes
+
+    if (isTopLevel) {
+        NavigationDrawer(
+            drawerContent = {
+                val drawerItemColors = NavigationDrawerItemDefaults.colors(
+                    contentColor = TvMaterialTheme.colorScheme.onSurface,
+                    inactiveContentColor = TvMaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    selectedContentColor = TvMaterialTheme.colorScheme.onSurface,
+                    focusedContentColor = TvMaterialTheme.colorScheme.inverseOnSurface,
+                    pressedContentColor = TvMaterialTheme.colorScheme.inverseOnSurface,
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(12.dp)
+                ) {
+                    NavigationDrawerItem(
+                        selected = currentRoute == HomeRoute,
+                        onClick = {
+                            if (currentRoute != HomeRoute) {
+                                backStack.clear()
+                                backStack.add(HomeRoute)
+                            }
+                        },
+                        leadingContent = { Icon(Icons.Default.Home, contentDescription = null) },
+                        colors = drawerItemColors
+                    ) {
+                        Text("Home")
+                    }
+                    NavigationDrawerItem(
+                        selected = currentRoute == SearchRoute,
+                        onClick = {
+                            if (currentRoute != SearchRoute) {
+                                backStack.clear()
+                                backStack.add(HomeRoute)
+                                backStack.add(SearchRoute)
+                            }
+                        },
+                        leadingContent = { Icon(Icons.Default.Search, contentDescription = null) },
+                        colors = drawerItemColors
+                    ) {
+                        Text("Search")
+                    }
+                    NavigationDrawerItem(
+                        selected = currentRoute == FavoritesRoute,
+                        onClick = {
+                            if (currentRoute != FavoritesRoute) {
+                                backStack.clear()
+                                backStack.add(HomeRoute)
+                                backStack.add(FavoritesRoute)
+                            }
+                        },
+                        leadingContent = { Icon(Icons.Default.Favorite, contentDescription = null) },
+                        colors = drawerItemColors
+                    ) {
+                        Text("Favorites")
+                    }
+                    NavigationDrawerItem(
+                        selected = currentRoute == HistoryRoute,
+                        onClick = {
+                            if (currentRoute != HistoryRoute) {
+                                backStack.clear()
+                                backStack.add(HomeRoute)
+                                backStack.add(HistoryRoute)
+                            }
+                        },
+                        leadingContent = { Icon(Icons.Default.History, contentDescription = null) },
+                        colors = drawerItemColors
+                    ) {
+                        Text("History")
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    NavigationDrawerItem(
+                        selected = currentRoute == SettingsRoute,
+                        onClick = {
+                            if (currentRoute != SettingsRoute) {
+                                backStack.clear()
+                                backStack.add(HomeRoute)
+                                backStack.add(SettingsRoute)
+                            }
+                        },
+                        leadingContent = { Icon(Icons.Default.Settings, contentDescription = null) },
+                        colors = drawerItemColors
+                    ) {
+                        Text("Settings")
+                    }
+                }
+            }
+        ) {
+            TvNavDisplay(backStack)
+        }
+    } else {
+        TvNavDisplay(backStack)
+    }
+}
+
+@Composable
+fun TvNavDisplay(backStack: MutableList<NavKey>) {
     NavDisplay(
         backStack = backStack,
         entryProvider = entryProvider {
@@ -47,6 +186,11 @@ fun TvNavHost() {
                     }
                 )
             }
+
+            entry<SearchRoute> { SearchScreen() }
+            entry<FavoritesRoute> { FavoritesScreen() }
+            entry<HistoryRoute> { HistoryScreen() }
+            entry<SettingsRoute> { SettingsScreen() }
 
             entry<ConferenceDetailRoute> { route ->
                 ConferenceDetailScreen(

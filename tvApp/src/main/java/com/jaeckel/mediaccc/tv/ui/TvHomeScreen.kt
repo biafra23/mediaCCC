@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +33,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Border
 import androidx.tv.material3.Card
+import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.Carousel
 import androidx.tv.material3.CarouselDefaults
 import androidx.tv.material3.CarouselState
@@ -44,6 +47,13 @@ import com.jaeckel.mediaccc.tv.ui.cards.ConferenceCard
 import com.jaeckel.mediaccc.tv.ui.cards.EventCard
 import com.jaeckel.mediaccc.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -76,6 +86,7 @@ fun TvHomeScreen(
             else -> {
                 val lazyListState = rememberLazyListState()
                 var recentEventsFocused by remember { mutableStateOf(false) }
+                val firstRecentEventFocusRequester = remember { FocusRequester() }
 
                 // Scroll to show recent events row when it gets focus
                 LaunchedEffect(recentEventsFocused) {
@@ -99,6 +110,9 @@ fun TvHomeScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(400.dp)
+                                    .focusProperties {
+                                        down = firstRecentEventFocusRequester
+                                    }
                             )
                         }
                     }
@@ -127,7 +141,8 @@ fun TvHomeScreen(
 
                                 EventRow(
                                     events = uiState.recentEvents,
-                                    onEventClick = onEventClick
+                                    onEventClick = onEventClick,
+                                    firstItemFocusRequester = firstRecentEventFocusRequester
                                 )
                             }
                         }
@@ -187,10 +202,20 @@ fun HeroCarousel(
         }
     ) { index ->
         val event = events[index]
+        var isFocused by remember { mutableStateOf(false) }
+        val scale by animateFloatAsState(if (isFocused) 1.05f else 1f)
 
         Card(
             onClick = { onEventClick(event) },
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(if (isFocused) 8.dp else 0.dp)
+                .onFocusChanged { isFocused = it.isFocused }
+                .scale(scale),
+            border = CardDefaults.border(
+                focusedBorder = Border(BorderStroke(4.dp, Color.White)),
+                border = Border(BorderStroke(0.dp, Color.Transparent))
+            )
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 // Background image
@@ -257,20 +282,27 @@ fun HeroCarousel(
 @Composable
 fun EventRow(
     events: List<Event>,
-    onEventClick: (Event) -> Unit
+    onEventClick: (Event) -> Unit,
+    firstItemFocusRequester: FocusRequester? = null
 ) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 48.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(events, key = { it.guid }) { event ->
+        itemsIndexed(events, key = { _, it -> it.guid }) { index, event ->
             EventCard(
                 event = event,
-                onClick = { onEventClick(event) }
+                onClick = { onEventClick(event) },
+                modifier = if (index == 0 && firstItemFocusRequester != null) {
+                    Modifier.focusRequester(firstItemFocusRequester)
+                } else {
+                    Modifier
+                }
             )
         }
     }
 }
+
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
