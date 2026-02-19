@@ -27,13 +27,17 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import chaintech.videoplayer.host.MediaPlayerHost
+import chaintech.videoplayer.ui.video.VideoPlayerComposable
 import coil3.compose.AsyncImage
 import com.jaeckel.mediaccc.viewmodel.EventDetailViewModel
 import kotlinx.datetime.LocalDateTime
@@ -55,6 +59,11 @@ fun EventDetailScreen(
         parameters = { parametersOf(eventGuid) }
     )
     val uiState by viewModel.uiState.collectAsState()
+
+    var isPlaying by remember { mutableStateOf(false) }
+    val playerHost = remember(uiState.bestRecording?.recordingUrl) {
+        uiState.bestRecording?.recordingUrl?.let { MediaPlayerHost(it) }
+    }
 
     val dateTimeFormat = remember {
         LocalDateTime.Format {
@@ -126,43 +135,46 @@ fun EventDetailScreen(
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
                     ) {
-                        // Poster/Thumbnail
+                        // Poster/Thumbnail or Video Player
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(250.dp)
                         ) {
-                            AsyncImage(
-                                model = event.posterUrl ?: event.thumbUrl,
-                                contentDescription = event.title,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize()
-                            )
+                            if (isPlaying && playerHost != null) {
+                                // Show video player
+                                VideoPlayerComposable(
+                                    modifier = Modifier.fillMaxSize(),
+                                    playerHost = playerHost
+                                )
+                            } else {
+                                // Show thumbnail with play button
+                                AsyncImage(
+                                    model = event.posterUrl ?: event.thumbUrl,
+                                    contentDescription = event.title,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize()
+                                )
 
-                            // Play button overlay
-                            if (uiState.bestRecording != null) {
-                                Box(
-                                    modifier = Modifier
-                                        .align(Alignment.Center)
-                                        .size(64.dp)
-                                        .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.9f))
-                                        .clickable {
-                                            onPlayClick(
-                                                uiState.bestRecording!!.recordingUrl ?: "",
-                                                event.title,
-                                                event.persons?.joinToString(", ") ?: "",
-                                                event.date?.toString() ?: "",
-                                                event.conferenceTitle ?: ""
-                                            )
-                                        },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "▶",
-                                        style = MaterialTheme.typography.headlineMedium,
-                                        color = MaterialTheme.colorScheme.onPrimary
-                                    )
+                                // Play button overlay
+                                if (uiState.bestRecording != null) {
+                                    Box(
+                                        modifier = Modifier
+                                            .align(Alignment.Center)
+                                            .size(64.dp)
+                                            .clip(CircleShape)
+                                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.9f))
+                                            .clickable {
+                                                isPlaying = true
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "▶",
+                                            style = MaterialTheme.typography.headlineMedium,
+                                            color = MaterialTheme.colorScheme.onPrimary
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -217,16 +229,10 @@ fun EventDetailScreen(
                             Spacer(modifier = Modifier.height(16.dp))
 
                             // Play button
-                            if (uiState.bestRecording != null) {
+                            if (uiState.bestRecording != null && !isPlaying) {
                                 Button(
                                     onClick = {
-                                        onPlayClick(
-                                            uiState.bestRecording!!.recordingUrl ?: "",
-                                            event.title,
-                                            event.persons?.joinToString(", ") ?: "",
-                                            event.date?.toString() ?: "",
-                                            event.conferenceTitle ?: ""
-                                        )
+                                        isPlaying = true
                                     },
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
