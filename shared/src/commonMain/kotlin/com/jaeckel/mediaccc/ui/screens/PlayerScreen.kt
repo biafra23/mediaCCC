@@ -11,12 +11,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import chaintech.videoplayer.host.MediaPlayerHost
-import chaintech.videoplayer.ui.video.VideoPlayerComposable
+import io.github.kdroidfilter.composemediaplayer.VideoPlayerSurface
+import io.github.kdroidfilter.composemediaplayer.rememberVideoPlayerState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,7 +25,10 @@ fun PlayerScreen(
     title: String,
     onBackClick: () -> Unit
 ) {
-    val playerHost = remember { MediaPlayerHost(videoUrl) }
+    val playerState = rememberVideoPlayerState()
+    LaunchedEffect(videoUrl) {
+        playerState.openUri(videoUrl)
+    }
 
     Scaffold(
         topBar = {
@@ -58,9 +61,9 @@ fun PlayerScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            VideoPlayerComposable(
-                modifier = Modifier.fillMaxSize(),
-                playerHost = playerHost
+            VideoPlayerSurface(
+                playerState = playerState,
+                modifier = Modifier.fillMaxSize()
             )
         }
     }
