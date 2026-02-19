@@ -35,7 +35,7 @@ class EventDetailViewModel(
             repository.getEvent(eventGuid).collect { result ->
                 result.fold(
                     onSuccess = { event ->
-                        val bestRecording = findBestRecording(event.recordings)
+                        val bestRecording = findBestRecording(event.recordings, event.originalLanguage)
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
@@ -58,10 +58,21 @@ class EventDetailViewModel(
         }
     }
 
-    private fun findBestRecording(recordings: List<Recording>): Recording? {
-        // Preference order: video/mp4 > video/mpeg > video/webm > any video
-        return recordings
+    private fun findBestRecording(recordings: List<Recording>, originalLanguage: String?): Recording? {
+        // Filter to video recordings only
+        val videoRecordings = recordings
             .filter { it.mimeType?.startsWith("video/") == true }
+
+        // Prefer recordings matching the event's original language
+        val preferred = if (originalLanguage != null) {
+            videoRecordings.filter { it.language == originalLanguage }
+                .ifEmpty { videoRecordings }
+        } else {
+            videoRecordings
+        }
+
+        // Then sort by format preference: mp4 > mpeg > webm > other
+        return preferred
             .sortedBy { recording ->
                 when (recording.mimeType) {
                     "video/mp4" -> 0
