@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.jaeckel.mediaccc.ui.util.SystemAppearance
 import io.github.kdroidfilter.composemediaplayer.VideoPlayerSurface
 import io.github.kdroidfilter.composemediaplayer.rememberVideoPlayerState
 
@@ -25,6 +26,7 @@ fun PlayerScreen(
     title: String,
     onBackClick: () -> Unit
 ) {
+    SystemAppearance(true)
     val playerState = rememberVideoPlayerState()
     LaunchedEffect(videoUrl) {
         playerState.openUri(videoUrl)

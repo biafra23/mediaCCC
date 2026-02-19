@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.jaeckel.mediaccc.ui.util.SystemAppearance
 import com.jaeckel.mediaccc.viewmodel.EventDetailViewModel
 import io.github.kdroidfilter.composemediaplayer.VideoPlayerSurface
 import io.github.kdroidfilter.composemediaplayer.VideoPlayerState
@@ -70,6 +71,10 @@ fun EventDetailScreen(
 
     var isPlaying by rememberSaveable { mutableStateOf(false) }
     val playerState = rememberVideoPlayerState()
+    
+    // Apply system appearance based on fullscreen state
+    SystemAppearance(playerState.isFullscreen)
+
     val recordingUrl = uiState.bestRecording?.recordingUrl
     LaunchedEffect(recordingUrl, isPlaying) {
         if (isPlaying && recordingUrl != null) {
