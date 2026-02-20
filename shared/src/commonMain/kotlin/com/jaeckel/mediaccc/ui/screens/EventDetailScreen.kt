@@ -54,6 +54,9 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
+import mediaccc.shared.generated.resources.Res
+import mediaccc.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -121,7 +124,7 @@ fun EventDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = uiState.event?.title ?: "Event",
+                        text = uiState.event?.title ?: stringResource(Res.string.event),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -163,11 +166,10 @@ fun EventDetailScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Error: ${uiState.errorMessage}",
-                            color = MaterialTheme.colorScheme.error
+                            text = stringResource(Res.string.error_message, uiState.errorMessage ?: ""),                            color = MaterialTheme.colorScheme.error
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = onBackClick) { Text("Go Back") }
+                        Button(onClick = onBackClick) { Text(stringResource(Res.string.go_back)) }
                     }
                 }
 
@@ -233,7 +235,7 @@ fun EventDetailScreen(
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
-                                            text = if (savedSliderPos > 5f) "▶ Resume" else "▶",
+                                            text = if (savedSliderPos > 5f) stringResource(Res.string.resume_icon) else stringResource(Res.string.play_icon),
                                             style = if (savedSliderPos > 5f) MaterialTheme.typography.bodyMedium
                                             else MaterialTheme.typography.headlineMedium,
                                             color = MaterialTheme.colorScheme.onPrimary
@@ -291,7 +293,7 @@ fun EventDetailScreen(
                                     },
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Text(if (savedSliderPos > 5f) "▶ Resume" else "▶ Play")
+                                    Text(if (savedSliderPos > 5f) stringResource(Res.string.resume) else stringResource(Res.string.play))
                                 }
                             }
 
@@ -300,7 +302,7 @@ fun EventDetailScreen(
                             event.description?.let { description ->
                                 if (description.isNotBlank()) {
                                     Text(
-                                        text = "Description",
+                                        text = stringResource(Res.string.description),
                                         style = MaterialTheme.typography.titleMedium
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))

@@ -35,6 +35,9 @@ import androidx.compose.ui.unit.dp
 import com.jaeckel.mediaccc.api.model.Event
 import com.jaeckel.mediaccc.ui.components.EventCard
 import com.jaeckel.mediaccc.viewmodel.ConferenceDetailViewModel
+import mediaccc.shared.generated.resources.Res
+import mediaccc.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -56,7 +59,7 @@ fun ConferenceDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = uiState.conference?.title ?: "Conference",
+                        text = uiState.conference?.title ?: stringResource(Res.string.conference),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -94,7 +97,7 @@ fun ConferenceDetailScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Error: ${uiState.errorMessage}",
+                            text = stringResource(Res.string.error_message, uiState.errorMessage ?: ""),
                             color = MaterialTheme.colorScheme.error
                         )
                     }
@@ -141,7 +144,7 @@ fun ConferenceDetailScreen(
 
                         // Events count
                         Text(
-                            text = "Events (${uiState.filteredEvents.size})",
+                            text = stringResource(Res.string.events_count, uiState.filteredEvents.size),
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )

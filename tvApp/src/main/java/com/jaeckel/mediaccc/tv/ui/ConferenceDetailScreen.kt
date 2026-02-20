@@ -40,8 +40,10 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.res.stringResource
 import androidx.tv.material3.Surface
 import androidx.tv.material3.SelectableSurfaceDefaults
+import com.jaeckel.mediaccc.tv.R
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -77,7 +79,7 @@ fun ConferenceDetailScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Error: ${uiState.errorMessage}",
+                        text = stringResource(R.string.error_message, uiState.errorMessage ?: ""),
                         color = Color.White
                     )
                 }
@@ -153,7 +155,7 @@ fun ConferenceDetailScreen(
                     }
 
                     Text(
-                        text = "Events (${uiState.filteredEvents.size})",
+                        text = stringResource(R.string.events_count, uiState.filteredEvents.size),
                         style = MaterialTheme.typography.titleLarge,
                         color = Color.White
                     )

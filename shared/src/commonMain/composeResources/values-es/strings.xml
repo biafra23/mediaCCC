@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <!-- Navigation / Sections -->
+    <string name="home">Inicio</string>
+    <string name="search">Buscar</string>
+    <string name="conferences">Conferencias</string>
+    <string name="favorites">Favoritos</string>
+    <string name="history">Historial</string>
+    <string name="settings">Ajustes</string>
+
+    <!-- Home Screen -->
+    <string name="continue_watching">Seguir viendo</string>
+    <string name="featured">Destacados</string>
+    <string name="recent">Recientes</string>
+    <string name="menu">Menú</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">Buscar eventos (mín. 3 caracteres)</string>
+    <string name="clear">Borrar</string>
+    <string name="no_results_found">No se encontraron resultados</string>
+
+    <!-- Event Detail Screen -->
+    <string name="event">Evento</string>
+    <string name="go_back">Volver</string>
+    <string name="resume">▶ Continuar</string>
+    <string name="play">▶ Reproducir</string>
+    <string name="resume_icon">▶ Continuar</string>
+    <string name="play_icon">▶</string>
+    <string name="description">Descripción</string>
+
+    <!-- Conference Detail Screen -->
+    <string name="conference">Conferencia</string>
+    <string name="events_count">Eventos (%1$d)</string>
+
+    <!-- Conferences Screen -->
+    <string name="no_conferences_available">No hay conferencias disponibles</string>
+
+    <!-- History Screen -->
+    <string name="watch_history">Historial de reproducción</string>
+    <string name="no_watch_history">Aún no hay historial</string>
+    <string name="min_remaining">%1$d min restantes</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_coming_soon">Favoritos próximamente</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_coming_soon">Ajustes próximamente</string>
+
+    <!-- Error -->
+    <string name="error_message">Error: %1$s</string>
+
+    <!-- Relative dates -->
+    <string name="just_now">Ahora mismo</string>
+    <string name="hours_ago">hace %1$d h</string>
+    <string name="yesterday">Ayer</string>
+    <string name="days_ago">hace %1$d d</string>
+</resources>

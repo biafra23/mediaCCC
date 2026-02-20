@@ -39,6 +39,9 @@ import coil3.compose.AsyncImage
 import com.jaeckel.mediaccc.data.db.PlaybackHistoryEntity
 import com.jaeckel.mediaccc.viewmodel.HistoryViewModel
 import kotlin.time.Clock
+import mediaccc.shared.generated.resources.Res
+import mediaccc.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,7 +56,7 @@ fun HistoryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Watch History") },
+                title = { Text(stringResource(Res.string.watch_history)) },
                 navigationIcon = {
                     Text(
                         text = "←",
@@ -78,7 +81,7 @@ fun HistoryScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No watch history yet",
+                    text = stringResource(Res.string.no_watch_history),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -212,7 +215,7 @@ private fun HistoryCard(
                     if (remainingSeconds > 0) {
                         val remainingMin = remainingSeconds / 60
                         Text(
-                            text = "${remainingMin} min remaining",
+                            text = stringResource(Res.string.min_remaining, remainingMin),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -223,17 +226,18 @@ private fun HistoryCard(
     }
 }
 
+@Composable
 private fun formatRelativeDate(epochMillis: Long): String {
     val now = Clock.System.now().toEpochMilliseconds()
     val diffMs = now - epochMillis
     val diffHours = diffMs / (1000 * 60 * 60)
     return when {
-        diffHours < 1L -> "Just now"
-        diffHours < 24L -> "${diffHours}h ago"
-        diffHours < 48L -> "Yesterday"
+        diffHours < 1L -> stringResource(Res.string.just_now)
+        diffHours < 24L -> stringResource(Res.string.hours_ago, diffHours)
+        diffHours < 48L -> stringResource(Res.string.yesterday)
         else -> {
             val days = diffHours / 24
-            "${days}d ago"
+            stringResource(Res.string.days_ago, days)
         }
     }
 }

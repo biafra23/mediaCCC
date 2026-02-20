@@ -14,6 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mediaccc.shared.generated.resources.Res
+import mediaccc.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,7 +26,7 @@ fun FavoritesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Favorites") },
+                title = { Text(stringResource(Res.string.favorites)) },
                 navigationIcon = {
                     Text(
                         text = "←",
@@ -47,7 +50,7 @@ fun FavoritesScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Favorites coming soon",
+                text = stringResource(Res.string.favorites_coming_soon),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

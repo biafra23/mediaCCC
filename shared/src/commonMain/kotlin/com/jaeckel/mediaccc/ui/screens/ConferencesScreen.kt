@@ -38,6 +38,9 @@ import androidx.compose.ui.unit.dp
 import com.jaeckel.mediaccc.api.model.Conference
 import com.jaeckel.mediaccc.ui.components.ConferenceCard
 import com.jaeckel.mediaccc.viewmodel.HomeViewModel
+import mediaccc.shared.generated.resources.Res
+import mediaccc.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -71,7 +74,7 @@ fun ConferencesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Conferences") },
+                title = { Text(stringResource(Res.string.conferences)) },
                 navigationIcon = {
                     Text(
                         text = "←",
@@ -137,7 +140,7 @@ fun ConferencesScreen(
                 }
                 else -> {
                     Text(
-                        text = "No conferences available",
+                        text = stringResource(Res.string.no_conferences_available),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.align(Alignment.Center)

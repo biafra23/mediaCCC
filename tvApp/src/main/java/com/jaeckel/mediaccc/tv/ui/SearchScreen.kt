@@ -28,6 +28,7 @@ import androidx.tv.material3.MaterialTheme
 import com.jaeckel.mediaccc.api.model.Event
 import com.jaeckel.mediaccc.tv.ui.cards.EventCard
 import com.jaeckel.mediaccc.viewmodel.SearchViewModel
+import com.jaeckel.mediaccc.tv.R
 import org.koin.compose.viewmodel.koinViewModel
 
 import androidx.compose.foundation.lazy.LazyRow
@@ -41,6 +42,7 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.style.TextOverflow
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.tv.material3.Surface
 import androidx.tv.material3.SelectableSurfaceDefaults
@@ -63,7 +65,7 @@ fun SearchScreen(
             .padding(horizontal = 48.dp, vertical = 32.dp)
     ) {
         Text(
-            text = "Search Events",
+            text = stringResource(R.string.search_events),
             style = MaterialTheme.typography.headlineMedium,
             color = Color.White
         )
@@ -76,7 +78,7 @@ fun SearchScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(searchFieldFocusRequester),
-            placeholder = { Text("Enter at least 3 characters...", color = Color.Gray) },
+            placeholder = { Text(stringResource(R.string.search_placeholder), color = Color.Gray) },
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color.White,
@@ -134,13 +136,13 @@ fun SearchScreen(
                 )
             } else if (uiState.errorMessage != null) {
                 Text(
-                    text = "Error: ${uiState.errorMessage}",
+                    text = stringResource(R.string.error_message, uiState.errorMessage ?: ""),
                     color = Color.Red,
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else if (uiState.filteredResults.isEmpty() && uiState.query.length >= 3) {
                 Text(
-                    text = "No events found.",
+                    text = stringResource(R.string.no_events_found),
                     color = Color.White,
                     modifier = Modifier.align(Alignment.Center)
                 )

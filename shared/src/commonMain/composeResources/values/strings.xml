@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="app_name">MediaCCC</string>
+
+    <!-- Navigation / Sections -->
+    <string name="home">Home</string>
+    <string name="search">Search</string>
+    <string name="conferences">Conferences</string>
+    <string name="favorites">Favorites</string>
+    <string name="history">History</string>
+    <string name="settings">Settings</string>
+
+    <!-- Home Screen -->
+    <string name="continue_watching">Continue Watching</string>
+    <string name="featured">Featured</string>
+    <string name="recent">Recent</string>
+    <string name="menu">Menu</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">Search events (min 3 characters)</string>
+    <string name="clear">Clear</string>
+    <string name="no_results_found">No results found</string>
+
+    <!-- Event Detail Screen -->
+    <string name="event">Event</string>
+    <string name="go_back">Go Back</string>
+    <string name="resume">▶ Resume</string>
+    <string name="play">▶ Play</string>
+    <string name="resume_icon">▶ Resume</string>
+    <string name="play_icon">▶</string>
+    <string name="description">Description</string>
+
+    <!-- Conference Detail Screen -->
+    <string name="conference">Conference</string>
+    <string name="events_count">Events (%1$d)</string>
+
+    <!-- Conferences Screen -->
+    <string name="no_conferences_available">No conferences available</string>
+
+    <!-- History Screen -->
+    <string name="watch_history">Watch History</string>
+    <string name="no_watch_history">No watch history yet</string>
+    <string name="min_remaining">%1$d min remaining</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_coming_soon">Favorites coming soon</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_coming_soon">Settings coming soon</string>
+
+    <!-- Error -->
+    <string name="error_message">Error: %1$s</string>
+
+    <!-- Relative dates -->
+    <string name="just_now">Just now</string>
+    <string name="hours_ago">%1$dh ago</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="days_ago">%1$dd ago</string>
+</resources>

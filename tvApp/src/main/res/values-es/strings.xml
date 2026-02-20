@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <!-- Navigation -->
+    <string name="home">Inicio</string>
+    <string name="search">Buscar</string>
+    <string name="conferences">Conferencias</string>
+    <string name="favorites">Favoritos</string>
+    <string name="history">Historial</string>
+    <string name="settings">Ajustes</string>
+
+    <!-- Home Screen -->
+    <string name="continue_watching">Seguir viendo</string>
+    <string name="recent_events">Eventos recientes</string>
+
+    <!-- Search -->
+    <string name="search_events">Buscar eventos</string>
+    <string name="search_placeholder">Ingrese al menos 3 caracteres…</string>
+    <string name="no_events_found">No se encontraron eventos.</string>
+
+    <!-- History -->
+    <string name="watch_history">Historial de reproducción</string>
+    <string name="no_watch_history">Aún no hay historial</string>
+    <string name="min_remaining">%1$d min restantes</string>
+
+    <!-- Relative dates -->
+    <string name="just_now">Ahora mismo</string>
+    <string name="hours_ago">hace %1$d h</string>
+    <string name="yesterday">Ayer</string>
+    <string name="days_ago">hace %1$d d</string>
+
+    <!-- Error -->
+    <string name="error_message">Error: %1$s</string>
+
+    <!-- Event Detail -->
+    <string name="go_back">Volver</string>
+    <string name="description">Descripción</string>
+    <string name="loading">Cargando…</string>
+    <string name="speakers">Ponentes: %1$s</string>
+    <string name="duration_min">Duración: %1$d min</string>
+    <string name="play">▶ Reproducir</string>
+
+    <!-- Conference Detail -->
+    <string name="events_count">Eventos (%1$d)</string>
+
+    <!-- Favorites / Settings -->
+    <string name="favorites_screen">Favoritos</string>
+    <string name="settings_screen">Ajustes</string>
+</resources>

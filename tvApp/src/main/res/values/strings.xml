@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="app_name">MediaCCC TV</string>
+
+    <!-- Navigation -->
+    <string name="home">Home</string>
+    <string name="search">Search</string>
+    <string name="conferences">Conferences</string>
+    <string name="favorites">Favorites</string>
+    <string name="history">History</string>
+    <string name="settings">Settings</string>
+
+    <!-- Home Screen -->
+    <string name="continue_watching">Continue Watching</string>
+    <string name="recent_events">Recent Events</string>
+
+    <!-- Search -->
+    <string name="search_events">Search Events</string>
+    <string name="search_placeholder">Enter at least 3 characters…</string>
+    <string name="no_events_found">No events found.</string>
+
+    <!-- History -->
+    <string name="watch_history">Watch History</string>
+    <string name="no_watch_history">No watch history yet</string>
+    <string name="min_remaining">%1$d min remaining</string>
+
+    <!-- Relative dates -->
+    <string name="just_now">Just now</string>
+    <string name="hours_ago">%1$dh ago</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="days_ago">%1$dd ago</string>
+
+    <!-- Error -->
+    <string name="error_message">Error: %1$s</string>
+
+    <!-- Event Detail -->
+    <string name="go_back">Go Back</string>
+    <string name="description">Description</string>
+    <string name="loading">Loading…</string>
+    <string name="speakers">Speakers: %1$s</string>
+    <string name="duration_min">Duration: %1$d min</string>
+    <string name="play">▶ Play</string>
+
+    <!-- Conference Detail -->
+    <string name="events_count">Events (%1$d)</string>
+
+    <!-- Favorites / Settings -->
+    <string name="favorites_screen">Favorites Screen</string>
+    <string name="settings_screen">Settings Screen</string>
+</resources>

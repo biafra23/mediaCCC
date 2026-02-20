@@ -45,23 +45,27 @@ import com.jaeckel.mediaccc.ui.screens.PlayerScreen
 import com.jaeckel.mediaccc.ui.screens.SearchScreen
 import com.jaeckel.mediaccc.ui.screens.SettingsScreen
 import kotlinx.coroutines.launch
+import mediaccc.shared.generated.resources.Res
+import mediaccc.shared.generated.resources.*
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 
 private data class DrawerItem(
-    val label: String,
+    val labelRes: StringResource,
     val icon: ImageVector,
     val route: NavKey
 )
 
 private val topDrawerItems = listOf(
-    DrawerItem("Home", Icons.Default.Home, HomeRoute),
-    DrawerItem("Search", Icons.Default.Search, SearchRoute),
-    DrawerItem("Conferences", Icons.Default.VideoLibrary, ConferencesRoute),
-    DrawerItem("Favorites", Icons.Default.Favorite, FavoritesRoute),
-    DrawerItem("History", Icons.Default.History, HistoryRoute),
+    DrawerItem(Res.string.home, Icons.Default.Home, HomeRoute),
+    DrawerItem(Res.string.search, Icons.Default.Search, SearchRoute),
+    DrawerItem(Res.string.conferences, Icons.Default.VideoLibrary, ConferencesRoute),
+    DrawerItem(Res.string.favorites, Icons.Default.Favorite, FavoritesRoute),
+    DrawerItem(Res.string.history, Icons.Default.History, HistoryRoute),
 )
 
 private val bottomDrawerItems = listOf(
-    DrawerItem("Settings", Icons.Default.Settings, SettingsRoute),
+    DrawerItem(Res.string.settings, Icons.Default.Settings, SettingsRoute),
 )
 
 @Composable
@@ -93,7 +97,7 @@ fun AppNavHost() {
         drawerContent = {
             ModalDrawerSheet(modifier = Modifier.width(280.dp)) {
                 Text(
-                    text = "MediaCCC",
+                    text = stringResource(Res.string.app_name),
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(horizontal = 28.dp, vertical = 24.dp)
                 )
@@ -106,7 +110,7 @@ fun AppNavHost() {
                 ) {
                     topDrawerItems.forEach { item ->
                         NavigationDrawerItem(
-                            label = { Text(item.label) },
+                            label = { Text(stringResource(item.labelRes)) },
                             icon = { Icon(item.icon, contentDescription = null) },
                             selected = currentRoute == item.route,
                             onClick = { navigateToDrawerRoute(item.route) },
@@ -121,7 +125,7 @@ fun AppNavHost() {
 
                     bottomDrawerItems.forEach { item ->
                         NavigationDrawerItem(
-                            label = { Text(item.label) },
+                            label = { Text(stringResource(item.labelRes)) },
                             icon = { Icon(item.icon, contentDescription = null) },
                             selected = currentRoute == item.route,
                             onClick = { navigateToDrawerRoute(item.route) },

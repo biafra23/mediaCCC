@@ -52,6 +52,7 @@ import androidx.tv.material3.MaterialTheme as TvMaterialTheme
 import androidx.compose.material.icons.filled.VideoLibrary
 import com.jaeckel.mediaccc.tv.navigation.ConferencesRoute
 import com.jaeckel.mediaccc.tv.ui.ConferencesScreen
+import androidx.compose.ui.res.stringResource
 
 class TvActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,7 +108,7 @@ fun TvNavHost() {
                         leadingContent = { Icon(Icons.Default.Home, contentDescription = null) },
                         colors = drawerItemColors
                     ) {
-                        Text("Home")
+                        Text(stringResource(R.string.home))
                     }
                     NavigationDrawerItem(
                         selected = currentRoute == SearchRoute,
@@ -121,7 +122,7 @@ fun TvNavHost() {
                         leadingContent = { Icon(Icons.Default.Search, contentDescription = null) },
                         colors = drawerItemColors
                     ) {
-                        Text("Search")
+                        Text(stringResource(R.string.search))
                     }
                     NavigationDrawerItem(
                         selected = currentRoute == ConferencesRoute,
@@ -135,7 +136,7 @@ fun TvNavHost() {
                         leadingContent = { Icon(Icons.Default.VideoLibrary, contentDescription = null) },
                         colors = drawerItemColors
                     ) {
-                        Text("Conferences")
+                        Text(stringResource(R.string.conferences))
                     }
                     NavigationDrawerItem(
                         selected = currentRoute == FavoritesRoute,
@@ -149,7 +150,7 @@ fun TvNavHost() {
                         leadingContent = { Icon(Icons.Default.Favorite, contentDescription = null) },
                         colors = drawerItemColors
                     ) {
-                        Text("Favorites")
+                        Text(stringResource(R.string.favorites))
                     }
                     NavigationDrawerItem(
                         selected = currentRoute == HistoryRoute,
@@ -163,7 +164,7 @@ fun TvNavHost() {
                         leadingContent = { Icon(Icons.Default.History, contentDescription = null) },
                         colors = drawerItemColors
                     ) {
-                        Text("History")
+                        Text(stringResource(R.string.history))
                     }
 
                     Spacer(modifier = Modifier.weight(1f))
@@ -180,7 +181,7 @@ fun TvNavHost() {
                         leadingContent = { Icon(Icons.Default.Settings, contentDescription = null) },
                         colors = drawerItemColors
                     ) {
-                        Text("Settings")
+                        Text(stringResource(R.string.settings))
                     }
                 }
             }

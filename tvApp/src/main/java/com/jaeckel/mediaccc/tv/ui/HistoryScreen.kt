@@ -39,8 +39,10 @@ import androidx.tv.material3.Text
 import coil3.compose.AsyncImage
 import com.jaeckel.mediaccc.data.db.PlaybackHistoryEntity
 import com.jaeckel.mediaccc.viewmodel.HistoryViewModel
+import com.jaeckel.mediaccc.tv.R
 import kotlin.time.Clock
 import org.koin.compose.viewmodel.koinViewModel
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun HistoryScreen(
@@ -56,7 +58,7 @@ fun HistoryScreen(
     ) {
         if (history.isEmpty()) {
             Text(
-                text = "No watch history yet",
+                text = stringResource(R.string.no_watch_history),
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White.copy(alpha = 0.6f),
                 modifier = Modifier.align(Alignment.Center)
@@ -64,7 +66,7 @@ fun HistoryScreen(
         } else {
             Column(modifier = Modifier.fillMaxSize()) {
             Text(
-                text = "Watch History",
+                text = stringResource(R.string.watch_history),
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.White,
                 modifier = Modifier.padding(start = 32.dp, top = 32.dp, bottom = 8.dp)
@@ -175,7 +177,7 @@ private fun TvHistoryCard(
                     if (remainingSeconds > 60) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "${remainingSeconds / 60} min remaining",
+                            text = stringResource(R.string.min_remaining, remainingSeconds / 60),
                             style = MaterialTheme.typography.labelSmall,
                             color = Color(0xFF9A80D8)
                         )
@@ -186,13 +188,14 @@ private fun TvHistoryCard(
     }
 }
 
+@Composable
 private fun formatRelativeDate(epochMillis: Long): String {
     val now = Clock.System.now().toEpochMilliseconds()
     val diffHours = (now - epochMillis) / (1000 * 60 * 60)
     return when {
-        diffHours < 1L -> "Just now"
-        diffHours < 24L -> "${diffHours}h ago"
-        diffHours < 48L -> "Yesterday"
-        else -> "${diffHours / 24}d ago"
+        diffHours < 1L -> stringResource(R.string.just_now)
+        diffHours < 24L -> stringResource(R.string.hours_ago, diffHours)
+        diffHours < 48L -> stringResource(R.string.yesterday)
+        else -> stringResource(R.string.days_ago, diffHours / 24)
     }
 }

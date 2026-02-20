@@ -36,7 +36,9 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import com.jaeckel.mediaccc.api.model.Conference
 import com.jaeckel.mediaccc.tv.ui.cards.ConferenceCard
 import com.jaeckel.mediaccc.viewmodel.HomeViewModel
+import com.jaeckel.mediaccc.tv.R
 import org.koin.compose.viewmodel.koinViewModel
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
@@ -95,7 +97,7 @@ fun ConferencesScreen(
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Column {
                         Text(
-                            text = "Conferences",
+                            text = stringResource(R.string.conferences),
                             style = MaterialTheme.typography.headlineMedium,
                             color = Color.White
                         )

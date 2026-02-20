@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
@@ -34,6 +35,7 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import coil3.compose.AsyncImage
 import com.jaeckel.mediaccc.api.model.Event
 import com.jaeckel.mediaccc.api.model.Recording
+import com.jaeckel.mediaccc.tv.R
 import com.jaeckel.mediaccc.viewmodel.EventDetailViewModel
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -93,7 +95,7 @@ fun EventDetailScreen(
         when {
             uiState.isLoading -> {
                 Text(
-                    text = "Loading...",
+                    text = stringResource(R.string.loading),
                     color = Color.White,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -104,12 +106,12 @@ fun EventDetailScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Error: ${uiState.errorMessage}",
+                        text = stringResource(R.string.error_message, uiState.errorMessage ?: ""),
                         color = Color.White
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = onBackClick) {
-                        Text("Go Back")
+                        Text(stringResource(R.string.go_back))
                     }
                 }
             }
@@ -225,7 +227,7 @@ private fun EventDetailContent(
                     if (persons.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Speakers: ${persons.joinToString(", ")}",
+                            text = stringResource(R.string.speakers, persons.joinToString(", ")),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.White.copy(alpha = 0.7f)
                         )
@@ -235,7 +237,7 @@ private fun EventDetailContent(
                 event.duration?.let { duration ->
                     val minutes = duration / 60
                     Text(
-                        text = "Duration: ${minutes} min",
+                        text = stringResource(R.string.duration_min, minutes),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.6f)
                     )
@@ -289,7 +291,7 @@ private fun EventDetailContent(
                                 containerColor = Color(0xFF6366F1)
                             )
                         ) {
-                            Text("▶ Play")
+                            Text(stringResource(R.string.play))
                         }
                     }
                 }
@@ -300,7 +302,7 @@ private fun EventDetailContent(
                 event.description?.let { description ->
                     if (description.isNotBlank()) {
                         Text(
-                            text = "Description",
+                            text = stringResource(R.string.description),
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.White
                         )

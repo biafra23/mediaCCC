@@ -45,6 +45,9 @@ import androidx.compose.ui.unit.dp
 import com.jaeckel.mediaccc.api.model.Event
 import com.jaeckel.mediaccc.ui.components.EventCard
 import com.jaeckel.mediaccc.viewmodel.SearchViewModel
+import mediaccc.shared.generated.resources.Res
+import mediaccc.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -60,7 +63,7 @@ fun SearchScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Search") },
+                title = { Text(stringResource(Res.string.search)) },
                 navigationIcon = {
                     Text(
                         text = "←",
@@ -88,12 +91,12 @@ fun SearchScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                placeholder = { Text("Search events (min 3 characters)") },
+                placeholder = { Text(stringResource(Res.string.search_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 trailingIcon = {
                     if (uiState.query.isNotEmpty()) {
                         IconButton(onClick = { viewModel.onQueryChanged("") }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Clear")
+                            Icon(Icons.Default.Clear, contentDescription = stringResource(Res.string.clear))
                         }
                     }
                 },
@@ -131,14 +134,14 @@ fun SearchScreen(
                     }
                     uiState.errorMessage != null -> {
                         Text(
-                            text = "Error: ${uiState.errorMessage}",
+                            text = stringResource(Res.string.error_message, uiState.errorMessage ?: ""),
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }
                     uiState.query.length >= 3 && uiState.searchResults.isEmpty() && !uiState.isLoading -> {
                         Text(
-                            text = "No results found",
+                            text = stringResource(Res.string.no_results_found),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.align(Alignment.Center)

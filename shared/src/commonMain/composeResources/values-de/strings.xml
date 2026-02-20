@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <!-- Navigation / Sections -->
+    <string name="home">Startseite</string>
+    <string name="search">Suche</string>
+    <string name="conferences">Konferenzen</string>
+    <string name="favorites">Favoriten</string>
+    <string name="history">Verlauf</string>
+    <string name="settings">Einstellungen</string>
+
+    <!-- Home Screen -->
+    <string name="continue_watching">Weiterschauen</string>
+    <string name="featured">Empfohlen</string>
+    <string name="recent">Aktuell</string>
+    <string name="menu">Menü</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">Events suchen (mind. 3 Zeichen)</string>
+    <string name="clear">Löschen</string>
+    <string name="no_results_found">Keine Ergebnisse gefunden</string>
+
+    <!-- Event Detail Screen -->
+    <string name="event">Event</string>
+    <string name="go_back">Zurück</string>
+    <string name="resume">▶ Fortsetzen</string>
+    <string name="play">▶ Abspielen</string>
+    <string name="resume_icon">▶ Fortsetzen</string>
+    <string name="play_icon">▶</string>
+    <string name="description">Beschreibung</string>
+
+    <!-- Conference Detail Screen -->
+    <string name="conference">Konferenz</string>
+    <string name="events_count">Events (%1$d)</string>
+
+    <!-- Conferences Screen -->
+    <string name="no_conferences_available">Keine Konferenzen verfügbar</string>
+
+    <!-- History Screen -->
+    <string name="watch_history">Wiedergabeverlauf</string>
+    <string name="no_watch_history">Noch kein Wiedergabeverlauf</string>
+    <string name="min_remaining">%1$d Min. verbleibend</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_coming_soon">Favoriten bald verfügbar</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_coming_soon">Einstellungen bald verfügbar</string>
+
+    <!-- Error -->
+    <string name="error_message">Fehler: %1$s</string>
+
+    <!-- Relative dates -->
+    <string name="just_now">Gerade eben</string>
+    <string name="hours_ago">vor %1$d Std.</string>
+    <string name="yesterday">Gestern</string>
+    <string name="days_ago">vor %1$d T.</string>
+</resources>

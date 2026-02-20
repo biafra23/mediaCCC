@@ -56,7 +56,9 @@ import com.jaeckel.mediaccc.tv.ui.cards.ConferenceCard
 import com.jaeckel.mediaccc.tv.ui.cards.EventCard
 import com.jaeckel.mediaccc.viewmodel.HistoryViewModel
 import com.jaeckel.mediaccc.viewmodel.HomeViewModel
+import com.jaeckel.mediaccc.tv.R
 import org.koin.compose.viewmodel.koinViewModel
+import androidx.compose.ui.res.stringResource
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -85,7 +87,7 @@ fun TvHomeScreen(
 
             uiState.errorMessage != null && uiState.promotedEvents.isEmpty() -> {
                 Text(
-                    text = "Error: ${uiState.errorMessage}",
+                    text = stringResource(R.string.error_message, uiState.errorMessage ?: ""),
                     color = Color.White,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -147,7 +149,7 @@ fun TvHomeScreen(
                         item {
                             Column {
                                 Text(
-                                    text = "Continue Watching",
+                                    text = stringResource(R.string.continue_watching),
                                     style = MaterialTheme.typography.headlineMedium,
                                     color = Color.White,
                                     modifier = Modifier.padding(horizontal = 48.dp)
@@ -174,7 +176,7 @@ fun TvHomeScreen(
                                     }
                             ) {
                                 Text(
-                                    text = "Recent Events",
+                                    text = stringResource(R.string.recent_events),
                                     style = MaterialTheme.typography.headlineMedium,
                                     color = Color.White,
                                     modifier = Modifier.padding(horizontal = 48.dp)
@@ -200,7 +202,7 @@ fun TvHomeScreen(
                         item {
                             Column {
                                 Text(
-                                    text = "Conferences",
+                                    text = stringResource(R.string.conferences),
                                     style = MaterialTheme.typography.headlineMedium,
                                     color = Color.White,
                                     modifier = Modifier.padding(horizontal = 48.dp)

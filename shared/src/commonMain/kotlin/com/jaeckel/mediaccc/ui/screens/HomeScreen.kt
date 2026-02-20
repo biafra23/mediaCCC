@@ -39,6 +39,9 @@ import com.jaeckel.mediaccc.ui.components.EventCardCompact
 import com.jaeckel.mediaccc.ui.components.HistoryCardCompact
 import com.jaeckel.mediaccc.viewmodel.HistoryViewModel
 import com.jaeckel.mediaccc.viewmodel.HomeViewModel
+import mediaccc.shared.generated.resources.Res
+import mediaccc.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,10 +60,10 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("MediaCCC") },
+                title = { Text(stringResource(Res.string.app_name)) },
                 navigationIcon = {
                     IconButton(onClick = onOpenDrawer) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu")
+                        Icon(Icons.Default.Menu, contentDescription = stringResource(Res.string.menu))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -85,7 +88,7 @@ fun HomeScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Error: ${uiState.errorMessage}",
+                            text = stringResource(Res.string.error_message, uiState.errorMessage ?: ""),
                             color = MaterialTheme.colorScheme.error
                         )
                     }
@@ -124,7 +127,7 @@ private fun HomeContent(
         // Continue Watching Section
         if (continueWatching.isNotEmpty()) {
             item {
-                SectionHeader(title = "Continue Watching")
+                SectionHeader(title = stringResource(Res.string.continue_watching))
             }
             item {
                 LazyRow(
@@ -146,7 +149,7 @@ private fun HomeContent(
 
         // Promoted Events Section
         if (promotedEvents.isNotEmpty()) {
-            item { SectionHeader(title = "Featured") }
+            item { SectionHeader(title = stringResource(Res.string.featured)) }
             item {
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -165,7 +168,7 @@ private fun HomeContent(
 
         // Recent Events Section
         if (recentEvents.isNotEmpty()) {
-            item { SectionHeader(title = "Recent") }
+            item { SectionHeader(title = stringResource(Res.string.recent)) }
             item {
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -186,7 +189,7 @@ private fun HomeContent(
 
         // Conferences Section
         if (conferences.isNotEmpty()) {
-            item { SectionHeader(title = "Conferences") }
+            item { SectionHeader(title = stringResource(Res.string.conferences)) }
             item {
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
