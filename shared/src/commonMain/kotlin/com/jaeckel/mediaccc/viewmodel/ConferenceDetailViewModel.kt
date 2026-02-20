@@ -15,8 +15,14 @@ data class ConferenceDetailUiState(
     val isLoading: Boolean = true,
     val conference: Conference? = null,
     val events: List<Event> = emptyList(),
-    val errorMessage: String? = null
-)
+    val errorMessage: String? = null,
+    val selectedTag: String? = null,
+    val tagCounts: List<Pair<String, Int>> = emptyList()
+) {
+    val filteredEvents: List<Event>
+        get() = if (selectedTag == null) events
+                else events.filter { it.tags?.contains(selectedTag) == true }
+}
 
 class ConferenceDetailViewModel(
     private val repository: MediaRepository,
@@ -30,6 +36,20 @@ class ConferenceDetailViewModel(
         loadConference()
     }
 
+    fun selectTag(tag: String?) {
+        _uiState.update { it.copy(selectedTag = if (it.selectedTag == tag) null else tag) }
+    }
+
+    private fun computeTagCounts(events: List<Event>): List<Pair<String, Int>> {
+        val counts = mutableMapOf<String, Int>()
+        for (event in events) {
+            event.tags?.forEach { tag ->
+                if (tag.isNotBlank()) counts[tag] = (counts[tag] ?: 0) + 1
+            }
+        }
+        return counts.entries.sortedByDescending { it.value }.map { it.key to it.value }
+    }
+
     private fun loadConference() {
         viewModelScope.launch {
             repository.getConference(acronym).collect { result ->
@@ -40,7 +60,8 @@ class ConferenceDetailViewModel(
                                 isLoading = false,
                                 conference = conference,
                                 events = conference.events,
-                                errorMessage = null
+                                errorMessage = null,
+                                tagCounts = computeTagCounts(conference.events)
                             )
                         }
                     },
