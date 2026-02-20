@@ -31,13 +31,19 @@ class EventDetailViewModel(
 
     init {
         loadEvent()
+        observeSavedPosition()
+    }
+
+    private fun observeSavedPosition() {
+        viewModelScope.launch {
+            historyRepository.getEntryFlow(eventGuid).collect { entry ->
+                _uiState.update { it.copy(savedSliderPos = entry?.sliderPos ?: 0f) }
+            }
+        }
     }
 
     private fun loadEvent() {
         viewModelScope.launch {
-            val savedEntry = historyRepository.getEntry(eventGuid)
-            _uiState.update { it.copy(savedSliderPos = savedEntry?.sliderPos ?: 0f) }
-
             repository.getEvent(eventGuid).collect { result ->
                 result.fold(
                     onSuccess = { event ->

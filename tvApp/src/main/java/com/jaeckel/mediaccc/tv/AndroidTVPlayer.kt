@@ -88,7 +88,7 @@ fun AndroidTVPlayer(
     var isPaused by remember { mutableStateOf(false) }
     var controlsVisible by remember { mutableStateOf(false) }
     var selectedControlIndex by remember { mutableIntStateOf(1) } // 0=rewind, 1=play/pause, 2=forward
-    var hasRestoredPosition by remember { mutableStateOf(false) }
+    var hasAttemptedRestore by remember { mutableStateOf(false) }
 
     // Periodically save progress
     LaunchedEffect(Unit) {
@@ -101,13 +101,14 @@ fun AndroidTVPlayer(
         }
     }
 
-    // Seek to saved position once duration is known
-    LaunchedEffect(duration) {
-        if (duration > 0 && !hasRestoredPosition && uiState.savedSliderPos > 5f) {
+    // Seek to saved position once duration is known and saved position is loaded
+    LaunchedEffect(duration, uiState.savedSliderPos) {
+        if (duration > 0 && !hasAttemptedRestore && uiState.savedSliderPos > 5f) {
+            hasAttemptedRestore = true // Mark immediately to prevent multiple triggers
+            delay(800) // Give the player enough time to be ready
             val seekTarget = (uiState.savedSliderPos / 1000f) * duration
             Log.i("AndroidTVPlayer", "Restoring position to $seekTarget (sliderPos: ${uiState.savedSliderPos})")
             playerHost.seekTo(seekTarget)
-            hasRestoredPosition = true
         }
     }
 

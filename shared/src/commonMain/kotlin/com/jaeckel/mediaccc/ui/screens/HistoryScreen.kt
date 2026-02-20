@@ -85,7 +85,7 @@ fun HistoryScreen(
             }
         } else {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
+                columns = GridCells.Fixed(2),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),

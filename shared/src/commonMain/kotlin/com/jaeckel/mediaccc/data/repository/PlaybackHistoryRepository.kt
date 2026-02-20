@@ -13,6 +13,8 @@ class PlaybackHistoryRepository(private val dao: PlaybackHistoryDao) {
 
     suspend fun getEntry(guid: String): PlaybackHistoryEntity? = dao.getByGuid(guid)
 
+    fun getEntryFlow(guid: String): Flow<PlaybackHistoryEntity?> = dao.getByGuidFlow(guid)
+
     suspend fun saveProgress(
         eventGuid: String,
         title: String,

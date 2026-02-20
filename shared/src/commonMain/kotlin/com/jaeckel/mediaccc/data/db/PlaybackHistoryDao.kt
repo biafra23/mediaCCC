@@ -19,4 +19,7 @@ interface PlaybackHistoryDao {
 
     @Query("SELECT * FROM playback_history WHERE eventGuid = :guid LIMIT 1")
     suspend fun getByGuid(guid: String): PlaybackHistoryEntity?
+
+    @Query("SELECT * FROM playback_history WHERE eventGuid = :guid LIMIT 1")
+    fun getByGuidFlow(guid: String): Flow<PlaybackHistoryEntity?>
 }

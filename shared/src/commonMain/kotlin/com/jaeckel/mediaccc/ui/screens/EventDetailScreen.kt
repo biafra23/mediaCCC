@@ -85,12 +85,12 @@ fun EventDetailScreen(
         }
     }
 
-    // Seek to saved position once the player starts playing
-    LaunchedEffect(playerState.isPlaying, hasRestoredPosition) {
+    // Seek to saved position once the player starts playing and position is loaded
+    LaunchedEffect(playerState.isPlaying, hasRestoredPosition, savedSliderPos) {
         if (playerState.isPlaying && !hasRestoredPosition && savedSliderPos > 5f) {
-            delay(300)
+            hasRestoredPosition = true // Set immediately
+            delay(500)
             playerState.seekTo(savedSliderPos)
-            hasRestoredPosition = true
         }
     }
 
