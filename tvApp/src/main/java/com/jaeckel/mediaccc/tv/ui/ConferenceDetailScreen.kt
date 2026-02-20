@@ -7,17 +7,23 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed as gridItemsIndexed
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed as rowItemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,12 +35,13 @@ import com.jaeckel.mediaccc.tv.ui.cards.EventCardWithOverlay
 import com.jaeckel.mediaccc.viewmodel.ConferenceDetailViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.runtime.remember
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.tv.material3.Surface
+import androidx.tv.material3.SelectableSurfaceDefaults
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -48,9 +55,9 @@ fun ConferenceDetailScreen(
         parameters = { parametersOf(acronym) }
     )
     val uiState by viewModel.uiState.collectAsState()
-    val focusRequesters = remember(uiState.events) {
-        List(uiState.events.size) { FocusRequester() }
-    }
+    
+    val firstTagFocusRequester = remember { FocusRequester() }
+    val firstResultFocusRequester = remember { FocusRequester() }
 
     Box(
         modifier = Modifier
@@ -105,8 +112,48 @@ fun ConferenceDetailScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
+                    // Tags Row
+                    if (uiState.tagCounts.isNotEmpty()) {
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            contentPadding = PaddingValues(bottom = 16.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            rowItemsIndexed(uiState.tagCounts) { index, (tag, count) ->
+                                val isSelected = uiState.selectedTag == tag
+                                Surface(
+                                    selected = isSelected,
+                                    onClick = { viewModel.selectTag(tag) },
+                                    modifier = Modifier
+                                        .then(if (index == 0) Modifier.focusRequester(firstTagFocusRequester) else Modifier)
+                                        .focusProperties {
+                                            down = firstResultFocusRequester
+                                        },
+                                    shape = SelectableSurfaceDefaults.shape(RoundedCornerShape(16.dp)),
+                                    colors = SelectableSurfaceDefaults.colors(
+                                        containerColor = Color.White.copy(alpha = 0.1f),
+                                        contentColor = Color.White.copy(alpha = 0.8f),
+                                        focusedContainerColor = Color.White,
+                                        focusedContentColor = Color.Black,
+                                        selectedContainerColor = Color(0xFF6366F1),
+                                        selectedContentColor = Color.White,
+                                        focusedSelectedContainerColor = Color.White,
+                                        focusedSelectedContentColor = Color.Black
+                                    )
+                                ) {
+                                    Text(
+                                        text = "$tag ($count)",
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+
                     Text(
-                        text = "Events (${uiState.events.size})",
+                        text = "Events (${uiState.filteredEvents.size})",
                         style = MaterialTheme.typography.titleLarge,
                         color = Color.White
                     )
@@ -121,19 +168,20 @@ fun ConferenceDetailScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        itemsIndexed(uiState.events, key = { _, event -> event.guid }) { index, event ->
+                        gridItemsIndexed(uiState.filteredEvents, key = { _, event -> event.guid }) { index, event ->
                             EventCardWithOverlay(
                                 event = event,
                                 onClick = { onEventClick(event) },
                                 modifier = Modifier
-                                    .focusRequester(focusRequesters[index])
+                                    .then(if (index == 0) Modifier.focusRequester(firstResultFocusRequester) else Modifier)
                                     .focusProperties {
-                                        if (index + 1 < focusRequesters.size) {
-                                            right = focusRequesters[index + 1]
+                                        if (uiState.tagCounts.isNotEmpty()) {
+                                            up = firstTagFocusRequester
                                         }
-                                        // Only override left if NOT at the start of a row (4 columns)
-                                        if (index % 4 != 0) {
-                                            left = focusRequesters[index - 1]
+                                        
+                                        // Grid navigation logic
+                                        if (index + 1 < uiState.filteredEvents.size) {
+                                            // right = ... automatically handled by LazyVerticalGrid unless overridden
                                         }
                                     }
                             )
