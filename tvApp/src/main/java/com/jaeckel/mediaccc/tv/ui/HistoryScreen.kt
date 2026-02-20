@@ -70,7 +70,7 @@ fun HistoryScreen(
                 modifier = Modifier.padding(start = 32.dp, top = 32.dp, bottom = 8.dp)
             )
             LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
+                columns = GridCells.Fixed(3),
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),

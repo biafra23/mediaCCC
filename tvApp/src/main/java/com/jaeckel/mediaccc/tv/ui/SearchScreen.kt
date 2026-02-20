@@ -75,16 +75,7 @@ fun SearchScreen(
             onValueChange = { viewModel.onQueryChanged(it) },
             modifier = Modifier
                 .fillMaxWidth()
-                .focusRequester(searchFieldFocusRequester)
-                .focusProperties {
-                    down = if (uiState.tagCounts.isNotEmpty()) {
-                        firstTagFocusRequester
-                    } else if (uiState.filteredResults.isNotEmpty()) {
-                        firstResultFocusRequester
-                    } else {
-                        searchFieldFocusRequester
-                    }
-                },
+                .focusRequester(searchFieldFocusRequester),
             placeholder = { Text("Enter at least 3 characters...", color = Color.Gray) },
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
@@ -111,11 +102,7 @@ fun SearchScreen(
                         selected = isSelected,
                         onClick = { viewModel.selectTag(tag) },
                         modifier = Modifier
-                            .then(if (index == 0) Modifier.focusRequester(firstTagFocusRequester) else Modifier)
-                            .focusProperties {
-                                up = searchFieldFocusRequester
-                                down = firstResultFocusRequester
-                            },
+                            .then(if (index == 0) Modifier.focusRequester(firstTagFocusRequester) else Modifier),
                         shape = SelectableSurfaceDefaults.shape(RoundedCornerShape(16.dp)),
                         colors = SelectableSurfaceDefaults.colors(
                             containerColor = Color.White.copy(alpha = 0.1f),
@@ -171,13 +158,6 @@ fun SearchScreen(
                             onClick = { onEventClick(event) },
                             modifier = Modifier
                                 .then(if (index == 0) Modifier.focusRequester(firstResultFocusRequester) else Modifier)
-                                .focusProperties {
-                                    up = if (uiState.tagCounts.isNotEmpty()) {
-                                        firstTagFocusRequester
-                                    } else {
-                                        searchFieldFocusRequester
-                                    }
-                                }
                         )
                     }
                 }

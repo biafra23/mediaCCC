@@ -41,6 +41,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun ConferencesScreen(
@@ -82,80 +84,75 @@ fun ConferencesScreen(
                 color = Color.White
             )
         } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 48.dp, vertical = 32.dp)
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(4),
+                contentPadding = PaddingValues(horizontal = 48.dp, vertical = 32.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxSize()
             ) {
-                Text(
-                    text = "Conferences",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Color.White
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Tags Row
-                if (tagCounts.isNotEmpty()) {
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(bottom = 8.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        rowItemsIndexed(tagCounts) { index, (tag, count) ->
-                            val isSelected = selectedTag == tag
-                            Surface(
-                                selected = isSelected,
-                                onClick = { selectedTag = if (isSelected) null else tag },
-                                modifier = Modifier
-                                    .then(if (index == 0) Modifier.focusRequester(firstTagFocusRequester) else Modifier)
-                                    .focusProperties {
-                                        down = firstResultFocusRequester
-                                    },
-                                shape = SelectableSurfaceDefaults.shape(RoundedCornerShape(16.dp)),
-                                colors = SelectableSurfaceDefaults.colors(
-                                    containerColor = Color.White.copy(alpha = 0.1f),
-                                    contentColor = Color.White.copy(alpha = 0.8f),
-                                    focusedContainerColor = Color.White,
-                                    focusedContentColor = Color.Black,
-                                    selectedContainerColor = Color(0xFF6366F1),
-                                    selectedContentColor = Color.White,
-                                    focusedSelectedContainerColor = Color.White,
-                                    focusedSelectedContentColor = Color.Black
-                                )
-                            ) {
-                                Text(
-                                    text = "$tag ($count)",
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                        }
+                // Title Section
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Column {
+                        Text(
+                            text = "Conferences",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = Color.White
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
                 }
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(4),
-                    contentPadding = PaddingValues(bottom = 32.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    gridItemsIndexed(filteredConferences, key = { _, it -> it.acronym }) { index, conference ->
-                        ConferenceCard(
-                            conference = conference,
-                            onClick = { onConferenceClick(conference) },
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .then(if (index == 0) Modifier.focusRequester(firstResultFocusRequester) else Modifier)
-                                .focusProperties {
-                                    if (tagCounts.isNotEmpty()) {
-                                        up = firstTagFocusRequester
+                // Tags Section
+                if (tagCounts.isNotEmpty()) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Column {
+                            LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                contentPadding = PaddingValues(bottom = 8.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                rowItemsIndexed(tagCounts) { index, (tag, count) ->
+                                    val isSelected = selectedTag == tag
+                                    Surface(
+                                        selected = isSelected,
+                                        onClick = { selectedTag = if (isSelected) null else tag },
+                                        modifier = Modifier
+                                            .then(if (index == 0) Modifier.focusRequester(firstTagFocusRequester) else Modifier),
+                                        shape = SelectableSurfaceDefaults.shape(RoundedCornerShape(16.dp)),
+                                        colors = SelectableSurfaceDefaults.colors(
+                                            containerColor = Color.White.copy(alpha = 0.1f),
+                                            contentColor = Color.White.copy(alpha = 0.8f),
+                                            focusedContainerColor = Color.White,
+                                            focusedContentColor = Color.Black,
+                                            selectedContainerColor = Color(0xFF6366F1),
+                                            selectedContentColor = Color.White,
+                                            focusedSelectedContainerColor = Color.White,
+                                            focusedSelectedContentColor = Color.Black
+                                        )
+                                    ) {
+                                        Text(
+                                            text = "$tag ($count)",
+                                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
                                     }
                                 }
-                        )
+                            }
+                            Spacer(modifier = Modifier.height(12.dp))
+                        }
                     }
+                }
+
+                // Grid Items
+                gridItemsIndexed(filteredConferences, key = { _, it -> it.acronym }) { index, conference ->
+                    ConferenceCard(
+                        conference = conference,
+                        onClick = { onConferenceClick(conference) },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .then(if (index == 0) Modifier.focusRequester(firstResultFocusRequester) else Modifier)
+                    )
                 }
             }
         }
