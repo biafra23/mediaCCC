@@ -546,9 +546,37 @@ private fun PlayerControlsOverlay(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = playerState.positionText, color = Color.White, fontSize = 12.sp)
-                    Text(text = playerState.durationText, color = Color.White, fontSize = 12.sp)
+                    Text(
+                        text = "-${computeRemainingTime(playerState.positionText, playerState.durationText)}",
+                        color = Color.White,
+                        fontSize = 12.sp
+                    )
                 }
             }
         }
     }
+}
+
+private fun parseTimeToSeconds(text: String): Int {
+    val parts = text.split(":")
+    return when (parts.size) {
+        3 -> (parts[0].toIntOrNull() ?: 0) * 3600 + (parts[1].toIntOrNull() ?: 0) * 60 + (parts[2].toIntOrNull() ?: 0)
+        2 -> (parts[0].toIntOrNull() ?: 0) * 60 + (parts[1].toIntOrNull() ?: 0)
+        else -> 0
+    }
+}
+
+private fun formatSeconds(totalSeconds: Int): String {
+    val h = totalSeconds / 3600
+    val m = (totalSeconds % 3600) / 60
+    val s = totalSeconds % 60
+    val pad = { v: Int -> v.toString().padStart(2, '0') }
+    return if (h > 0) "$h:${pad(m)}:${pad(s)}" else "$m:${pad(s)}"
+}
+
+private fun computeRemainingTime(positionText: String, durationText: String): String {
+    val position = parseTimeToSeconds(positionText)
+    val duration = parseTimeToSeconds(durationText)
+    val remaining = (duration - position).coerceAtLeast(0)
+    return formatSeconds(remaining)
 }

@@ -377,7 +377,7 @@ private fun PlayerControlsOverlay(
                 Spacer(modifier = Modifier.width(16.dp))
 
                 Text(
-                    text = formatTime(duration),
+                    text = "-${formatTime((duration - currentTime).coerceAtLeast(0f))}",
                     color = Color.White,
                     fontSize = 14.sp
                 )

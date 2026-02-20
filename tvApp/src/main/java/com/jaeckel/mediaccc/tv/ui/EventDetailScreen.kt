@@ -288,7 +288,9 @@ private fun EventDetailContent(
                                     bestRecording.recordingUrl ?: "",
                                     event.title,
                                     event.persons?.joinToString(", ") ?: "",
-                                    event.date?.toString() ?: "",
+                                    event.date?.let {
+                                        dateTimeFormat.format(it.toLocalDateTime(TimeZone.currentSystemDefault()))
+                                    } ?: "",
                                     event.conferenceTitle ?: "",
                                     event.duration ?: 0L
                                 )
