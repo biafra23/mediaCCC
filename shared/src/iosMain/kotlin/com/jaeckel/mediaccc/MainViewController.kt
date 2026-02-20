@@ -9,13 +9,14 @@ import coil3.SingletonImageLoader
 import coil3.compose.LocalPlatformContext
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.svg.SvgDecoder
+import com.jaeckel.mediaccc.di.platformModule
 import com.jaeckel.mediaccc.di.sharedModule
 import com.jaeckel.mediaccc.ui.navigation.AppNavHost
 import org.koin.core.context.startKoin
 
-fun initKoin() {
+fun doInitKoin() {
     startKoin {
-        modules(sharedModule)
+        modules(sharedModule, platformModule())
     }
 }
 
