@@ -29,9 +29,11 @@ data class ConferenceDetailRoute(val acronym: String) : NavKey
 
 @Serializable
 data class PlayerRoute(
+    val eventGuid: String,
     val videoUrl: String,
     val title: String = "",
     val speakers: String = "",
     val date: String = "",
-    val conference: String = ""
+    val conference: String = "",
+    val duration: Long = 0
 ) : NavKey

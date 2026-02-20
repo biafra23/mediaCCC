@@ -59,7 +59,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun EventDetailScreen(
     eventGuid: String,
-    onPlayClick: (videoUrl: String, title: String, speakers: String, date: String, conference: String) -> Unit,
+    onPlayClick: (eventGuid: String, videoUrl: String, title: String, speakers: String, date: String, conference: String, duration: Long) -> Unit,
     onBackClick: () -> Unit
 ) {
     // Use eventGuid as key to ensure we get a fresh ViewModel for each event
@@ -118,9 +118,9 @@ fun EventDetailScreen(
                     event = uiState.event!!,
                     bestRecording = uiState.bestRecording,
                     dateTimeFormat = dateTimeFormat,
-                    onPlayClick = { videoUrl, title, speakers, date, conference ->
+                    onPlayClick = { guid, videoUrl, title, speakers, date, conference, duration ->
                         viewModel.saveProgress(uiState.savedSliderPos)
-                        onPlayClick(videoUrl, title, speakers, date, conference)
+                        onPlayClick(guid, videoUrl, title, speakers, date, conference, duration)
                     },
                     playButtonFocusRequester = playButtonFocusRequester
                 )
@@ -139,7 +139,7 @@ private fun EventDetailContent(
     event: Event,
     bestRecording: Recording?,
     dateTimeFormat: DateTimeFormat<LocalDateTime>,
-    onPlayClick: (videoUrl: String, title: String, speakers: String, date: String, conference: String) -> Unit,
+    onPlayClick: (eventGuid: String, videoUrl: String, title: String, speakers: String, date: String, conference: String, duration: Long) -> Unit,
     playButtonFocusRequester: FocusRequester
 ) {
     val descriptionScrollState = rememberScrollState()
@@ -249,11 +249,13 @@ private fun EventDetailContent(
                         Button(
                             onClick = {
                                 onPlayClick(
+                                    event.guid,
                                     bestRecording.recordingUrl ?: "",
                                     event.title,
                                     event.persons?.joinToString(", ") ?: "",
                                     event.date?.toString() ?: "",
-                                    event.conferenceTitle ?: ""
+                                    event.conferenceTitle ?: "",
+                                    event.duration ?: 0L
                                 )
                             },
                             modifier = Modifier

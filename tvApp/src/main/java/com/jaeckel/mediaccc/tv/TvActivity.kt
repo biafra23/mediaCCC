@@ -204,6 +204,9 @@ fun TvNavDisplay(backStack: MutableList<NavKey>) {
                     },
                     onConferenceClick = { conference ->
                         backStack.add(ConferenceDetailRoute(conference.acronym))
+                    },
+                    onHistoryEventClick = { guid ->
+                        backStack.add(EventDetailRoute(guid))
                     }
                 )
             }
@@ -249,13 +252,15 @@ fun TvNavDisplay(backStack: MutableList<NavKey>) {
             entry<EventDetailRoute> { route ->
                 EventDetailScreen(
                     eventGuid = route.eventGuid,
-                    onPlayClick = { videoUrl, title, speakers, date, conference ->
+                    onPlayClick = { eventGuid, videoUrl, title, speakers, date, conference, duration ->
                         backStack.add(PlayerRoute(
+                            eventGuid = eventGuid,
                             videoUrl = videoUrl,
                             title = title,
                             speakers = speakers,
                             date = date,
-                            conference = conference
+                            conference = conference,
+                            duration = duration
                         ))
                     },
                     onBackClick = {
@@ -268,11 +273,13 @@ fun TvNavDisplay(backStack: MutableList<NavKey>) {
 
             entry<PlayerRoute> { route ->
                 AndroidTVPlayer(
+                    eventGuid = route.eventGuid,
                     videoUrl = route.videoUrl,
                     title = route.title,
                     speakers = route.speakers,
                     date = route.date,
-                    conference = route.conference
+                    conference = route.conference,
+                    durationFromEvent = route.duration
                 )
             }
         }

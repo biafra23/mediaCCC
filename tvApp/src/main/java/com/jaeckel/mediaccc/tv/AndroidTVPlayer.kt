@@ -57,24 +57,59 @@ import chaintech.videoplayer.model.VideoPlayerConfig
 import chaintech.videoplayer.ui.video.VideoPlayerComposable
 import kotlinx.coroutines.delay
 
+import androidx.compose.runtime.collectAsState
+import com.jaeckel.mediaccc.viewmodel.EventDetailViewModel
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
+
 @Composable
 fun AndroidTVPlayer(
+    eventGuid: String,
     videoUrl: String,
     title: String = "",
     speakers: String = "",
     date: String = "",
-    conference: String = ""
+    conference: String = "",
+    durationFromEvent: Long = 0
 ) {
     Log.i("AndroidTVPlayer", "videoUrl: $videoUrl")
     Log.i("AndroidTVPlayer", "title: $title")
 
+    val viewModel: EventDetailViewModel = koinViewModel(
+        key = eventGuid,
+        parameters = { parametersOf(eventGuid) }
+    )
+    val uiState by viewModel.uiState.collectAsState()
+
     val playerHost = remember { MediaPlayerHost(videoUrl) }
 
     var currentTime by remember { mutableFloatStateOf(0f) }
-    var duration by remember { mutableFloatStateOf(0f) }
+    var duration by remember { mutableFloatStateOf(durationFromEvent.toFloat()) }
     var isPaused by remember { mutableStateOf(false) }
     var controlsVisible by remember { mutableStateOf(false) }
     var selectedControlIndex by remember { mutableIntStateOf(1) } // 0=rewind, 1=play/pause, 2=forward
+    var hasRestoredPosition by remember { mutableStateOf(false) }
+
+    // Periodically save progress
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(5000)
+            if (duration > 0) {
+                val progress = (currentTime / duration) * 1000f
+                viewModel.saveProgress(progress)
+            }
+        }
+    }
+
+    // Seek to saved position once duration is known
+    LaunchedEffect(duration) {
+        if (duration > 0 && !hasRestoredPosition && uiState.savedSliderPos > 5f) {
+            val seekTarget = (uiState.savedSliderPos / 1000f) * duration
+            Log.i("AndroidTVPlayer", "Restoring position to $seekTarget (sliderPos: ${uiState.savedSliderPos})")
+            playerHost.seekTo(seekTarget)
+            hasRestoredPosition = true
+        }
+    }
 
     // Auto-hide controls after 5 seconds
     LaunchedEffect(controlsVisible) {
