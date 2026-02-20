@@ -29,6 +29,8 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,6 +43,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -88,6 +94,7 @@ fun AndroidTVPlayer(
     var isPaused by remember { mutableStateOf(false) }
     var controlsVisible by remember { mutableStateOf(false) }
     var selectedControlIndex by remember { mutableIntStateOf(1) } // 0=rewind, 1=play/pause, 2=forward
+    var seekBarFocused by remember { mutableStateOf(false) }
     var hasAttemptedRestore by remember { mutableStateOf(false) }
 
     // Periodically save progress
@@ -112,9 +119,9 @@ fun AndroidTVPlayer(
         }
     }
 
-    // Auto-hide controls after 5 seconds
-    LaunchedEffect(controlsVisible) {
-        if (controlsVisible) {
+    // Auto-hide controls after 5 seconds (but not while seeking)
+    LaunchedEffect(controlsVisible, seekBarFocused) {
+        if (controlsVisible && !seekBarFocused) {
             delay(5000)
             controlsVisible = false
         }
@@ -123,19 +130,37 @@ fun AndroidTVPlayer(
     fun handleKeyEvent(keyEvent: androidx.compose.ui.input.key.KeyEvent): Boolean {
         if (keyEvent.type == KeyEventType.KeyDown) {
             when (keyEvent.nativeKeyEvent.keyCode) {
-                KeyEvent.KEYCODE_DPAD_UP,
+                KeyEvent.KEYCODE_DPAD_UP -> {
+                    if (controlsVisible && seekBarFocused) {
+                        // Leave seekbar and hide overlay
+                        seekBarFocused = false
+                        controlsVisible = false
+                    } else if (controlsVisible && !seekBarFocused) {
+                        seekBarFocused = true
+                    } else {
+                        controlsVisible = true
+                    }
+                    return true
+                }
+
                 KeyEvent.KEYCODE_DPAD_DOWN -> {
-                    // Toggle controls visibility
-                    controlsVisible = !controlsVisible
+                    if (controlsVisible && seekBarFocused) {
+                        // Move focus to buttons below
+                        seekBarFocused = false
+                    } else if (!controlsVisible) {
+                        controlsVisible = true
+                    }
                     return true
                 }
 
                 KeyEvent.KEYCODE_DPAD_LEFT -> {
                     if (controlsVisible) {
-                        // Navigate control selection left
-                        selectedControlIndex = (selectedControlIndex - 1).coerceAtLeast(0)
+                        if (seekBarFocused) {
+                            playerHost.seekTo((currentTime - 10f).coerceAtLeast(0f))
+                        } else {
+                            selectedControlIndex = (selectedControlIndex - 1).coerceAtLeast(0)
+                        }
                     } else {
-                        // Seek backward 10 seconds
                         playerHost.seekTo((currentTime - 10f).coerceAtLeast(0f))
                     }
                     return true
@@ -143,10 +168,12 @@ fun AndroidTVPlayer(
 
                 KeyEvent.KEYCODE_DPAD_RIGHT -> {
                     if (controlsVisible) {
-                        // Navigate control selection right
-                        selectedControlIndex = (selectedControlIndex + 1).coerceAtMost(2)
+                        if (seekBarFocused) {
+                            playerHost.seekTo(currentTime + 10f)
+                        } else {
+                            selectedControlIndex = (selectedControlIndex + 1).coerceAtMost(2)
+                        }
                     } else {
-                        // Seek forward 10 seconds
                         playerHost.seekTo(currentTime + 10f)
                     }
                     return true
@@ -155,14 +182,17 @@ fun AndroidTVPlayer(
                 KeyEvent.KEYCODE_DPAD_CENTER,
                 KeyEvent.KEYCODE_ENTER -> {
                     if (controlsVisible) {
-                        // Execute selected control action
-                        when (selectedControlIndex) {
-                            0 -> playerHost.seekTo((currentTime - 10f).coerceAtLeast(0f))
-                            1 -> playerHost.togglePlayPause()
-                            2 -> playerHost.seekTo(currentTime + 10f)
+                        if (seekBarFocused) {
+                            // Pause/play while seekbar is focused
+                            playerHost.togglePlayPause()
+                        } else {
+                            when (selectedControlIndex) {
+                                0 -> playerHost.seekTo((currentTime - 10f).coerceAtLeast(0f))
+                                1 -> playerHost.togglePlayPause()
+                                2 -> playerHost.seekTo(currentTime + 10f)
+                            }
                         }
                     } else {
-                        // Show controls first, then toggle play/pause
                         controlsVisible = true
                         playerHost.togglePlayPause()
                     }
@@ -250,7 +280,9 @@ fun AndroidTVPlayer(
                 currentTime = currentTime,
                 duration = duration,
                 isPaused = isPaused,
-                selectedIndex = selectedControlIndex
+                selectedIndex = selectedControlIndex,
+                seekBarFocused = seekBarFocused,
+                onSeek = { playerHost.seekTo(it) }
             )
         }
     }
@@ -265,7 +297,9 @@ private fun PlayerControlsOverlay(
     currentTime: Float,
     duration: Float,
     isPaused: Boolean,
-    selectedIndex: Int
+    selectedIndex: Int,
+    seekBarFocused: Boolean,
+    onSeek: (Float) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -364,14 +398,28 @@ private fun PlayerControlsOverlay(
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                LinearProgressIndicator(
-                    progress = { if (duration > 0) currentTime / duration else 0f },
+                Slider(
+                    value = if (duration > 0) currentTime else 0f,
+                    onValueChange = { onSeek(it) },
+                    valueRange = 0f..duration.coerceAtLeast(1f),
                     modifier = Modifier
                         .weight(1f)
-                        .height(4.dp)
-                        .clip(RoundedCornerShape(2.dp)),
-                    color = Color.White,
-                    trackColor = Color.White.copy(alpha = 0.3f)
+                        .drawBehind {
+                            // Dark outline behind the track for visibility on light backgrounds
+                            val trackHeight = 6.dp.toPx()
+                            val y = size.height / 2
+                            drawRoundRect(
+                                color = Color.Black.copy(alpha = 0.5f),
+                                topLeft = Offset(0f, y - trackHeight / 2 - 1.dp.toPx()),
+                                size = Size(size.width, trackHeight + 2.dp.toPx()),
+                                cornerRadius = CornerRadius(trackHeight)
+                            )
+                        },
+                    colors = SliderDefaults.colors(
+                        thumbColor = if (seekBarFocused) Color(0xFF6366F1) else Color.White,
+                        activeTrackColor = Color.White,
+                        inactiveTrackColor = Color.White.copy(alpha = 0.3f)
+                    )
                 )
 
                 Spacer(modifier = Modifier.width(16.dp))
