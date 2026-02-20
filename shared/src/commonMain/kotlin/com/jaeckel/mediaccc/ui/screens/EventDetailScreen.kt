@@ -71,15 +71,38 @@ fun EventDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     var isPlaying by rememberSaveable { mutableStateOf(false) }
+    var hasRestoredPosition by remember { mutableStateOf(false) }
     val playerState = rememberVideoPlayerState()
-    
-    // Apply system appearance based on fullscreen state
+
     SystemAppearance(playerState.isFullscreen)
 
     val recordingUrl = uiState.bestRecording?.recordingUrl
+    val savedSliderPos = uiState.savedSliderPos
+
     LaunchedEffect(recordingUrl, isPlaying) {
         if (isPlaying && recordingUrl != null) {
             playerState.openUri(recordingUrl)
+        }
+    }
+
+    // Seek to saved position once the player starts playing
+    LaunchedEffect(playerState.isPlaying, hasRestoredPosition) {
+        if (playerState.isPlaying && !hasRestoredPosition && savedSliderPos > 5f) {
+            delay(300)
+            playerState.seekTo(savedSliderPos)
+            hasRestoredPosition = true
+        }
+    }
+
+    // As soon as play starts: write the initial history entry, then refresh position every 5 s.
+    // This ensures history is populated regardless of how the user navigates away.
+    LaunchedEffect(isPlaying) {
+        if (isPlaying) {
+            viewModel.saveProgress(savedSliderPos)
+            while (true) {
+                delay(5_000)
+                viewModel.saveProgress(playerState.sliderPos)
+            }
         }
     }
 
@@ -109,7 +132,10 @@ fun EventDetailScreen(
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = Modifier
                             .padding(horizontal = 12.dp)
-                            .clickable { onBackClick() }
+                            .clickable {
+                                viewModel.saveProgress(playerState.sliderPos)
+                                onBackClick()
+                            }
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -126,9 +152,7 @@ fun EventDetailScreen(
         ) {
             when {
                 uiState.isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
 
                 uiState.errorMessage != null -> {
@@ -141,9 +165,7 @@ fun EventDetailScreen(
                             color = MaterialTheme.colorScheme.error
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = onBackClick) {
-                            Text("Go Back")
-                        }
+                        Button(onClick = onBackClick) { Text("Go Back") }
                     }
                 }
 
@@ -155,13 +177,11 @@ fun EventDetailScreen(
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
                     ) {
-                        // Poster/Thumbnail or Video Player
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(250.dp)
                         ) {
-                            // Always compose the surface so fullscreen can work
                             VideoPlayerSurface(
                                 playerState = playerState,
                                 modifier = Modifier.fillMaxSize(),
@@ -171,7 +191,7 @@ fun EventDetailScreen(
                                             dateTimeFormat.format(it.toLocalDateTime(TimeZone.currentSystemDefault()))
                                         } ?: ""
                                         val speakers = event.persons?.joinToString(", ") ?: ""
-                                        
+
                                         PlayerControlsOverlay(
                                             playerState = playerState,
                                             title = event.title,
@@ -179,6 +199,7 @@ fun EventDetailScreen(
                                             conference = event.conferenceTitle ?: "",
                                             date = formattedDate,
                                             onExitFullscreen = {
+                                                viewModel.saveProgress(playerState.sliderPos)
                                                 playerState.toggleFullscreen()
                                                 isPlaying = false
                                                 playerState.pause()
@@ -189,7 +210,6 @@ fun EventDetailScreen(
                             )
 
                             if (!isPlaying || recordingUrl == null) {
-                                // Show thumbnail with play button on top
                                 AsyncImage(
                                     model = event.posterUrl ?: event.thumbUrl,
                                     contentDescription = event.title,
@@ -197,7 +217,6 @@ fun EventDetailScreen(
                                     modifier = Modifier.fillMaxSize()
                                 )
 
-                                // Play button overlay
                                 if (uiState.bestRecording != null) {
                                     Box(
                                         modifier = Modifier
@@ -212,8 +231,9 @@ fun EventDetailScreen(
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
-                                            text = "▶",
-                                            style = MaterialTheme.typography.headlineMedium,
+                                            text = if (savedSliderPos > 5f) "▶ Resume" else "▶",
+                                            style = if (savedSliderPos > 5f) MaterialTheme.typography.bodyMedium
+                                            else MaterialTheme.typography.headlineMedium,
                                             color = MaterialTheme.colorScheme.onPrimary
                                         )
                                     }
@@ -226,13 +246,11 @@ fun EventDetailScreen(
                                 .fillMaxWidth()
                                 .padding(16.dp)
                         ) {
-                            // Title
                             Text(
                                 text = event.title,
                                 style = MaterialTheme.typography.headlineSmall
                             )
 
-                            // Subtitle
                             event.subtitle?.let { subtitle ->
                                 if (subtitle.isNotBlank()) {
                                     Text(
@@ -246,32 +264,23 @@ fun EventDetailScreen(
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            // Meta info
-                            event.conferenceTitle?.let { conference ->
-                                MetaInfoRow(label = "📅", text = conference)
-                            }
+                            event.conferenceTitle?.let { MetaInfoRow(label = "📅", text = it) }
 
                             event.date?.let { date ->
-                                val localDateTime =
-                                    date.toLocalDateTime(TimeZone.currentSystemDefault())
-                                val formattedDate = dateTimeFormat.format(localDateTime)
-                                MetaInfoRow(label = "🗓", text = formattedDate)
+                                val localDateTime = date.toLocalDateTime(TimeZone.currentSystemDefault())
+                                MetaInfoRow(label = "🗓", text = dateTimeFormat.format(localDateTime))
                             }
 
                             event.persons?.let { persons ->
-                                if (persons.isNotEmpty()) {
-                                    MetaInfoRow(label = "👤", text = persons.joinToString(", "))
-                                }
+                                if (persons.isNotEmpty()) MetaInfoRow(label = "👤", text = persons.joinToString(", "))
                             }
 
                             event.duration?.let { duration ->
-                                val minutes = duration / 60
-                                MetaInfoRow(label = "⏱", text = "${minutes} min")
+                                MetaInfoRow(label = "⏱", text = "${duration / 60} min")
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            // Play button
                             if (uiState.bestRecording != null && !isPlaying) {
                                 Button(
                                     onClick = {
@@ -280,13 +289,12 @@ fun EventDetailScreen(
                                     },
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Text("▶ Play")
+                                    Text(if (savedSliderPos > 5f) "▶ Resume" else "▶ Play")
                                 }
                             }
 
                             Spacer(modifier = Modifier.height(24.dp))
 
-                            // Description
                             event.description?.let { description ->
                                 if (description.isNotBlank()) {
                                     Text(
@@ -310,18 +318,12 @@ fun EventDetailScreen(
 }
 
 @Composable
-private fun MetaInfoRow(
-    label: String,
-    text: String
-) {
+private fun MetaInfoRow(label: String, text: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(vertical = 4.dp)
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Text(text = label, style = MaterialTheme.typography.bodyMedium)
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = text,
@@ -350,9 +352,7 @@ private fun PlayerControlsOverlay(
         }
     }
 
-    fun onInteract() {
-        interactionCount++
-    }
+    fun onInteract() { interactionCount++ }
 
     Box(
         modifier = Modifier
@@ -360,13 +360,12 @@ private fun PlayerControlsOverlay(
             .clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
-            ) { 
+            ) {
                 showControls = !showControls
                 if (showControls) onInteract()
             }
     ) {
         if (showControls) {
-            // Top bar with close button and metadata
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -380,9 +379,9 @@ private fun PlayerControlsOverlay(
                     color = Color.White,
                     fontSize = 24.sp,
                     modifier = Modifier
-                        .clickable { 
+                        .clickable {
                             onInteract()
-                            onExitFullscreen() 
+                            onExitFullscreen()
                         }
                         .padding(8.dp)
                 )
@@ -399,21 +398,21 @@ private fun PlayerControlsOverlay(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    
+
                     val metaText = buildString {
                         if (speakers.isNotBlank()) append(speakers)
-                        val metaParts = listOfNotNull(
+                        val parts = listOfNotNull(
                             conference.takeIf { it.isNotBlank() },
                             date.takeIf { it.isNotBlank() }
                         )
-                        if (metaParts.isNotEmpty()) {
+                        if (parts.isNotEmpty()) {
                             if (isNotEmpty()) append(" • ")
-                            append(metaParts.joinToString(" • "))
+                            append(parts.joinToString(" • "))
                         }
                     }
-                    
+
                     if (metaText.isNotBlank()) {
-                         Text(
+                        Text(
                             text = metaText,
                             color = Color.White.copy(alpha = 0.7f),
                             style = MaterialTheme.typography.bodySmall,
@@ -424,17 +423,16 @@ private fun PlayerControlsOverlay(
                 }
             }
 
-            // Center play/pause
             val isPlaying = playerState.isPlaying
-            val buttonColor = if (isPlaying) Color.Black.copy(alpha = 0.6f) else MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
-            val iconColor = if (isPlaying) Color.White else MaterialTheme.colorScheme.onPrimary
-            
             Box(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(buttonColor)
+                    .background(
+                        if (isPlaying) Color.Black.copy(alpha = 0.6f)
+                        else MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
+                    )
                     .clickable {
                         onInteract()
                         if (isPlaying) playerState.pause() else playerState.play()
@@ -444,11 +442,10 @@ private fun PlayerControlsOverlay(
                 Text(
                     text = if (isPlaying) "⏸" else "▶",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = iconColor
+                    color = if (isPlaying) Color.White else MaterialTheme.colorScheme.onPrimary
                 )
             }
 
-            // Bottom bar with seek slider and time
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -479,16 +476,8 @@ private fun PlayerControlsOverlay(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = playerState.positionText,
-                        color = Color.White,
-                        fontSize = 12.sp
-                    )
-                    Text(
-                        text = playerState.durationText,
-                        color = Color.White,
-                        fontSize = 12.sp
-                    )
+                    Text(text = playerState.positionText, color = Color.White, fontSize = 12.sp)
+                    Text(text = playerState.durationText, color = Color.White, fontSize = 12.sp)
                 }
             }
         }

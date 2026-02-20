@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.jaeckel.mediaccc.MediaRepository
 import com.jaeckel.mediaccc.api.model.Event
 import com.jaeckel.mediaccc.api.model.Recording
+import com.jaeckel.mediaccc.data.repository.PlaybackHistoryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,11 +16,13 @@ data class EventDetailUiState(
     val isLoading: Boolean = true,
     val event: Event? = null,
     val bestRecording: Recording? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val savedSliderPos: Float = 0f
 )
 
 class EventDetailViewModel(
     private val repository: MediaRepository,
+    private val historyRepository: PlaybackHistoryRepository,
     private val eventGuid: String
 ) : ViewModel() {
 
@@ -32,6 +35,9 @@ class EventDetailViewModel(
 
     private fun loadEvent() {
         viewModelScope.launch {
+            val savedEntry = historyRepository.getEntry(eventGuid)
+            _uiState.update { it.copy(savedSliderPos = savedEntry?.sliderPos ?: 0f) }
+
             repository.getEvent(eventGuid).collect { result ->
                 result.fold(
                     onSuccess = { event ->
@@ -58,12 +64,25 @@ class EventDetailViewModel(
         }
     }
 
+    fun saveProgress(sliderPos: Float) {
+        val event = _uiState.value.event ?: return
+        viewModelScope.launch {
+            historyRepository.saveProgress(
+                eventGuid = event.guid,
+                title = event.title,
+                thumbUrl = event.thumbUrl ?: event.posterUrl,
+                conferenceTitle = event.conferenceTitle,
+                persons = event.persons?.joinToString(", "),
+                duration = event.duration,
+                sliderPos = sliderPos
+            )
+        }
+    }
+
     private fun findBestRecording(recordings: List<Recording>, originalLanguage: String?): Recording? {
-        // Filter to video recordings only
         val videoRecordings = recordings
             .filter { it.mimeType?.startsWith("video/") == true }
 
-        // Prefer recordings matching the event's original language
         val preferred = if (originalLanguage != null) {
             videoRecordings.filter { it.language == originalLanguage }
                 .ifEmpty { videoRecordings }
@@ -71,7 +90,6 @@ class EventDetailViewModel(
             videoRecordings
         }
 
-        // Then sort by format preference: mp4 > mpeg > webm > other
         return preferred
             .sortedBy { recording ->
                 when (recording.mimeType) {
@@ -84,4 +102,3 @@ class EventDetailViewModel(
             .firstOrNull()
     }
 }
-

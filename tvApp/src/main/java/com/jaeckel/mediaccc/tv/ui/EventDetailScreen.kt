@@ -118,7 +118,10 @@ fun EventDetailScreen(
                     event = uiState.event!!,
                     bestRecording = uiState.bestRecording,
                     dateTimeFormat = dateTimeFormat,
-                    onPlayClick = onPlayClick,
+                    onPlayClick = { videoUrl, title, speakers, date, conference ->
+                        viewModel.saveProgress(uiState.savedSliderPos)
+                        onPlayClick(videoUrl, title, speakers, date, conference)
+                    },
                     playButtonFocusRequester = playButtonFocusRequester
                 )
 

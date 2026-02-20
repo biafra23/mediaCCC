@@ -8,6 +8,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.jaeckel.mediaccc.ui.screens.ConferenceDetailScreen
 import com.jaeckel.mediaccc.ui.screens.EventDetailScreen
+import com.jaeckel.mediaccc.ui.screens.HistoryScreen
 import com.jaeckel.mediaccc.ui.screens.HomeScreen
 import com.jaeckel.mediaccc.ui.screens.PlayerScreen
 
@@ -25,6 +26,23 @@ fun AppNavHost() {
                     },
                     onConferenceClick = { conference ->
                         backStack.add(ConferenceDetailRoute(conference.acronym))
+                    },
+                    onHistoryEventClick = { guid ->
+                        backStack.add(EventDetailRoute(guid))
+                    },
+                    onHistoryClick = {
+                        backStack.add(HistoryRoute)
+                    }
+                )
+            }
+
+            entry<HistoryRoute> {
+                HistoryScreen(
+                    onEventClick = { guid ->
+                        backStack.add(EventDetailRoute(guid))
+                    },
+                    onBackClick = {
+                        if (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
                     }
                 )
             }
@@ -79,4 +97,3 @@ fun AppNavHost() {
         }
     )
 }
-

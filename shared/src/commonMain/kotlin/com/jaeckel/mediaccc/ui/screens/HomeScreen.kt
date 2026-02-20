@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,15 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -31,9 +29,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jaeckel.mediaccc.api.model.Conference
 import com.jaeckel.mediaccc.api.model.Event
+import com.jaeckel.mediaccc.data.db.PlaybackHistoryEntity
 import com.jaeckel.mediaccc.ui.components.ConferenceCard
 import com.jaeckel.mediaccc.ui.components.EventCard
 import com.jaeckel.mediaccc.ui.components.EventCardCompact
+import com.jaeckel.mediaccc.ui.components.HistoryCardCompact
+import com.jaeckel.mediaccc.viewmodel.HistoryViewModel
 import com.jaeckel.mediaccc.viewmodel.HomeViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -41,15 +42,26 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
+    historyViewModel: HistoryViewModel = koinViewModel(),
     onEventClick: (Event) -> Unit,
-    onConferenceClick: (Conference) -> Unit
+    onConferenceClick: (Conference) -> Unit,
+    onHistoryEventClick: (String) -> Unit,
+    onHistoryClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val history by historyViewModel.history.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("MediaCCC") },
+                actions = {
+                    if (history.isNotEmpty()) {
+                        TextButton(onClick = onHistoryClick) {
+                            Text("History")
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -64,9 +76,7 @@ fun HomeScreen(
         ) {
             when {
                 uiState.isLoading && uiState.promotedEvents.isEmpty() -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
                 uiState.errorMessage != null && uiState.promotedEvents.isEmpty() -> {
                     Column(
@@ -81,11 +91,14 @@ fun HomeScreen(
                 }
                 else -> {
                     HomeContent(
+                        history = history,
                         promotedEvents = uiState.promotedEvents,
                         recentEvents = uiState.recentEvents,
                         conferences = uiState.conferences,
                         onEventClick = onEventClick,
-                        onConferenceClick = onConferenceClick
+                        onConferenceClick = onConferenceClick,
+                        onHistoryEventClick = onHistoryEventClick,
+                        onSeeAllHistory = onHistoryClick
                     )
                 }
             }
@@ -95,22 +108,50 @@ fun HomeScreen(
 
 @Composable
 private fun HomeContent(
+    history: List<PlaybackHistoryEntity>,
     promotedEvents: List<Event>,
     recentEvents: List<Event>,
     conferences: List<Conference>,
     onEventClick: (Event) -> Unit,
-    onConferenceClick: (Conference) -> Unit
+    onConferenceClick: (Conference) -> Unit,
+    onHistoryEventClick: (String) -> Unit,
+    onSeeAllHistory: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
+        // Continue Watching Section
+        if (history.isNotEmpty()) {
+            item {
+                SectionHeaderWithAction(
+                    title = "Continue Watching",
+                    actionLabel = "See All",
+                    onAction = onSeeAllHistory
+                )
+            }
+            item {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(history.take(10), key = { it.eventGuid }) { entry ->
+                        HistoryCardCompact(
+                            entry = entry,
+                            onClick = { onHistoryEventClick(entry.eventGuid) },
+                            modifier = Modifier
+                                .width(200.dp)
+                                .height(145.dp)
+                        )
+                    }
+                }
+            }
+        }
+
         // Promoted Events Section
         if (promotedEvents.isNotEmpty()) {
-            item {
-                SectionHeader(title = "Featured")
-            }
+            item { SectionHeader(title = "Featured") }
             item {
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -129,9 +170,7 @@ private fun HomeContent(
 
         // Recent Events Section
         if (recentEvents.isNotEmpty()) {
-            item {
-                SectionHeader(title = "Recent")
-            }
+            item { SectionHeader(title = "Recent") }
             item {
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -152,9 +191,7 @@ private fun HomeContent(
 
         // Conferences Section
         if (conferences.isNotEmpty()) {
-            item {
-                SectionHeader(title = "Conferences")
-            }
+            item { SectionHeader(title = "Conferences") }
             item {
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -184,5 +221,21 @@ private fun SectionHeader(title: String) {
     )
 }
 
-
-
+@Composable
+private fun SectionHeaderWithAction(title: String, actionLabel: String, onAction: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.weight(1f)
+        )
+        TextButton(onClick = onAction) {
+            Text(actionLabel)
+        }
+    }
+}

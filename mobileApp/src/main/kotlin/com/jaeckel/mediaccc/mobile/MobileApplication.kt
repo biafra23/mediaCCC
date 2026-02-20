@@ -5,6 +5,7 @@ import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.svg.SvgDecoder
+import com.jaeckel.mediaccc.di.platformModule
 import com.jaeckel.mediaccc.di.sharedModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -17,7 +18,7 @@ class MobileApplication : Application(), SingletonImageLoader.Factory {
         startKoin {
             androidLogger()
             androidContext(this@MobileApplication)
-            modules(sharedModule)
+            modules(sharedModule, platformModule())
         }
     }
 

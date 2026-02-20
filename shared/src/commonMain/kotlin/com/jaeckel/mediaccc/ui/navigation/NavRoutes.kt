@@ -21,3 +21,6 @@ data class PlayerRoute(
     val conference: String = ""
 ) : NavKey
 
+
+@Serializable
+data object HistoryRoute : NavKey

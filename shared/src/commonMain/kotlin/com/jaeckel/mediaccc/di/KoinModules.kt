@@ -2,26 +2,33 @@ package com.jaeckel.mediaccc.di
 
 import com.jaeckel.mediaccc.MediaRepository
 import com.jaeckel.mediaccc.api.MediaCCCApi
+import com.jaeckel.mediaccc.data.db.AppDatabase
+import com.jaeckel.mediaccc.data.db.PlaybackHistoryDao
+import com.jaeckel.mediaccc.data.repository.PlaybackHistoryRepository
 import com.jaeckel.mediaccc.viewmodel.ConferenceDetailViewModel
 import com.jaeckel.mediaccc.viewmodel.EventDetailViewModel
+import com.jaeckel.mediaccc.viewmodel.HistoryViewModel
 import com.jaeckel.mediaccc.viewmodel.HomeViewModel
 import com.jaeckel.mediaccc.viewmodel.SearchViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
-/**
- * Koin module for shared dependencies.
- *
- * Use Koin's verify() function in unit tests to catch
- * missing dependencies at build time instead of runtime.
- */
 val sharedModule = module {
     single { MediaCCCApi() }
-    single { MediaRepository(get()) }
-    viewModel { (eventGuid: String) -> EventDetailViewModel(get(), eventGuid) }
-    viewModel { (acronym: String) -> ConferenceDetailViewModel(get(), acronym) }
-    viewModel { HomeViewModel(get()) }
-    viewModel { SearchViewModel(get()) }
+    single { MediaRepository(get<MediaCCCApi>()) }
+    single<PlaybackHistoryDao> { get<AppDatabase>().playbackHistoryDao() }
+    single<PlaybackHistoryRepository> { PlaybackHistoryRepository(get<PlaybackHistoryDao>()) }
+    viewModel { (eventGuid: String) ->
+        EventDetailViewModel(
+            get<MediaRepository>(),
+            get<PlaybackHistoryRepository>(),
+            eventGuid
+        )
+    }
+    viewModel { (acronym: String) -> ConferenceDetailViewModel(get<MediaRepository>(), acronym) }
+    viewModel { HomeViewModel(get<MediaRepository>()) }
+    viewModel { SearchViewModel(get<MediaRepository>()) }
+    viewModel { HistoryViewModel(get<PlaybackHistoryRepository>()) }
 }
 
 
