@@ -29,6 +29,7 @@
     <string name="resume_icon">▶ Resume</string>
     <string name="play_icon">▶</string>
     <string name="description">Description</string>
+    <string name="language">Language</string>
 
     <!-- Conference Detail Screen -->
     <string name="conference">Conference</string>

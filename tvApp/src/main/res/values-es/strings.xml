@@ -38,6 +38,7 @@
     <string name="speakers">Ponentes: %1$s</string>
     <string name="duration_min">Duración: %1$d min</string>
     <string name="play">▶ Reproducir</string>
+    <string name="language">Idioma</string>
 
     <!-- Conference Detail -->
     <string name="events_count">Eventos (%1$d)</string>

@@ -16,6 +16,8 @@ data class EventDetailUiState(
     val isLoading: Boolean = true,
     val event: Event? = null,
     val bestRecording: Recording? = null,
+    val availableLanguages: List<String> = emptyList(),
+    val selectedLanguage: String? = null,
     val errorMessage: String? = null,
     val savedSliderPos: Float = 0f
 )
@@ -47,12 +49,20 @@ class EventDetailViewModel(
             repository.getEvent(eventGuid).collect { result ->
                 result.fold(
                     onSuccess = { event ->
-                        val bestRecording = findBestRecording(event.recordings, event.originalLanguage)
+                        val languages = event.recordings
+                            .filter { it.mimeType?.startsWith("video/") == true }
+                            .mapNotNull { it.language }
+                            .distinct()
+                            .sorted()
+                        val defaultLang = event.originalLanguage ?: languages.firstOrNull()
+                        val bestRecording = findBestRecording(event.recordings, defaultLang)
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
                                 event = event,
                                 bestRecording = bestRecording,
+                                availableLanguages = languages,
+                                selectedLanguage = defaultLang,
                                 errorMessage = null
                             )
                         }
@@ -70,6 +80,14 @@ class EventDetailViewModel(
         }
     }
 
+
+    fun selectLanguage(language: String) {
+        val event = _uiState.value.event ?: return
+        val bestRecording = findBestRecording(event.recordings, language)
+        _uiState.update {
+            it.copy(selectedLanguage = language, bestRecording = bestRecording)
+        }
+    }
 
     fun saveProgress(sliderPos: Float) {
         val event = _uiState.value.event ?: return

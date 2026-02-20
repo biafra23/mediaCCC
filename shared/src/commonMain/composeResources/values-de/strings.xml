@@ -27,6 +27,7 @@
     <string name="resume_icon">▶ Fortsetzen</string>
     <string name="play_icon">▶</string>
     <string name="description">Beschreibung</string>
+    <string name="language">Sprache</string>
 
     <!-- Conference Detail Screen -->
     <string name="conference">Konferenz</string>

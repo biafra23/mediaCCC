@@ -119,6 +119,9 @@ fun EventDetailScreen(
                 EventDetailContent(
                     event = uiState.event!!,
                     bestRecording = uiState.bestRecording,
+                    availableLanguages = uiState.availableLanguages,
+                    selectedLanguage = uiState.selectedLanguage,
+                    onLanguageSelected = { viewModel.selectLanguage(it) },
                     dateTimeFormat = dateTimeFormat,
                     onPlayClick = { guid, videoUrl, title, speakers, date, conference, duration ->
                         viewModel.saveProgress(uiState.savedSliderPos)
@@ -140,6 +143,9 @@ fun EventDetailScreen(
 private fun EventDetailContent(
     event: Event,
     bestRecording: Recording?,
+    availableLanguages: List<String>,
+    selectedLanguage: String?,
+    onLanguageSelected: (String) -> Unit,
     dateTimeFormat: DateTimeFormat<LocalDateTime>,
     onPlayClick: (eventGuid: String, videoUrl: String, title: String, speakers: String, date: String, conference: String, duration: Long) -> Unit,
     playButtonFocusRequester: FocusRequester
@@ -241,6 +247,33 @@ private fun EventDetailContent(
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.6f)
                     )
+                }
+
+                // Language selector
+                if (availableLanguages.size > 1) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "🌐 ${stringResource(R.string.language)}:",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.7f)
+                        )
+                        availableLanguages.forEach { lang ->
+                            val isSelected = lang == selectedLanguage
+                            Button(
+                                onClick = { onLanguageSelected(lang) },
+                                colors = ButtonDefaults.colors(
+                                    containerColor = if (isSelected) Color(0xFF6366F1) else Color.White.copy(alpha = 0.15f),
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Text(lang.uppercase())
+                            }
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))

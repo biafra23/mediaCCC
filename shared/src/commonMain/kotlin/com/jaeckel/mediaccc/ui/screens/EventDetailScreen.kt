@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -281,6 +283,54 @@ fun EventDetailScreen(
 
                             event.duration?.let { duration ->
                                 MetaInfoRow(label = "⏱", text = "${duration / 60} min")
+                            }
+
+                            // Language selector
+                            if (uiState.availableLanguages.size > 1) {
+                                var languageMenuExpanded by remember { mutableStateOf(false) }
+                                Box {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .padding(vertical = 4.dp)
+                                            .clickable { languageMenuExpanded = true }
+                                    ) {
+                                        Text(text = "🌐", style = MaterialTheme.typography.bodyMedium)
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "${stringResource(Res.string.language)}: ${uiState.selectedLanguage?.uppercase() ?: ""}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        Text(
+                                            text = " ▾",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                    DropdownMenu(
+                                        expanded = languageMenuExpanded,
+                                        onDismissRequest = { languageMenuExpanded = false }
+                                    ) {
+                                        uiState.availableLanguages.forEach { lang ->
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Text(
+                                                        text = lang.uppercase(),
+                                                        color = if (lang == uiState.selectedLanguage)
+                                                            MaterialTheme.colorScheme.primary
+                                                        else
+                                                            MaterialTheme.colorScheme.onSurface
+                                                    )
+                                                },
+                                                onClick = {
+                                                    viewModel.selectLanguage(lang)
+                                                    languageMenuExpanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))

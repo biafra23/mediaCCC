@@ -40,6 +40,7 @@
     <string name="speakers">Speakers: %1$s</string>
     <string name="duration_min">Duration: %1$d min</string>
     <string name="play">▶ Play</string>
+    <string name="language">Language</string>
 
     <!-- Conference Detail -->
     <string name="events_count">Events (%1$d)</string>
