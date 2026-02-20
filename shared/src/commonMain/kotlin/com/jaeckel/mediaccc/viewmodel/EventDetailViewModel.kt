@@ -64,6 +64,7 @@ class EventDetailViewModel(
         }
     }
 
+
     fun saveProgress(sliderPos: Float) {
         val event = _uiState.value.event ?: return
         viewModelScope.launch {

@@ -24,3 +24,15 @@ data class PlayerRoute(
 
 @Serializable
 data object HistoryRoute : NavKey
+
+@Serializable
+data object SearchRoute : NavKey
+
+@Serializable
+data object ConferencesRoute : NavKey
+
+@Serializable
+data object FavoritesRoute : NavKey
+
+@Serializable
+data object SettingsRoute : NavKey

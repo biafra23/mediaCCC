@@ -13,12 +13,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -46,7 +49,7 @@ fun HomeScreen(
     onEventClick: (Event) -> Unit,
     onConferenceClick: (Conference) -> Unit,
     onHistoryEventClick: (String) -> Unit,
-    onHistoryClick: () -> Unit
+    onOpenDrawer: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val history by historyViewModel.history.collectAsState()
@@ -55,11 +58,9 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = { Text("MediaCCC") },
-                actions = {
-                    if (history.isNotEmpty()) {
-                        TextButton(onClick = onHistoryClick) {
-                            Text("History")
-                        }
+                navigationIcon = {
+                    IconButton(onClick = onOpenDrawer) {
+                        Icon(Icons.Default.Menu, contentDescription = "Menu")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -97,8 +98,7 @@ fun HomeScreen(
                         conferences = uiState.conferences,
                         onEventClick = onEventClick,
                         onConferenceClick = onConferenceClick,
-                        onHistoryEventClick = onHistoryEventClick,
-                        onSeeAllHistory = onHistoryClick
+                        onHistoryEventClick = onHistoryEventClick
                     )
                 }
             }
@@ -114,8 +114,7 @@ private fun HomeContent(
     conferences: List<Conference>,
     onEventClick: (Event) -> Unit,
     onConferenceClick: (Conference) -> Unit,
-    onHistoryEventClick: (String) -> Unit,
-    onSeeAllHistory: () -> Unit
+    onHistoryEventClick: (String) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -125,11 +124,7 @@ private fun HomeContent(
         // Continue Watching Section
         if (history.isNotEmpty()) {
             item {
-                SectionHeaderWithAction(
-                    title = "Continue Watching",
-                    actionLabel = "See All",
-                    onAction = onSeeAllHistory
-                )
+                SectionHeader(title = "Continue Watching")
             }
             item {
                 LazyRow(
@@ -221,21 +216,3 @@ private fun SectionHeader(title: String) {
     )
 }
 
-@Composable
-private fun SectionHeaderWithAction(title: String, actionLabel: String, onAction: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.weight(1f)
-        )
-        TextButton(onClick = onAction) {
-            Text(actionLabel)
-        }
-    }
-}
