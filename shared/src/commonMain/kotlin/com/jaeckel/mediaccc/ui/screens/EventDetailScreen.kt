@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.jaeckel.mediaccc.ui.util.PipState
 import com.jaeckel.mediaccc.ui.util.SystemAppearance
 import com.jaeckel.mediaccc.viewmodel.EventDetailViewModel
 import io.github.kdroidfilter.composemediaplayer.VideoPlayerSurface
@@ -80,6 +82,14 @@ fun EventDetailScreen(
     val playerState = rememberVideoPlayerState()
 
     SystemAppearance(playerState.isFullscreen)
+
+    // Track playing state for PiP
+    LaunchedEffect(isPlaying, playerState.isPlaying) {
+        PipState.setPlaying(isPlaying && playerState.isPlaying)
+    }
+    DisposableEffect(Unit) {
+        onDispose { PipState.setPlaying(false) }
+    }
 
     val recordingUrl = uiState.bestRecording?.recordingUrl
     val savedSliderPos = uiState.savedSliderPos
