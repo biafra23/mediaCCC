@@ -76,7 +76,7 @@ fun EventDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     var isPlaying by rememberSaveable { mutableStateOf(false) }
-    var hasRestoredPosition by remember { mutableStateOf(false) }
+    var hasRestoredPosition by rememberSaveable { mutableStateOf(false) }
     val playerState = rememberVideoPlayerState()
 
     SystemAppearance(playerState.isFullscreen)
@@ -84,29 +84,35 @@ fun EventDetailScreen(
     val recordingUrl = uiState.bestRecording?.recordingUrl
     val savedSliderPos = uiState.savedSliderPos
 
+    // Open URI and seek to saved position in one coroutine to guarantee ordering
     LaunchedEffect(recordingUrl, isPlaying) {
         if (isPlaying && recordingUrl != null) {
             playerState.openUri(recordingUrl)
-        }
-    }
-
-    // Seek to saved position once the player starts playing and position is loaded
-    LaunchedEffect(playerState.isPlaying, hasRestoredPosition, savedSliderPos) {
-        if (playerState.isPlaying && !hasRestoredPosition && savedSliderPos > 5f) {
-            hasRestoredPosition = true // Set immediately
-            delay(500)
-            playerState.seekTo(savedSliderPos)
+            // Wait for the player to actually start playing
+            while (!playerState.isPlaying) {
+                delay(100)
+            }
+            // Now seek to saved position if needed
+            if (!hasRestoredPosition && savedSliderPos > 5f) {
+                hasRestoredPosition = true
+                // Retry seek — some players need repeated attempts after buffering
+                repeat(6) {
+                    delay(500)
+                    playerState.seekTo(savedSliderPos)
+                }
+            }
         }
     }
 
     // As soon as play starts: write the initial history entry, then refresh position every 5 s.
-    // This ensures history is populated regardless of how the user navigates away.
+    // Wait a bit before first auto-save to avoid overwriting restored position.
     LaunchedEffect(isPlaying) {
         if (isPlaying) {
             viewModel.saveProgress(savedSliderPos)
+            delay(5_000)
             while (true) {
-                delay(5_000)
                 viewModel.saveProgress(playerState.sliderPos)
+                delay(5_000)
             }
         }
     }
@@ -237,9 +243,8 @@ fun EventDetailScreen(
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
-                                            text = if (savedSliderPos > 5f) stringResource(Res.string.resume_icon) else stringResource(Res.string.play_icon),
-                                            style = if (savedSliderPos > 5f) MaterialTheme.typography.bodyMedium
-                                            else MaterialTheme.typography.headlineMedium,
+                                            text = "▶",
+                                            style = MaterialTheme.typography.headlineMedium,
                                             color = MaterialTheme.colorScheme.onPrimary
                                         )
                                     }
