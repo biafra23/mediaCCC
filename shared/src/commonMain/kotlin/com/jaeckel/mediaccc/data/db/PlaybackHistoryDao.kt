@@ -14,6 +14,9 @@ interface PlaybackHistoryDao {
     @Query("SELECT * FROM playback_history ORDER BY lastPlayedAt DESC")
     fun getAll(): Flow<List<PlaybackHistoryEntity>>
 
+    @Query("SELECT * FROM playback_history WHERE sliderPos > 5 AND sliderPos < 975 ORDER BY lastPlayedAt DESC")
+    fun getContinueWatching(): Flow<List<PlaybackHistoryEntity>>
+
     @Query("SELECT * FROM playback_history WHERE eventGuid = :guid LIMIT 1")
     suspend fun getByGuid(guid: String): PlaybackHistoryEntity?
 }

@@ -133,7 +133,9 @@ fun EventDetailScreen(
                         modifier = Modifier
                             .padding(horizontal = 12.dp)
                             .clickable {
-                                viewModel.saveProgress(playerState.sliderPos)
+                                if (isPlaying) {
+                                    viewModel.saveProgress(playerState.sliderPos)
+                                }
                                 onBackClick()
                             }
                     )

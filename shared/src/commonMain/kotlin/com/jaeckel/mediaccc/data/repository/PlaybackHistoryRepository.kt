@@ -9,6 +9,8 @@ class PlaybackHistoryRepository(private val dao: PlaybackHistoryDao) {
 
     fun getHistory(): Flow<List<PlaybackHistoryEntity>> = dao.getAll()
 
+    fun getContinueWatching(): Flow<List<PlaybackHistoryEntity>> = dao.getContinueWatching()
+
     suspend fun getEntry(guid: String): PlaybackHistoryEntity? = dao.getByGuid(guid)
 
     suspend fun saveProgress(

@@ -15,4 +15,8 @@ class HistoryViewModel(
     val history: StateFlow<List<PlaybackHistoryEntity>> = historyRepository
         .getHistory()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val continueWatching: StateFlow<List<PlaybackHistoryEntity>> = historyRepository
+        .getContinueWatching()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 }

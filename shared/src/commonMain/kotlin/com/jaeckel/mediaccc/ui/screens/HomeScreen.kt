@@ -52,7 +52,7 @@ fun HomeScreen(
     onOpenDrawer: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val history by historyViewModel.history.collectAsState()
+    val continueWatching by historyViewModel.continueWatching.collectAsState()
 
     Scaffold(
         topBar = {
@@ -92,7 +92,7 @@ fun HomeScreen(
                 }
                 else -> {
                     HomeContent(
-                        history = history,
+                        continueWatching = continueWatching,
                         promotedEvents = uiState.promotedEvents,
                         recentEvents = uiState.recentEvents,
                         conferences = uiState.conferences,
@@ -108,7 +108,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeContent(
-    history: List<PlaybackHistoryEntity>,
+    continueWatching: List<PlaybackHistoryEntity>,
     promotedEvents: List<Event>,
     recentEvents: List<Event>,
     conferences: List<Conference>,
@@ -122,7 +122,7 @@ private fun HomeContent(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         // Continue Watching Section
-        if (history.isNotEmpty()) {
+        if (continueWatching.isNotEmpty()) {
             item {
                 SectionHeader(title = "Continue Watching")
             }
@@ -131,7 +131,7 @@ private fun HomeContent(
                     contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(history.take(10), key = { it.eventGuid }) { entry ->
+                    items(continueWatching.take(10), key = { it.eventGuid }) { entry ->
                         HistoryCardCompact(
                             entry = entry,
                             onClick = { onHistoryEventClick(entry.eventGuid) },
