@@ -44,11 +44,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.jaeckel.mediaccc.api.model.Event
+import com.jaeckel.mediaccc.api.model.Recording
 import com.jaeckel.mediaccc.ui.util.PipState
 import com.jaeckel.mediaccc.ui.util.SystemAppearance
+import com.jaeckel.mediaccc.viewmodel.EventDetailUiState
 import com.jaeckel.mediaccc.viewmodel.EventDetailViewModel
 import io.github.kdroidfilter.composemediaplayer.VideoPlayerSurface
 import io.github.kdroidfilter.composemediaplayer.VideoPlayerState
@@ -56,6 +60,7 @@ import io.github.kdroidfilter.composemediaplayer.rememberVideoPlayerState
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import mediaccc.shared.generated.resources.Res
@@ -193,196 +198,281 @@ fun EventDetailScreen(
 
                 uiState.event != null -> {
                     val event = uiState.event!!
+                    EventDetailContent(
+                        event = event,
+                        uiState = uiState,
+                        playerState = playerState,
+                        isPlaying = isPlaying,
+                        recordingUrl = recordingUrl,
+                        savedSliderPos = savedSliderPos,
+                        dateTimeFormat = dateTimeFormat,
+                        onPlayClick = {
+                            isPlaying = true
+                            playerState.toggleFullscreen()
+                        },
+                        onExitFullscreen = {
+                            viewModel.saveProgress(playerState.sliderPos)
+                            playerState.toggleFullscreen()
+                            isPlaying = false
+                            playerState.pause()
+                        },
+                        onLanguageSelected = { viewModel.selectLanguage(it) }
+                    )
+                }
+            }
+        }
+    }
+}
 
-                    Column(
+@Composable
+private fun EventDetailContent(
+    event: Event,
+    uiState: EventDetailUiState,
+    playerState: VideoPlayerState,
+    isPlaying: Boolean,
+    recordingUrl: String?,
+    savedSliderPos: Float,
+    dateTimeFormat: DateTimeFormat<LocalDateTime>,
+    onPlayClick: () -> Unit,
+    onExitFullscreen: () -> Unit,
+    onLanguageSelected: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp)
+        ) {
+            VideoPlayerSurface(
+                playerState = playerState,
+                modifier = Modifier.fillMaxSize(),
+                overlay = {
+                    if (playerState.isFullscreen) {
+                        val formattedDate = event.date?.let {
+                            dateTimeFormat.format(it.toLocalDateTime(TimeZone.currentSystemDefault()))
+                        } ?: ""
+                        val speakers = event.persons?.joinToString(", ") ?: ""
+
+                        PlayerControlsOverlay(
+                            playerState = playerState,
+                            title = event.title,
+                            speakers = speakers,
+                            conference = event.conferenceTitle ?: "",
+                            date = formattedDate,
+                            onExitFullscreen = onExitFullscreen
+                        )
+                    }
+                }
+            )
+
+            if (!isPlaying || recordingUrl == null) {
+                AsyncImage(
+                    model = event.posterUrl ?: event.thumbUrl,
+                    contentDescription = event.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+
+                if (uiState.bestRecording != null) {
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
+                            .align(Alignment.Center)
+                            .size(64.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.9f))
+                            .clickable { onPlayClick() },
+                        contentAlignment = Alignment.Center
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(250.dp)
-                        ) {
-                            VideoPlayerSurface(
-                                playerState = playerState,
-                                modifier = Modifier.fillMaxSize(),
-                                overlay = {
-                                    if (playerState.isFullscreen) {
-                                        val formattedDate = event.date?.let {
-                                            dateTimeFormat.format(it.toLocalDateTime(TimeZone.currentSystemDefault()))
-                                        } ?: ""
-                                        val speakers = event.persons?.joinToString(", ") ?: ""
-
-                                        PlayerControlsOverlay(
-                                            playerState = playerState,
-                                            title = event.title,
-                                            speakers = speakers,
-                                            conference = event.conferenceTitle ?: "",
-                                            date = formattedDate,
-                                            onExitFullscreen = {
-                                                viewModel.saveProgress(playerState.sliderPos)
-                                                playerState.toggleFullscreen()
-                                                isPlaying = false
-                                                playerState.pause()
-                                            }
-                                        )
-                                    }
-                                }
-                            )
-
-                            if (!isPlaying || recordingUrl == null) {
-                                AsyncImage(
-                                    model = event.posterUrl ?: event.thumbUrl,
-                                    contentDescription = event.title,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize()
-                                )
-
-                                if (uiState.bestRecording != null) {
-                                    Box(
-                                        modifier = Modifier
-                                            .align(Alignment.Center)
-                                            .size(64.dp)
-                                            .clip(CircleShape)
-                                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.9f))
-                                            .clickable {
-                                                isPlaying = true
-                                                playerState.toggleFullscreen()
-                                            },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = "▶",
-                                            style = MaterialTheme.typography.headlineMedium,
-                                            color = MaterialTheme.colorScheme.onPrimary
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                        ) {
-                            Text(
-                                text = event.title,
-                                style = MaterialTheme.typography.headlineSmall
-                            )
-
-                            event.subtitle?.let { subtitle ->
-                                if (subtitle.isNotBlank()) {
-                                    Text(
-                                        text = subtitle,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.padding(top = 4.dp)
-                                    )
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            event.conferenceTitle?.let { MetaInfoRow(label = "📅", text = it) }
-
-                            event.date?.let { date ->
-                                val localDateTime = date.toLocalDateTime(TimeZone.currentSystemDefault())
-                                MetaInfoRow(label = "🗓", text = dateTimeFormat.format(localDateTime))
-                            }
-
-                            event.persons?.let { persons ->
-                                if (persons.isNotEmpty()) MetaInfoRow(label = "👤", text = persons.joinToString(", "))
-                            }
-
-                            event.duration?.let { duration ->
-                                MetaInfoRow(label = "⏱", text = "${duration / 60} min")
-                            }
-
-                            // Language selector
-                            if (uiState.availableLanguages.size > 1) {
-                                var languageMenuExpanded by remember { mutableStateOf(false) }
-                                Box {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier
-                                            .padding(vertical = 4.dp)
-                                            .clickable { languageMenuExpanded = true }
-                                    ) {
-                                        Text(text = "🌐", style = MaterialTheme.typography.bodyMedium)
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = "${stringResource(Res.string.language)}: ${uiState.selectedLanguage?.uppercase() ?: ""}",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
-                                        Text(
-                                            text = " ▾",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
-                                    }
-                                    DropdownMenu(
-                                        expanded = languageMenuExpanded,
-                                        onDismissRequest = { languageMenuExpanded = false }
-                                    ) {
-                                        uiState.availableLanguages.forEach { lang ->
-                                            DropdownMenuItem(
-                                                text = {
-                                                    Text(
-                                                        text = lang.uppercase(),
-                                                        color = if (lang == uiState.selectedLanguage)
-                                                            MaterialTheme.colorScheme.primary
-                                                        else
-                                                            MaterialTheme.colorScheme.onSurface
-                                                    )
-                                                },
-                                                onClick = {
-                                                    viewModel.selectLanguage(lang)
-                                                    languageMenuExpanded = false
-                                                }
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            if (uiState.bestRecording != null && !isPlaying) {
-                                Button(
-                                    onClick = {
-                                        isPlaying = true
-                                        playerState.toggleFullscreen()
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text(if (savedSliderPos > 5f) stringResource(Res.string.resume) else stringResource(Res.string.play))
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(24.dp))
-
-                            event.description?.let { description ->
-                                if (description.isNotBlank()) {
-                                    Text(
-                                        text = stringResource(Res.string.description),
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Text(
-                                        text = description,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                        }
+                        Text(
+                            text = "▶",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
                 }
             }
         }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = event.title,
+                style = MaterialTheme.typography.headlineSmall
+            )
+
+            event.subtitle?.let { subtitle ->
+                if (subtitle.isNotBlank()) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            event.conferenceTitle?.let { MetaInfoRow(label = "📅", text = it) }
+
+            event.date?.let { date ->
+                val localDateTime = date.toLocalDateTime(TimeZone.currentSystemDefault())
+                MetaInfoRow(label = "🗓", text = dateTimeFormat.format(localDateTime))
+            }
+
+            event.persons?.let { persons ->
+                if (persons.isNotEmpty()) MetaInfoRow(label = "👤", text = persons.joinToString(", "))
+            }
+
+            event.duration?.let { duration ->
+                MetaInfoRow(label = "⏱", text = "${duration / 60} min")
+            }
+
+            // Language selector
+            if (uiState.availableLanguages.size > 1) {
+                var languageMenuExpanded by remember { mutableStateOf(false) }
+                Box {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(vertical = 4.dp)
+                            .clickable { languageMenuExpanded = true }
+                    ) {
+                        Text(text = "🌐", style = MaterialTheme.typography.bodyMedium)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "${stringResource(Res.string.language)}: ${uiState.selectedLanguage?.uppercase() ?: ""}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = " ▾",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = languageMenuExpanded,
+                        onDismissRequest = { languageMenuExpanded = false }
+                    ) {
+                        uiState.availableLanguages.forEach { lang ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = lang.uppercase(),
+                                        color = if (lang == uiState.selectedLanguage)
+                                            MaterialTheme.colorScheme.primary
+                                        else
+                                            MaterialTheme.colorScheme.onSurface
+                                    )
+                                },
+                                onClick = {
+                                    onLanguageSelected(lang)
+                                    languageMenuExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (uiState.bestRecording != null && !isPlaying) {
+                Button(
+                    onClick = onPlayClick,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(if (savedSliderPos > 5f) stringResource(Res.string.resume) else stringResource(Res.string.play))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            event.description?.let { description ->
+                if (description.isNotBlank()) {
+                    Text(
+                        text = stringResource(Res.string.description),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun EventDetailContentPreview() {
+    val sampleEvent = Event(
+        guid = "preview-guid",
+        title = "The Future of Open Source Security",
+        subtitle = "How communities protect critical infrastructure",
+        slug = "future-open-source-security",
+        url = "https://api.media.ccc.de/public/events/preview",
+        conferenceTitle = "38th Chaos Communication Congress",
+        persons = listOf("Alice Example", "Bob Speaker"),
+        duration = 3600,
+        description = "In this talk we explore the challenges and opportunities facing open source security in an increasingly connected world. We discuss supply chain attacks, reproducible builds, and community-driven security audits that help protect the software everyone depends on."
+    )
+    val sampleRecording = Recording(
+        size = 500,
+        length = 3600,
+        mimeType = "video/mp4",
+        language = "eng",
+        filename = "sample.mp4",
+        state = "new",
+        folder = "",
+        highQuality = true,
+        width = 1920,
+        height = 1080,
+        recordingUrl = "https://example.com/video.mp4",
+        url = "https://example.com/video.mp4",
+        eventUrl = "https://example.com/event",
+        conferenceUrl = "https://example.com/conference"
+    )
+    val uiState = EventDetailUiState(
+        isLoading = false,
+        event = sampleEvent,
+        bestRecording = sampleRecording,
+        availableLanguages = listOf("eng", "deu"),
+        selectedLanguage = "eng"
+    )
+    val dateTimeFormat = remember {
+        LocalDateTime.Format {
+            day()
+            char('.')
+            monthNumber()
+            char('.')
+            year()
+        }
+    }
+    MaterialTheme {
+        EventDetailContent(
+            event = sampleEvent,
+            uiState = uiState,
+            playerState = rememberVideoPlayerState(),
+            isPlaying = false,
+            recordingUrl = sampleRecording.recordingUrl,
+            savedSliderPos = 0f,
+            dateTimeFormat = dateTimeFormat,
+            onPlayClick = {},
+            onExitFullscreen = {},
+            onLanguageSelected = {}
+        )
     }
 }
 

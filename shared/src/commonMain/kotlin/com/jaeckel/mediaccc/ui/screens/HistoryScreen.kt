@@ -29,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -108,7 +109,7 @@ fun HistoryScreen(
 }
 
 @Composable
-private fun HistoryCard(
+internal fun HistoryCard(
     entry: PlaybackHistoryEntity,
     onClick: () -> Unit
 ) {
@@ -239,5 +240,25 @@ private fun formatRelativeDate(epochMillis: Long): String {
             val days = diffHours / 24
             stringResource(Res.string.days_ago, days)
         }
+    }
+}
+
+@Preview
+@Composable
+private fun HistoryCardPreview() {
+    MaterialTheme {
+        HistoryCard(
+            entry = PlaybackHistoryEntity(
+                eventGuid = "preview-1",
+                title = "The Art of Reverse Engineering",
+                thumbUrl = null,
+                conferenceTitle = "37th Chaos Communication Congress",
+                persons = "Jane Hacker, John Doe",
+                duration = 3600,
+                lastPlayedAt = Clock.System.now().toEpochMilliseconds() - 3600000,
+                sliderPos = 450f
+            ),
+            onClick = {}
+        )
     }
 }

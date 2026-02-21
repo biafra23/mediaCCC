@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.jaeckel.mediaccc.api.model.Event
@@ -167,6 +168,59 @@ fun ConferenceDetailScreen(
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ConferenceDetailPreview() {
+    val sampleEvents = listOf(
+        Event(
+            guid = "evt-1",
+            title = "Hacking the Planet",
+            slug = "hacking-planet",
+            url = "https://example.com",
+            conferenceTitle = "38C3",
+            tags = listOf("security", "hacking"),
+            persons = listOf("Jane Hacker"),
+            duration = 3600
+        ),
+        Event(
+            guid = "evt-2",
+            title = "Privacy in the Age of AI",
+            slug = "privacy-ai",
+            url = "https://example.com",
+            conferenceTitle = "38C3",
+            tags = listOf("privacy", "ai"),
+            persons = listOf("John Privacy"),
+            duration = 2700
+        )
+    )
+    MaterialTheme {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Text(
+                text = "A conference about hacking and digital rights.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(16.dp)
+            )
+            Text(
+                text = "Events (2)",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 280.dp),
+                contentPadding = PaddingValues(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(sampleEvents, key = { it.guid }) { event ->
+                    EventCard(event = event, onClick = {})
                 }
             }
         }

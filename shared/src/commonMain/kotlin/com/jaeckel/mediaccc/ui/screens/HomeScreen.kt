@@ -29,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jaeckel.mediaccc.api.model.Conference
 import com.jaeckel.mediaccc.api.model.Event
@@ -115,7 +116,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun HomeContent(
+internal fun HomeContent(
     liveStreams: List<LiveStreamItem>,
     continueWatching: List<PlaybackHistoryEntity>,
     promotedEvents: List<Event>,
@@ -245,5 +246,57 @@ private fun SectionHeader(title: String) {
         style = MaterialTheme.typography.titleLarge,
         modifier = Modifier.padding(horizontal = 16.dp)
     )
+}
+
+@Preview
+@Composable
+private fun HomeContentPreview() {
+    val sampleEvents = listOf(
+        Event(
+            guid = "event-1",
+            title = "Opening Keynote: Digital Freedom",
+            slug = "opening-keynote",
+            url = "https://example.com",
+            conferenceTitle = "38C3",
+            persons = listOf("Alice"),
+            duration = 3600
+        ),
+        Event(
+            guid = "event-2",
+            title = "Building Secure Systems",
+            slug = "secure-systems",
+            url = "https://example.com",
+            conferenceTitle = "38C3",
+            persons = listOf("Bob"),
+            duration = 2700
+        )
+    )
+    val sampleConferences = listOf(
+        Conference(
+            acronym = "38c3",
+            title = "38th Chaos Communication Congress",
+            slug = "congress/38c3",
+            url = "https://example.com"
+        ),
+        Conference(
+            acronym = "camp2023",
+            title = "Chaos Communication Camp 2023",
+            slug = "events/camp2023",
+            url = "https://example.com"
+        )
+    )
+    MaterialTheme {
+        HomeContent(
+            liveStreams = emptyList(),
+            continueWatching = emptyList(),
+            promotedEvents = sampleEvents,
+            recentEvents = sampleEvents,
+            conferences = sampleConferences,
+            onEventClick = {},
+            onConferenceClick = {},
+            onHistoryEventClick = {},
+            onLiveStreamClick = {}
+        )
+    }
 }
 

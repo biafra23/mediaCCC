@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -262,4 +263,16 @@ private fun formatSeconds(totalSeconds: Int): String {
     val s = totalSeconds % 60
     val pad = { v: Int -> v.toString().padStart(2, '0') }
     return if (h > 0) "$h:${pad(m)}:${pad(s)}" else "$m:${pad(s)}"
+}
+
+@Preview
+@Composable
+private fun PlayerScreenPreview() {
+    MaterialTheme {
+        PlayerScreen(
+            videoUrl = "https://example.com/stream.m3u8",
+            title = "Aktionshalle — Winterkongress 2026",
+            onBackClick = {}
+        )
+    }
 }
