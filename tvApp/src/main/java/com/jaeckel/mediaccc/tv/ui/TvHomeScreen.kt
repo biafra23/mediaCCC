@@ -56,6 +56,7 @@ import com.jaeckel.mediaccc.tv.ui.cards.ConferenceCard
 import com.jaeckel.mediaccc.tv.ui.cards.EventCard
 import com.jaeckel.mediaccc.viewmodel.HistoryViewModel
 import com.jaeckel.mediaccc.viewmodel.HomeViewModel
+import com.jaeckel.mediaccc.viewmodel.LiveStreamItem
 import com.jaeckel.mediaccc.tv.R
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.compose.ui.res.stringResource
@@ -67,7 +68,8 @@ fun TvHomeScreen(
     historyViewModel: HistoryViewModel = koinViewModel(),
     onEventClick: (Event) -> Unit,
     onConferenceClick: (Conference) -> Unit,
-    onHistoryEventClick: (String) -> Unit = {}
+    onHistoryEventClick: (String) -> Unit = {},
+    onLiveStreamClick: (LiveStreamItem) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val continueWatching by historyViewModel.continueWatching.collectAsState()
@@ -120,6 +122,31 @@ fun TvHomeScreen(
                     state = lazyListState,
                     contentPadding = PaddingValues(bottom = 32.dp)
                 ) {
+                    // Live Streams Section
+                    if (uiState.liveStreams.isNotEmpty()) {
+                        item {
+                            Column {
+                                Text(
+                                    text = stringResource(R.string.live_streams),
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(horizontal = 48.dp)
+                                )
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                LiveStreamRow(
+                                    streams = uiState.liveStreams,
+                                    onStreamClick = onLiveStreamClick
+                                )
+                            }
+                        }
+
+                        item {
+                            Spacer(modifier = Modifier.height(24.dp))
+                        }
+                    }
+
                     // Hero Carousel for promoted events
                     if (uiState.promotedEvents.isNotEmpty()) {
                         item {
@@ -455,6 +482,98 @@ fun ContinueWatchingRow(
                         color = Color(0xFF6650A4),
                         trackColor = Color.White.copy(alpha = 0.2f)
                     )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+fun LiveStreamRow(
+    streams: List<LiveStreamItem>,
+    onStreamClick: (LiveStreamItem) -> Unit
+) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 48.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(streams, key = { "${it.conferenceName}-${it.roomName}" }) { stream ->
+            var isFocused by remember { mutableStateOf(false) }
+            val scale by animateFloatAsState(if (isFocused) 1.05f else 1f)
+
+            Card(
+                onClick = { onStreamClick(stream) },
+                modifier = Modifier
+                    .width(280.dp)
+                    .height(200.dp)
+                    .scale(scale)
+                    .onFocusChanged { isFocused = it.isFocused },
+                colors = CardDefaults.colors(
+                    containerColor = Color(0xFF2A2A4E),
+                    focusedContainerColor = Color(0xFF3A3A5E)
+                )
+            ) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    AsyncImage(
+                        model = stream.thumbUrl,
+                        contentDescription = stream.roomName,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
+                                    startY = 50f
+                                )
+                            )
+                    )
+                    // LIVE badge
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(8.dp)
+                            .background(Color.Red, MaterialTheme.shapes.small)
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "🔴 LIVE",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White
+                        )
+                    }
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(12.dp)
+                    ) {
+                        Text(
+                            text = stream.roomName,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = stream.conferenceName,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.7f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        stream.currentTalkTitle?.let { title ->
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.5f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
                 }
             }
         }

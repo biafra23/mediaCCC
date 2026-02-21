@@ -208,6 +208,19 @@ fun TvNavDisplay(backStack: MutableList<NavKey>) {
                     },
                     onHistoryEventClick = { guid ->
                         backStack.add(EventDetailRoute(guid))
+                    },
+                    onLiveStreamClick = { stream ->
+                        stream.hlsUrl?.let { url ->
+                            backStack.add(PlayerRoute(
+                                eventGuid = "",
+                                videoUrl = url,
+                                title = stream.roomName,
+                                speakers = stream.currentTalkSpeaker ?: "",
+                                date = "",
+                                conference = stream.conferenceName,
+                                duration = 0
+                            ))
+                        }
                     }
                 )
             }

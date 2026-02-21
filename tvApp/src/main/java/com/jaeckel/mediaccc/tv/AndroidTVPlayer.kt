@@ -81,8 +81,10 @@ fun AndroidTVPlayer(
     Log.i("AndroidTVPlayer", "videoUrl: $videoUrl")
     Log.i("AndroidTVPlayer", "title: $title")
 
+    val isLiveStream = eventGuid.isEmpty()
+
     val viewModel: EventDetailViewModel = koinViewModel(
-        key = eventGuid,
+        key = eventGuid.ifEmpty { "live-stream" },
         parameters = { parametersOf(eventGuid) }
     )
     val uiState by viewModel.uiState.collectAsState()
@@ -97,25 +99,27 @@ fun AndroidTVPlayer(
     var seekBarFocused by remember { mutableStateOf(false) }
     var hasAttemptedRestore by remember { mutableStateOf(false) }
 
-    // Periodically save progress
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(5000)
-            if (duration > 0) {
-                val progress = (currentTime / duration) * 1000f
-                viewModel.saveProgress(progress)
+    // Periodically save progress (skip for live streams)
+    if (!isLiveStream) {
+        LaunchedEffect(Unit) {
+            while (true) {
+                delay(5000)
+                if (duration > 0) {
+                    val progress = (currentTime / duration) * 1000f
+                    viewModel.saveProgress(progress)
+                }
             }
         }
-    }
 
-    // Seek to saved position once duration is known and saved position is loaded
-    LaunchedEffect(duration, uiState.savedSliderPos) {
-        if (duration > 0 && !hasAttemptedRestore && uiState.savedSliderPos > 5f) {
-            hasAttemptedRestore = true // Mark immediately to prevent multiple triggers
-            delay(800) // Give the player enough time to be ready
-            val seekTarget = (uiState.savedSliderPos / 1000f) * duration
-            Log.i("AndroidTVPlayer", "Restoring position to $seekTarget (sliderPos: ${uiState.savedSliderPos})")
-            playerHost.seekTo(seekTarget)
+        // Seek to saved position once duration is known and saved position is loaded
+        LaunchedEffect(duration, uiState.savedSliderPos) {
+            if (duration > 0 && !hasAttemptedRestore && uiState.savedSliderPos > 5f) {
+                hasAttemptedRestore = true
+                delay(800)
+                val seekTarget = (uiState.savedSliderPos / 1000f) * duration
+                Log.i("AndroidTVPlayer", "Restoring position to $seekTarget (sliderPos: ${uiState.savedSliderPos})")
+                playerHost.seekTo(seekTarget)
+            }
         }
     }
 

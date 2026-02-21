@@ -11,6 +11,7 @@
     <!-- Home Screen -->
     <string name="continue_watching">Seguir viendo</string>
     <string name="recent_events">Eventos recientes</string>
+    <string name="live_streams">En Vivo</string>
 
     <!-- Search -->
     <string name="search_events">Buscar eventos</string>

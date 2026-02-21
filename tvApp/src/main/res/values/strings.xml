@@ -13,6 +13,7 @@
     <!-- Home Screen -->
     <string name="continue_watching">Continue Watching</string>
     <string name="recent_events">Recent Events</string>
+    <string name="live_streams">Live Now</string>
 
     <!-- Search -->
     <string name="search_events">Search Events</string>
