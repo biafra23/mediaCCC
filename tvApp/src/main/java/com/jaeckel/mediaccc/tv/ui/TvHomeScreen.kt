@@ -14,11 +14,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +42,11 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -54,12 +63,21 @@ import com.jaeckel.mediaccc.api.model.Event
 import com.jaeckel.mediaccc.data.db.PlaybackHistoryEntity
 import com.jaeckel.mediaccc.tv.ui.cards.ConferenceCard
 import com.jaeckel.mediaccc.tv.ui.cards.EventCard
+import com.jaeckel.mediaccc.data.repository.FavoritesRepository
+import com.jaeckel.mediaccc.data.db.FavoriteEventDao
+import com.jaeckel.mediaccc.data.db.FavoriteEventEntity
 import com.jaeckel.mediaccc.viewmodel.HistoryViewModel
 import com.jaeckel.mediaccc.viewmodel.HomeViewModel
 import com.jaeckel.mediaccc.viewmodel.LiveStreamItem
 import com.jaeckel.mediaccc.tv.R
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
+import org.koin.compose.KoinApplication
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -74,22 +92,53 @@ fun TvHomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     val continueWatching by historyViewModel.continueWatching.collectAsState()
 
+    TvHomeScreenContent(
+        isLoading = uiState.isLoading,
+        errorMessage = uiState.errorMessage,
+        promotedEvents = uiState.promotedEvents,
+        recentEvents = uiState.recentEvents,
+        conferences = uiState.conferences,
+        liveStreams = uiState.liveStreams,
+        continueWatching = continueWatching,
+        onEventClick = onEventClick,
+        onConferenceClick = onConferenceClick,
+        onHistoryEventClick = onHistoryEventClick,
+        onLiveStreamClick = onLiveStreamClick
+    )
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+fun TvHomeScreenContent(
+    isLoading: Boolean,
+    errorMessage: String?,
+    promotedEvents: List<Event>,
+    recentEvents: List<Event>,
+    conferences: List<Conference>,
+    liveStreams: List<LiveStreamItem>,
+    continueWatching: List<PlaybackHistoryEntity>,
+    onEventClick: (Event) -> Unit,
+    onConferenceClick: (Conference) -> Unit,
+    onHistoryEventClick: (String) -> Unit = {},
+    onLiveStreamClick: (LiveStreamItem) -> Unit = {}
+) {
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF1A1A2E))
     ) {
         when {
-            uiState.isLoading && uiState.promotedEvents.isEmpty() && uiState.recentEvents.isEmpty() -> {
+            isLoading && promotedEvents.isEmpty() && recentEvents.isEmpty() -> {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
                     color = Color.White
                 )
             }
 
-            uiState.errorMessage != null && uiState.promotedEvents.isEmpty() -> {
+            errorMessage != null && promotedEvents.isEmpty() -> {
                 Text(
-                    text = stringResource(R.string.error_message, uiState.errorMessage ?: ""),
+                    text = stringResource(R.string.error_message, errorMessage),
                     color = Color.White,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -101,9 +150,19 @@ fun TvHomeScreen(
                 val firstRecentEventFocusRequester = remember { FocusRequester() }
                 val firstContinueWatchingFocusRequester = remember { FocusRequester() }
 
-                val recentEventsIndex = remember(uiState.promotedEvents, continueWatching) {
+                // Index of the row right after the carousel (continue watching or recent events)
+                val nextSectionAfterCarouselIndex = remember(liveStreams, promotedEvents) {
                     var index = 0
-                    if (uiState.promotedEvents.isNotEmpty()) index++
+                    if (liveStreams.isNotEmpty()) index += 2 // live streams + spacer
+                    if (promotedEvents.isNotEmpty()) index++ // carousel
+                    index++ // spacer after carousel
+                    index
+                }
+
+                val recentEventsIndex = remember(liveStreams, promotedEvents, continueWatching) {
+                    var index = 0
+                    if (liveStreams.isNotEmpty()) index += 2
+                    if (promotedEvents.isNotEmpty()) index++
                     index++ // Spacer
                     if (continueWatching.isNotEmpty()) index++
                     index
@@ -123,7 +182,7 @@ fun TvHomeScreen(
                     contentPadding = PaddingValues(bottom = 32.dp)
                 ) {
                     // Live Streams Section
-                    if (uiState.liveStreams.isNotEmpty()) {
+                    if (liveStreams.isNotEmpty()) {
                         item {
                             Column {
                                 Text(
@@ -136,7 +195,7 @@ fun TvHomeScreen(
                                 Spacer(modifier = Modifier.height(16.dp))
 
                                 LiveStreamRow(
-                                    streams = uiState.liveStreams,
+                                    streams = liveStreams,
                                     onStreamClick = onLiveStreamClick
                                 )
                             }
@@ -148,21 +207,21 @@ fun TvHomeScreen(
                     }
 
                     // Hero Carousel for promoted events
-                    if (uiState.promotedEvents.isNotEmpty()) {
+                    if (promotedEvents.isNotEmpty()) {
                         item {
                             PromotedCarousel(
-                                events = uiState.promotedEvents,
+                                events = promotedEvents,
                                 onEventClick = onEventClick,
+                                nextFocusDown = if (continueWatching.isNotEmpty()) {
+                                    firstContinueWatchingFocusRequester
+                                } else {
+                                    firstRecentEventFocusRequester
+                                },
+                                scrollState = lazyListState,
+                                scrollToIndex = nextSectionAfterCarouselIndex,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(400.dp)
-                                    .focusProperties {
-                                        down = if (continueWatching.isNotEmpty()) {
-                                            firstContinueWatchingFocusRequester
-                                        } else {
-                                            firstRecentEventFocusRequester
-                                        }
-                                    }
                             )
                         }
                     }
@@ -194,7 +253,7 @@ fun TvHomeScreen(
                     }
 
                     // Recent Events Section
-                    if (uiState.recentEvents.isNotEmpty()) {
+                    if (recentEvents.isNotEmpty()) {
                         item {
                             Column(
                                 modifier = Modifier
@@ -212,7 +271,7 @@ fun TvHomeScreen(
                                 Spacer(modifier = Modifier.height(16.dp))
 
                                 EventRow(
-                                    events = uiState.recentEvents,
+                                    events = recentEvents,
                                     onEventClick = onEventClick,
                                     firstItemFocusRequester = firstRecentEventFocusRequester
                                 )
@@ -221,7 +280,7 @@ fun TvHomeScreen(
                     }
 
                     // Conferences Section
-                    if (uiState.conferences.isNotEmpty()) {
+                    if (conferences.isNotEmpty()) {
                         item {
                             Spacer(modifier = Modifier.height(24.dp))
                         }
@@ -238,7 +297,7 @@ fun TvHomeScreen(
                                 Spacer(modifier = Modifier.height(16.dp))
 
                                 ConferenceRow(
-                                    conferences = uiState.conferences,
+                                    conferences = conferences,
                                     onConferenceClick = onConferenceClick
                                 )
                             }
@@ -255,13 +314,32 @@ fun TvHomeScreen(
 fun PromotedCarousel(
     events: List<Event>,
     onEventClick: (Event) -> Unit,
+    nextFocusDown: FocusRequester? = null,
+    scrollState: LazyListState? = null,
+    scrollToIndex: Int = 0,
     modifier: Modifier = Modifier
 ) {
     val carouselState = remember { CarouselState() }
+    val scope = rememberCoroutineScope()
 
     Carousel(
         itemCount = events.size,
-        modifier = modifier,
+        modifier = modifier
+            .onKeyEvent { keyEvent ->
+                if (keyEvent.type == KeyEventType.KeyDown && keyEvent.key == Key.DirectionDown) {
+                    if (nextFocusDown != null) {
+                        scope.launch {
+                            scrollState?.animateScrollToItem(scrollToIndex)
+                            nextFocusDown.requestFocus()
+                        }
+                        true
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            },
         carouselState = carouselState,
         carouselIndicator = {
             CarouselDefaults.IndicatorRow(
@@ -277,74 +355,129 @@ fun PromotedCarousel(
         var isFocused by remember { mutableStateOf(false) }
         val scale by animateFloatAsState(if (isFocused) 1.05f else 1f)
 
-        Card(
-            onClick = { onEventClick(event) },
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(if (isFocused) 8.dp else 0.dp)
-                .onFocusChanged { isFocused = it.hasFocus }
-                .scale(scale),
-            border = CardDefaults.border(
-                focusedBorder = Border(BorderStroke(4.dp, Color.White)),
-                border = Border(BorderStroke(0.dp, Color.Transparent))
-            )
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                // Background image
-                AsyncImage(
-                    model = event.posterUrl ?: event.thumbUrl,
-                    contentDescription = event.title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
+        val favoritesRepository: FavoritesRepository = koinInject()
+        val isFavorite by favoritesRepository.isFavorite(event.guid).collectAsState(initial = false)
+        var showMenu by remember { mutableStateOf(false) }
+        val scope = rememberCoroutineScope()
 
-                // Gradient overlay
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    Color.Black.copy(alpha = 0.8f)
-                                ),
-                                startY = 100f
-                            )
-                        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            Card(
+                onClick = { onEventClick(event) },
+                onLongClick = { showMenu = true },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(if (isFocused) 8.dp else 0.dp)
+                    .onFocusChanged { isFocused = it.hasFocus }
+                    .scale(scale),
+                border = CardDefaults.border(
+                    focusedBorder = Border(BorderStroke(4.dp, Color.White)),
+                    border = Border(BorderStroke(0.dp, Color.Transparent))
                 )
-
-                // Event info
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(48.dp)
-                ) {
-                    Text(
-                        text = event.title,
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = Color.White,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+            ) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    // Background image
+                    AsyncImage(
+                        model = event.posterUrl ?: event.thumbUrl,
+                        contentDescription = event.title,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
                     )
-                    event.conferenceTitle?.let { conference ->
+
+                    // Gradient overlay
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        Color.Black.copy(alpha = 0.8f)
+                                    ),
+                                    startY = 100f
+                                )
+                            )
+                    )
+
+                    // Favorite star badge
+                    if (isFavorite) {
                         Text(
-                            text = conference,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color.White.copy(alpha = 0.8f)
+                            text = "★",
+                            color = Color(0xFFFFD700),
+                            style = MaterialTheme.typography.headlineMedium,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(16.dp)
                         )
                     }
-                    event.subtitle?.let { subtitle ->
-                        if (subtitle.isNotBlank()) {
+
+                    // Event info
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(48.dp)
+                    ) {
+                        Text(
+                            text = event.title,
+                            style = MaterialTheme.typography.headlineLarge,
+                            color = Color.White,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        event.conferenceTitle?.let { conference ->
                             Text(
-                                text = subtitle,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White.copy(alpha = 0.6f),
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis
+                                text = conference,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.White.copy(alpha = 0.8f)
                             )
+                        }
+                        event.subtitle?.let { subtitle ->
+                            if (subtitle.isNotBlank()) {
+                                Text(
+                                    text = subtitle,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.White.copy(alpha = 0.6f),
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
                         }
                     }
                 }
+            }
+
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            if (isFavorite) stringResource(R.string.remove_from_favorites)
+                            else stringResource(R.string.add_to_favorites)
+                        )
+                    },
+                    leadingIcon = {
+                        Text(
+                            text = if (isFavorite) "★" else "☆",
+                            color = if (isFavorite) Color(0xFFFFD700) else Color.Unspecified
+                        )
+                    },
+                    onClick = {
+                        showMenu = false
+                        scope.launch {
+                            favoritesRepository.toggleFavorite(
+                                eventGuid = event.guid,
+                                isFavorite = isFavorite,
+                                title = event.title,
+                                thumbUrl = event.thumbUrl,
+                                posterUrl = event.posterUrl,
+                                conferenceTitle = event.conferenceTitle,
+                                persons = event.persons?.joinToString(", "),
+                                duration = event.duration
+                            )
+                        }
+                    }
+                )
             }
         }
     }
@@ -411,76 +544,132 @@ fun ContinueWatchingRow(
             var isFocused by remember { mutableStateOf(false) }
             val scale by animateFloatAsState(if (isFocused) 1.05f else 1f)
 
-            Card(
-                onClick = { onEventClick(entry.eventGuid) },
-                modifier = Modifier
-                    .width(240.dp)
-                    .height(180.dp)
-                    .scale(scale)
-                    .onFocusChanged { isFocused = it.isFocused }
-                    .then(
-                        if (index == 0 && firstItemFocusRequester != null) {
-                            Modifier.focusRequester(firstItemFocusRequester)
-                        } else {
-                            Modifier
-                        }
-                    ),
-                colors = CardDefaults.colors(
-                    containerColor = Color(0xFF2A2A4E),
-                    focusedContainerColor = Color(0xFF3A3A5E)
-                )
-            ) {
-                Column {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        AsyncImage(
-                            model = entry.thumbUrl,
-                            contentDescription = entry.title,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
+            val favoritesRepository: FavoritesRepository = koinInject()
+            val isFavorite by favoritesRepository.isFavorite(entry.eventGuid).collectAsState(initial = false)
+            var showMenu by remember { mutableStateOf(false) }
+            val scope = rememberCoroutineScope()
+
+            Box {
+                Card(
+                    onClick = { onEventClick(entry.eventGuid) },
+                    onLongClick = { showMenu = true },
+                    modifier = Modifier
+                        .width(240.dp)
+                        .height(180.dp)
+                        .scale(scale)
+                        .onFocusChanged { isFocused = it.isFocused }
+                        .then(
+                            if (index == 0 && firstItemFocusRequester != null) {
+                                Modifier.focusRequester(firstItemFocusRequester)
+                            } else {
+                                Modifier
+                            }
+                        ),
+                    colors = CardDefaults.colors(
+                        containerColor = Color(0xFF2A2A4E),
+                        focusedContainerColor = Color(0xFF3A3A5E)
+                    )
+                ) {
+                    Column {
                         Box(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
-                                        startY = 50f
-                                    )
-                                )
-                        )
-                        Column(
-                            modifier = Modifier
-                                .align(Alignment.BottomStart)
-                                .padding(12.dp)
+                                .fillMaxWidth()
+                                .weight(1f)
                         ) {
-                            Text(
-                                text = entry.title,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis
+                            AsyncImage(
+                                model = entry.thumbUrl,
+                                contentDescription = entry.title,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
                             )
-                            entry.conferenceTitle?.let {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        Brush.verticalGradient(
+                                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
+                                            startY = 50f
+                                        )
+                                    )
+                            )
+
+                            // Favorite star badge
+                            if (isFavorite) {
                                 Text(
-                                    text = it,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Color.White.copy(alpha = 0.7f),
-                                    maxLines = 1,
+                                    text = "★",
+                                    color = Color(0xFFFFD700),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(6.dp)
+                                )
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .align(Alignment.BottomStart)
+                                    .padding(12.dp)
+                            ) {
+                                Text(
+                                    text = entry.title,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.White,
+                                    maxLines = 2,
                                     overflow = TextOverflow.Ellipsis
+                                )
+                                entry.conferenceTitle?.let {
+                                    Text(
+                                        text = it,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color.White.copy(alpha = 0.7f),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            }
+                        }
+
+                        LinearProgressIndicator(
+                            progress = { progress },
+                            modifier = Modifier.fillMaxWidth(),
+                            color = Color(0xFF6650A4),
+                            trackColor = Color.White.copy(alpha = 0.2f)
+                        )
+                    }
+                }
+
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                if (isFavorite) stringResource(R.string.remove_from_favorites)
+                                else stringResource(R.string.add_to_favorites)
+                            )
+                        },
+                        leadingIcon = {
+                            Text(
+                                text = if (isFavorite) "★" else "☆",
+                                color = if (isFavorite) Color(0xFFFFD700) else Color.Unspecified
+                            )
+                        },
+                        onClick = {
+                            showMenu = false
+                            scope.launch {
+                                favoritesRepository.toggleFavorite(
+                                    eventGuid = entry.eventGuid,
+                                    isFavorite = isFavorite,
+                                    title = entry.title,
+                                    thumbUrl = entry.thumbUrl,
+                                    posterUrl = null,
+                                    conferenceTitle = entry.conferenceTitle,
+                                    persons = entry.persons,
+                                    duration = entry.duration
                                 )
                             }
                         }
-                    }
-
-                    LinearProgressIndicator(
-                        progress = { progress },
-                        modifier = Modifier.fillMaxWidth(),
-                        color = Color(0xFF6650A4),
-                        trackColor = Color.White.copy(alpha = 0.2f)
                     )
                 }
             }
@@ -580,3 +769,140 @@ fun LiveStreamRow(
     }
 }
 
+
+@Preview(device = "id:tv_1080p", showBackground = true)
+@Composable
+private fun TvHomeScreenPreview() {
+    val sampleEvents = listOf(
+        Event(
+            guid = "event-1",
+            title = "Opening Keynote: Digital Freedom in a Connected World",
+            slug = "opening-keynote",
+            url = "https://example.com",
+            conferenceTitle = "38C3",
+            subtitle = "The future of digital rights",
+            persons = listOf("Alice", "Bob"),
+            duration = 3600
+        ),
+        Event(
+            guid = "event-2",
+            title = "Building Secure Systems",
+            slug = "secure-systems",
+            url = "https://example.com",
+            conferenceTitle = "38C3",
+            persons = listOf("Charlie"),
+            duration = 2700
+        ),
+        Event(
+            guid = "event-3",
+            title = "Privacy by Design",
+            slug = "privacy-design",
+            url = "https://example.com",
+            conferenceTitle = "Camp 2023",
+            persons = listOf("Diana", "Eve"),
+            duration = 1800
+        ),
+        Event(
+            guid = "event-4",
+            title = "Open Source Hardware",
+            slug = "open-hardware",
+            url = "https://example.com",
+            conferenceTitle = "Camp 2023",
+            persons = listOf("Frank"),
+            duration = 2400
+        )
+    )
+    val sampleConferences = listOf(
+        Conference(
+            acronym = "38c3",
+            title = "38th Chaos Communication Congress",
+            slug = "congress/38c3",
+            url = "https://example.com"
+        ),
+        Conference(
+            acronym = "camp2023",
+            title = "Chaos Communication Camp 2023",
+            slug = "events/camp2023",
+            url = "https://example.com"
+        )
+    )
+    PreviewKoinProvider {
+        MaterialTheme {
+            TvHomeScreenContent(
+                isLoading = false,
+                errorMessage = null,
+                promotedEvents = sampleEvents.take(2),
+                recentEvents = sampleEvents,
+                conferences = sampleConferences,
+                liveStreams = emptyList(),
+                continueWatching = emptyList(),
+                onEventClick = {},
+                onConferenceClick = {},
+                onHistoryEventClick = {},
+                onLiveStreamClick = {}
+            )
+        }
+    }
+}
+
+@Preview(device = "id:tv_1080p", showBackground = true)
+@Composable
+private fun TvHomeScreenLoadingPreview() {
+    MaterialTheme {
+        TvHomeScreenContent(
+            isLoading = true,
+            errorMessage = null,
+            promotedEvents = emptyList(),
+            recentEvents = emptyList(),
+            conferences = emptyList(),
+            liveStreams = emptyList(),
+            continueWatching = emptyList(),
+            onEventClick = {},
+            onConferenceClick = {}
+        )
+    }
+}
+
+@Preview(device = "id:tv_1080p", showBackground = true)
+@Composable
+private fun TvHomeScreenErrorPreview() {
+    MaterialTheme {
+        TvHomeScreenContent(
+            isLoading = false,
+            errorMessage = "Network connection failed",
+            promotedEvents = emptyList(),
+            recentEvents = emptyList(),
+            conferences = emptyList(),
+            liveStreams = emptyList(),
+            continueWatching = emptyList(),
+            onEventClick = {},
+            onConferenceClick = {}
+        )
+    }
+}
+
+/**
+ * Provides a minimal Koin context for @Preview composables.
+ * Registers a FavoritesRepository with a no-op DAO so sub-composables
+ * that call koinInject<FavoritesRepository>() don't crash.
+ */
+@Composable
+private fun PreviewKoinProvider(content: @Composable () -> Unit) {
+    KoinApplication(application = {
+        modules(
+            org.koin.dsl.module {
+                single { FavoritesRepository(PreviewFavoriteEventDao()) }
+            }
+        )
+    }) {
+        content()
+    }
+}
+
+/** Stub DAO that returns empty flows; used only in @Preview. */
+private class PreviewFavoriteEventDao : FavoriteEventDao {
+    override suspend fun insert(entity: FavoriteEventEntity) {}
+    override suspend fun delete(eventGuid: String) {}
+    override fun getAll(): Flow<List<FavoriteEventEntity>> = flowOf(emptyList())
+    override fun isFavorite(eventGuid: String): Flow<Boolean> = flowOf(false)
+}

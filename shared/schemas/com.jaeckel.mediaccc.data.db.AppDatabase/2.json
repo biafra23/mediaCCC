@@ -1,0 +1,124 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "7ef5be2f3d0aa8d02a688a4be1ad37b2",
+    "entities": [
+      {
+        "tableName": "playback_history",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventGuid` TEXT NOT NULL, `title` TEXT NOT NULL, `thumbUrl` TEXT, `conferenceTitle` TEXT, `persons` TEXT, `duration` INTEGER, `lastPlayedAt` INTEGER NOT NULL, `sliderPos` REAL NOT NULL, PRIMARY KEY(`eventGuid`))",
+        "fields": [
+          {
+            "fieldPath": "eventGuid",
+            "columnName": "eventGuid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "thumbUrl",
+            "columnName": "thumbUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "conferenceTitle",
+            "columnName": "conferenceTitle",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "persons",
+            "columnName": "persons",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "lastPlayedAt",
+            "columnName": "lastPlayedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sliderPos",
+            "columnName": "sliderPos",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "eventGuid"
+          ]
+        }
+      },
+      {
+        "tableName": "favorite_events",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventGuid` TEXT NOT NULL, `title` TEXT NOT NULL, `thumbUrl` TEXT, `posterUrl` TEXT, `conferenceTitle` TEXT, `persons` TEXT, `duration` INTEGER, `starredAt` INTEGER NOT NULL, PRIMARY KEY(`eventGuid`))",
+        "fields": [
+          {
+            "fieldPath": "eventGuid",
+            "columnName": "eventGuid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "thumbUrl",
+            "columnName": "thumbUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "posterUrl",
+            "columnName": "posterUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "conferenceTitle",
+            "columnName": "conferenceTitle",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "persons",
+            "columnName": "persons",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "starredAt",
+            "columnName": "starredAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "eventGuid"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7ef5be2f3d0aa8d02a688a4be1ad37b2')"
+    ]
+  }
+}

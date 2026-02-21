@@ -239,7 +239,13 @@ fun TvNavDisplay(backStack: MutableList<NavKey>) {
                     }
                 )
             }
-            entry<FavoritesRoute> { FavoritesScreen() }
+            entry<FavoritesRoute> {
+                FavoritesScreen(
+                    onEventClick = { guid ->
+                        backStack.add(EventDetailRoute(guid))
+                    }
+                )
+            }
             entry<HistoryRoute> {
                 HistoryScreen(
                     onEventClick = { guid ->

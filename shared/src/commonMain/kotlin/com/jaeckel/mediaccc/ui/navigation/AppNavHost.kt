@@ -203,7 +203,12 @@ private fun AppNavDisplay(
             }
 
             entry<FavoritesRoute> {
-                FavoritesScreen(onBackClick = ::popBack)
+                FavoritesScreen(
+                    onEventClick = { guid ->
+                        backStack.add(EventDetailRoute(guid))
+                    },
+                    onBackClick = ::popBack
+                )
             }
 
             entry<HistoryRoute> {

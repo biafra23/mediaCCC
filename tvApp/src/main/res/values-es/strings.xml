@@ -46,5 +46,8 @@
 
     <!-- Favorites / Settings -->
     <string name="favorites_screen">Favoritos</string>
+    <string name="no_favorites_yet">Aún no hay favoritos</string>
+    <string name="add_to_favorites">Agregar a favoritos</string>
+    <string name="remove_from_favorites">Quitar de favoritos</string>
     <string name="settings_screen">Ajustes</string>
 </resources>

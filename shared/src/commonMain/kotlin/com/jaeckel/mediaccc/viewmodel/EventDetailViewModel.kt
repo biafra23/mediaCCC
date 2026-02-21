@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.jaeckel.mediaccc.MediaRepository
 import com.jaeckel.mediaccc.api.model.Event
 import com.jaeckel.mediaccc.api.model.Recording
+import com.jaeckel.mediaccc.data.repository.FavoritesRepository
 import com.jaeckel.mediaccc.data.repository.PlaybackHistoryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,12 +20,14 @@ data class EventDetailUiState(
     val availableLanguages: List<String> = emptyList(),
     val selectedLanguage: String? = null,
     val errorMessage: String? = null,
-    val savedSliderPos: Float = 0f
+    val savedSliderPos: Float = 0f,
+    val isFavorite: Boolean = false
 )
 
 class EventDetailViewModel(
     private val repository: MediaRepository,
     private val historyRepository: PlaybackHistoryRepository,
+    private val favoritesRepository: FavoritesRepository,
     private val eventGuid: String
 ) : ViewModel() {
 
@@ -34,6 +37,15 @@ class EventDetailViewModel(
     init {
         loadEvent()
         observeSavedPosition()
+        observeFavoriteStatus()
+    }
+
+    private fun observeFavoriteStatus() {
+        viewModelScope.launch {
+            favoritesRepository.isFavorite(eventGuid).collect { isFav ->
+                _uiState.update { it.copy(isFavorite = isFav) }
+            }
+        }
     }
 
     private fun observeSavedPosition() {
@@ -100,6 +112,22 @@ class EventDetailViewModel(
                 persons = event.persons?.joinToString(", "),
                 duration = event.duration,
                 sliderPos = sliderPos
+            )
+        }
+    }
+
+    fun toggleFavorite() {
+        val event = _uiState.value.event ?: return
+        viewModelScope.launch {
+            favoritesRepository.toggleFavorite(
+                eventGuid = event.guid,
+                isFavorite = _uiState.value.isFavorite,
+                title = event.title,
+                thumbUrl = event.thumbUrl,
+                posterUrl = event.posterUrl,
+                conferenceTitle = event.conferenceTitle,
+                persons = event.persons?.joinToString(", "),
+                duration = event.duration
             )
         }
     }

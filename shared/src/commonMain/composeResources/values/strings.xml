@@ -46,6 +46,9 @@
 
     <!-- Favorites Screen -->
     <string name="favorites_coming_soon">Favorites coming soon</string>
+    <string name="no_favorites_yet">No favorites yet</string>
+    <string name="add_to_favorites">Add to favorites</string>
+    <string name="remove_from_favorites">Remove from favorites</string>
 
     <!-- Settings Screen -->
     <string name="settings_coming_soon">Settings coming soon</string>

@@ -166,6 +166,18 @@ fun EventDetailScreen(
                             }
                     )
                 },
+                actions = {
+                    if (uiState.event != null) {
+                        Text(
+                            text = if (uiState.isFavorite) "★" else "☆",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = if (uiState.isFavorite) Color(0xFFFFD700) else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp)
+                                .clickable { viewModel.toggleFavorite() }
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -216,7 +228,8 @@ fun EventDetailScreen(
                             isPlaying = false
                             playerState.pause()
                         },
-                        onLanguageSelected = { viewModel.selectLanguage(it) }
+                        onLanguageSelected = { viewModel.selectLanguage(it) },
+                        onToggleFavorite = { viewModel.toggleFavorite() }
                     )
                 }
             }
@@ -235,7 +248,8 @@ private fun EventDetailContent(
     dateTimeFormat: DateTimeFormat<LocalDateTime>,
     onPlayClick: () -> Unit,
     onExitFullscreen: () -> Unit,
-    onLanguageSelected: (String) -> Unit
+    onLanguageSelected: (String) -> Unit,
+    onToggleFavorite: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -263,7 +277,9 @@ private fun EventDetailContent(
                             speakers = speakers,
                             conference = event.conferenceTitle ?: "",
                             date = formattedDate,
-                            onExitFullscreen = onExitFullscreen
+                            isFavorite = uiState.isFavorite,
+                            onExitFullscreen = onExitFullscreen,
+                            onToggleFavorite = onToggleFavorite
                         )
                     }
                 }
@@ -499,7 +515,9 @@ private fun PlayerControlsOverlay(
     speakers: String,
     conference: String,
     date: String,
-    onExitFullscreen: () -> Unit
+    isFavorite: Boolean = false,
+    onExitFullscreen: () -> Unit,
+    onToggleFavorite: () -> Unit = {}
 ) {
     var showControls by remember { mutableStateOf(true) }
     var interactionCount by remember { mutableStateOf(0) }
@@ -580,6 +598,18 @@ private fun PlayerControlsOverlay(
                         )
                     }
                 }
+
+                Text(
+                    text = if (isFavorite) "★" else "☆",
+                    color = if (isFavorite) Color(0xFFFFD700) else Color.White,
+                    fontSize = 24.sp,
+                    modifier = Modifier
+                        .clickable {
+                            onInteract()
+                            onToggleFavorite()
+                        }
+                        .padding(8.dp)
+                )
             }
 
             val isPlaying = playerState.isPlaying

@@ -121,7 +121,9 @@ fun EventDetailScreen(
                     bestRecording = uiState.bestRecording,
                     availableLanguages = uiState.availableLanguages,
                     selectedLanguage = uiState.selectedLanguage,
+                    isFavorite = uiState.isFavorite,
                     onLanguageSelected = { viewModel.selectLanguage(it) },
+                    onToggleFavorite = { viewModel.toggleFavorite() },
                     dateTimeFormat = dateTimeFormat,
                     onPlayClick = { guid, videoUrl, title, speakers, date, conference, duration ->
                         viewModel.saveProgress(uiState.savedSliderPos)
@@ -145,7 +147,9 @@ private fun EventDetailContent(
     bestRecording: Recording?,
     availableLanguages: List<String>,
     selectedLanguage: String?,
+    isFavorite: Boolean,
     onLanguageSelected: (String) -> Unit,
+    onToggleFavorite: () -> Unit,
     dateTimeFormat: DateTimeFormat<LocalDateTime>,
     onPlayClick: (eventGuid: String, videoUrl: String, title: String, speakers: String, date: String, conference: String, duration: Long) -> Unit,
     playButtonFocusRequester: FocusRequester
@@ -328,6 +332,17 @@ private fun EventDetailContent(
                         ) {
                             Text(stringResource(R.string.play))
                         }
+                    }
+
+                    // Favorite button
+                    Button(
+                        onClick = onToggleFavorite,
+                        colors = ButtonDefaults.colors(
+                            containerColor = if (isFavorite) Color(0xFFFFD700).copy(alpha = 0.3f) else Color.White.copy(alpha = 0.15f),
+                            contentColor = if (isFavorite) Color(0xFFFFD700) else Color.White
+                        )
+                    ) {
+                        Text(if (isFavorite) "★ ${stringResource(R.string.remove_from_favorites)}" else "☆ ${stringResource(R.string.add_to_favorites)}")
                     }
                 }
 
