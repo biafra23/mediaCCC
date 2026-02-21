@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import androidx.compose.material.icons.filled.List
 import com.jaeckel.mediaccc.ui.screens.ConferenceDetailScreen
 import com.jaeckel.mediaccc.ui.screens.ConferencesScreen
 import com.jaeckel.mediaccc.ui.screens.EventDetailScreen
@@ -42,6 +43,7 @@ import com.jaeckel.mediaccc.ui.screens.FavoritesScreen
 import com.jaeckel.mediaccc.ui.screens.HistoryScreen
 import com.jaeckel.mediaccc.ui.screens.HomeScreen
 import com.jaeckel.mediaccc.ui.screens.PlayerScreen
+import com.jaeckel.mediaccc.ui.screens.QueueScreen
 import com.jaeckel.mediaccc.ui.screens.SearchScreen
 import com.jaeckel.mediaccc.ui.screens.SettingsScreen
 import kotlinx.coroutines.launch
@@ -62,6 +64,7 @@ private val topDrawerItems = listOf(
     DrawerItem(Res.string.conferences, Icons.Default.VideoLibrary, ConferencesRoute),
     DrawerItem(Res.string.favorites, Icons.Default.Favorite, FavoritesRoute),
     DrawerItem(Res.string.history, Icons.Default.History, HistoryRoute),
+    DrawerItem(Res.string.queue, Icons.Default.List, QueueRoute),
 )
 
 private val bottomDrawerItems = listOf(
@@ -80,6 +83,7 @@ fun AppNavHost() {
             currentRoute is ConferencesRoute ||
             currentRoute is FavoritesRoute ||
             currentRoute is HistoryRoute ||
+            currentRoute is QueueRoute ||
             currentRoute is SettingsRoute
 
     fun navigateToDrawerRoute(route: NavKey) {
@@ -220,6 +224,24 @@ private fun AppNavDisplay(
                 )
             }
 
+            entry<QueueRoute> {
+                QueueScreen(
+                    onEventClick = { videoUrl, title, speakers, date, conference, eventGuid ->
+                        backStack.add(
+                            PlayerRoute(
+                                videoUrl = videoUrl,
+                                title = title,
+                                speakers = speakers,
+                                date = date,
+                                conference = conference,
+                                eventGuid = eventGuid
+                            )
+                        )
+                    },
+                    onBackClick = ::popBack
+                )
+            }
+
             entry<SettingsRoute> {
                 SettingsScreen(onBackClick = ::popBack)
             }
@@ -256,6 +278,7 @@ private fun AppNavDisplay(
                 PlayerScreen(
                     videoUrl = route.videoUrl,
                     title = route.title,
+                    eventGuid = route.eventGuid,
                     onBackClick = ::popBack
                 )
             }

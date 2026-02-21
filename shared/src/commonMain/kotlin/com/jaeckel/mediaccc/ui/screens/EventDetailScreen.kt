@@ -168,6 +168,36 @@ fun EventDetailScreen(
                 },
                 actions = {
                     if (uiState.event != null) {
+                        var showMenu by remember { mutableStateOf(false) }
+                        Box {
+                            Text(
+                                text = "⋮",
+                                style = MaterialTheme.typography.headlineSmall,
+                                modifier = Modifier
+                                    .padding(horizontal = 12.dp)
+                                    .clickable { showMenu = true }
+                            )
+                            DropdownMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(Res.string.add_to_queue_start)) },
+                                    onClick = {
+                                        showMenu = false
+                                        viewModel.addToQueueStart()
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(Res.string.add_to_queue_end)) },
+                                    onClick = {
+                                        showMenu = false
+                                        viewModel.addToQueueEnd()
+                                    }
+                                )
+                            }
+                        }
+
                         Text(
                             text = if (uiState.isFavorite) "★" else "☆",
                             style = MaterialTheme.typography.headlineSmall,

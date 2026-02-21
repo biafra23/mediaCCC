@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.jaeckel.mediaccc.api.model.Event
 import com.jaeckel.mediaccc.data.repository.FavoritesRepository
+import com.jaeckel.mediaccc.data.repository.QueueRepository
 import kotlinx.coroutines.launch
 import mediaccc.shared.generated.resources.Res
 import mediaccc.shared.generated.resources.*
@@ -45,10 +46,13 @@ import org.koin.compose.koinInject
 fun EventCard(
     event: Event,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRemoveFromQueue: (() -> Unit)? = null
 ) {
     val favoritesRepository: FavoritesRepository = koinInject()
+    val queueRepository: QueueRepository = koinInject()
     val isFavorite by favoritesRepository.isFavorite(event.guid).collectAsState(initial = false)
+    val isInQueue by queueRepository.isInQueue(event.guid).collectAsState(initial = false)
     var showMenu by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
@@ -159,6 +163,51 @@ fun EventCard(
             expanded = showMenu,
             onDismissRequest = { showMenu = false }
         ) {
+            if (onRemoveFromQueue != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(Res.string.remove_from_queue)) },
+                    onClick = {
+                        showMenu = false
+                        onRemoveFromQueue()
+                    }
+                )
+            } else {
+                DropdownMenuItem(
+                    text = { Text(stringResource(Res.string.add_to_queue_start)) },
+                    onClick = {
+                        showMenu = false
+                        scope.launch {
+                            queueRepository.addToBeginning(
+                                eventGuid = event.guid,
+                                title = event.title,
+                                thumbUrl = event.thumbUrl,
+                                posterUrl = event.posterUrl,
+                                conferenceTitle = event.conferenceTitle,
+                                persons = event.persons?.joinToString(", "),
+                                duration = event.duration
+                            )
+                        }
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(Res.string.add_to_queue_end)) },
+                    onClick = {
+                        showMenu = false
+                        scope.launch {
+                            queueRepository.addToEnd(
+                                eventGuid = event.guid,
+                                title = event.title,
+                                thumbUrl = event.thumbUrl,
+                                posterUrl = event.posterUrl,
+                                conferenceTitle = event.conferenceTitle,
+                                persons = event.persons?.joinToString(", "),
+                                duration = event.duration
+                            )
+                        }
+                    }
+                )
+            }
+
             DropdownMenuItem(
                 text = {
                     Text(
@@ -197,10 +246,13 @@ fun EventCard(
 fun EventCardCompact(
     event: Event,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRemoveFromQueue: (() -> Unit)? = null
 ) {
     val favoritesRepository: FavoritesRepository = koinInject()
+    val queueRepository: QueueRepository = koinInject()
     val isFavorite by favoritesRepository.isFavorite(event.guid).collectAsState(initial = false)
+    val isInQueue by queueRepository.isInQueue(event.guid).collectAsState(initial = false)
     var showMenu by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
@@ -277,6 +329,51 @@ fun EventCardCompact(
             expanded = showMenu,
             onDismissRequest = { showMenu = false }
         ) {
+            if (onRemoveFromQueue != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(Res.string.remove_from_queue)) },
+                    onClick = {
+                        showMenu = false
+                        onRemoveFromQueue()
+                    }
+                )
+            } else {
+                DropdownMenuItem(
+                    text = { Text(stringResource(Res.string.add_to_queue_start)) },
+                    onClick = {
+                        showMenu = false
+                        scope.launch {
+                            queueRepository.addToBeginning(
+                                eventGuid = event.guid,
+                                title = event.title,
+                                thumbUrl = event.thumbUrl,
+                                posterUrl = event.posterUrl,
+                                conferenceTitle = event.conferenceTitle,
+                                persons = event.persons?.joinToString(", "),
+                                duration = event.duration
+                            )
+                        }
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(Res.string.add_to_queue_end)) },
+                    onClick = {
+                        showMenu = false
+                        scope.launch {
+                            queueRepository.addToEnd(
+                                eventGuid = event.guid,
+                                title = event.title,
+                                thumbUrl = event.thumbUrl,
+                                posterUrl = event.posterUrl,
+                                conferenceTitle = event.conferenceTitle,
+                                persons = event.persons?.joinToString(", "),
+                                duration = event.duration
+                            )
+                        }
+                    }
+                )
+            }
+
             DropdownMenuItem(
                 text = {
                     Text(

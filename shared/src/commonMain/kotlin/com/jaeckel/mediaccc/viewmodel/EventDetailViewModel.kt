@@ -7,6 +7,7 @@ import com.jaeckel.mediaccc.api.model.Event
 import com.jaeckel.mediaccc.api.model.Recording
 import com.jaeckel.mediaccc.data.repository.FavoritesRepository
 import com.jaeckel.mediaccc.data.repository.PlaybackHistoryRepository
+import com.jaeckel.mediaccc.data.repository.QueueRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,6 +29,7 @@ class EventDetailViewModel(
     private val repository: MediaRepository,
     private val historyRepository: PlaybackHistoryRepository,
     private val favoritesRepository: FavoritesRepository,
+    private val queueRepository: QueueRepository,
     private val eventGuid: String
 ) : ViewModel() {
 
@@ -122,6 +124,36 @@ class EventDetailViewModel(
             favoritesRepository.toggleFavorite(
                 eventGuid = event.guid,
                 isFavorite = _uiState.value.isFavorite,
+                title = event.title,
+                thumbUrl = event.thumbUrl,
+                posterUrl = event.posterUrl,
+                conferenceTitle = event.conferenceTitle,
+                persons = event.persons?.joinToString(", "),
+                duration = event.duration
+            )
+        }
+    }
+
+    fun addToQueueStart() {
+        val event = _uiState.value.event ?: return
+        viewModelScope.launch {
+            queueRepository.addToBeginning(
+                eventGuid = event.guid,
+                title = event.title,
+                thumbUrl = event.thumbUrl,
+                posterUrl = event.posterUrl,
+                conferenceTitle = event.conferenceTitle,
+                persons = event.persons?.joinToString(", "),
+                duration = event.duration
+            )
+        }
+    }
+
+    fun addToQueueEnd() {
+        val event = _uiState.value.event ?: return
+        viewModelScope.launch {
+            queueRepository.addToEnd(
+                eventGuid = event.guid,
                 title = event.title,
                 thumbUrl = event.thumbUrl,
                 posterUrl = event.posterUrl,

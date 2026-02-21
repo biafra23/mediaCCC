@@ -18,7 +18,8 @@ data class PlayerRoute(
     val title: String = "",
     val speakers: String = "",
     val date: String = "",
-    val conference: String = ""
+    val conference: String = "",
+    val eventGuid: String? = null
 ) : NavKey
 
 
@@ -33,6 +34,9 @@ data object ConferencesRoute : NavKey
 
 @Serializable
 data object FavoritesRoute : NavKey
+
+@Serializable
+data object QueueRoute : NavKey
 
 @Serializable
 data object SettingsRoute : NavKey

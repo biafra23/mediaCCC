@@ -19,6 +19,7 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,28 +32,48 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jaeckel.mediaccc.ui.util.SystemAppearance
+import com.jaeckel.mediaccc.viewmodel.PlayerViewModel
 import io.github.kdroidfilter.composemediaplayer.VideoPlayerSurface
 import io.github.kdroidfilter.composemediaplayer.VideoPlayerState
 import io.github.kdroidfilter.composemediaplayer.rememberVideoPlayerState
 import kotlinx.coroutines.delay
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun PlayerScreen(
     videoUrl: String,
     title: String,
+    eventGuid: String? = null,
     onBackClick: () -> Unit
 ) {
+    val viewModel: PlayerViewModel = koinViewModel(
+        parameters = { parametersOf(videoUrl, title, eventGuid) }
+    )
+    val uiState by viewModel.uiState.collectAsState()
+
     SystemAppearance(true)
     val playerState = rememberVideoPlayerState()
     var isBuffering by remember { mutableStateOf(true) }
 
-    LaunchedEffect(videoUrl) {
-        playerState.openUri(videoUrl)
+    LaunchedEffect(uiState.videoUrl) {
+        uiState.videoUrl?.let { url ->
+            playerState.openUri(url)
+        }
     }
 
     LaunchedEffect(playerState.isPlaying) {
         if (playerState.isPlaying) {
             isBuffering = false
+        }
+    }
+
+    // Detect end of playback to play next
+    LaunchedEffect(playerState.positionText, playerState.durationText) {
+        val duration = parseTimeToSeconds(playerState.durationText)
+        val position = parseTimeToSeconds(playerState.positionText)
+        if (duration > 0 && position >= duration - 1) {
+            viewModel.playNext()
         }
     }
 
@@ -73,12 +94,12 @@ fun PlayerScreen(
             overlay = {
                 LivePlayerOverlay(
                     playerState = playerState,
-                    title = title,
+                    title = uiState.title,
                     onBackClick = onBackClick
                 )
             }
         )
-        if (isBuffering) {
+        if (isBuffering || uiState.isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.size(48.dp),
                 color = Color.White
