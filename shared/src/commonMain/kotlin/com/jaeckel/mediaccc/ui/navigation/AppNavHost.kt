@@ -167,6 +167,19 @@ private fun AppNavDisplay(
                     onHistoryEventClick = { guid ->
                         backStack.add(EventDetailRoute(guid))
                     },
+                    onLiveStreamClick = { stream ->
+                        stream.hlsUrl?.let { url ->
+                            backStack.add(
+                                PlayerRoute(
+                                    videoUrl = url,
+                                    title = stream.roomName,
+                                    speakers = stream.currentTalkSpeaker ?: "",
+                                    date = "",
+                                    conference = stream.conferenceName
+                                )
+                            )
+                        }
+                    },
                     onOpenDrawer = onOpenDrawer
                 )
             }

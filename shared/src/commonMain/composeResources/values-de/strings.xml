@@ -10,6 +10,7 @@
 
     <!-- Home Screen -->
     <string name="continue_watching">Weiterschauen</string>
+    <string name="live_streams">Jetzt Live</string>
     <string name="featured">Empfohlen</string>
     <string name="recent">Aktuell</string>
     <string name="menu">Menü</string>

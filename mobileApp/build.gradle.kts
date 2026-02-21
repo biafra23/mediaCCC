@@ -55,6 +55,9 @@ dependencies {
     // Koin for Android
     implementation(libs.koin.android)
 
+    // Media3 HLS support for live stream playback
+    implementation("androidx.media3:media3-exoplayer-hls:1.9.0")
+
     // Coil for image loading with SVG support
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)

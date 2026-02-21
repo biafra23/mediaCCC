@@ -1,7 +1,9 @@
 package com.jaeckel.mediaccc.di
 
 import com.jaeckel.mediaccc.MediaRepository
+import com.jaeckel.mediaccc.StreamingRepository
 import com.jaeckel.mediaccc.api.MediaCCCApi
+import com.jaeckel.mediaccc.api.StreamingApi
 import com.jaeckel.mediaccc.data.db.AppDatabase
 import com.jaeckel.mediaccc.data.db.PlaybackHistoryDao
 import com.jaeckel.mediaccc.data.repository.PlaybackHistoryRepository
@@ -15,7 +17,9 @@ import org.koin.dsl.module
 
 val sharedModule = module {
     single { MediaCCCApi() }
+    single { StreamingApi() }
     single { MediaRepository(get<MediaCCCApi>()) }
+    single { StreamingRepository(get<StreamingApi>()) }
     single<PlaybackHistoryDao> { get<AppDatabase>().playbackHistoryDao() }
     single<PlaybackHistoryRepository> { PlaybackHistoryRepository(get<PlaybackHistoryDao>()) }
     viewModel { (eventGuid: String) ->
@@ -26,7 +30,7 @@ val sharedModule = module {
         )
     }
     viewModel { (acronym: String) -> ConferenceDetailViewModel(get<MediaRepository>(), acronym) }
-    viewModel { HomeViewModel(get<MediaRepository>()) }
+    viewModel { HomeViewModel(get<MediaRepository>(), get<StreamingRepository>()) }
     viewModel { SearchViewModel(get<MediaRepository>()) }
     viewModel { HistoryViewModel(get<PlaybackHistoryRepository>()) }
 }

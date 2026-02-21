@@ -37,8 +37,10 @@ import com.jaeckel.mediaccc.ui.components.ConferenceCard
 import com.jaeckel.mediaccc.ui.components.EventCard
 import com.jaeckel.mediaccc.ui.components.EventCardCompact
 import com.jaeckel.mediaccc.ui.components.HistoryCardCompact
+import com.jaeckel.mediaccc.ui.components.LiveStreamCard
 import com.jaeckel.mediaccc.viewmodel.HistoryViewModel
 import com.jaeckel.mediaccc.viewmodel.HomeViewModel
+import com.jaeckel.mediaccc.viewmodel.LiveStreamItem
 import mediaccc.shared.generated.resources.Res
 import mediaccc.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -52,6 +54,7 @@ fun HomeScreen(
     onEventClick: (Event) -> Unit,
     onConferenceClick: (Conference) -> Unit,
     onHistoryEventClick: (String) -> Unit,
+    onLiveStreamClick: (LiveStreamItem) -> Unit,
     onOpenDrawer: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -95,13 +98,15 @@ fun HomeScreen(
                 }
                 else -> {
                     HomeContent(
+                        liveStreams = uiState.liveStreams,
                         continueWatching = continueWatching,
                         promotedEvents = uiState.promotedEvents,
                         recentEvents = uiState.recentEvents,
                         conferences = uiState.conferences,
                         onEventClick = onEventClick,
                         onConferenceClick = onConferenceClick,
-                        onHistoryEventClick = onHistoryEventClick
+                        onHistoryEventClick = onHistoryEventClick,
+                        onLiveStreamClick = onLiveStreamClick
                     )
                 }
             }
@@ -111,19 +116,42 @@ fun HomeScreen(
 
 @Composable
 private fun HomeContent(
+    liveStreams: List<LiveStreamItem>,
     continueWatching: List<PlaybackHistoryEntity>,
     promotedEvents: List<Event>,
     recentEvents: List<Event>,
     conferences: List<Conference>,
     onEventClick: (Event) -> Unit,
     onConferenceClick: (Conference) -> Unit,
-    onHistoryEventClick: (String) -> Unit
+    onHistoryEventClick: (String) -> Unit,
+    onLiveStreamClick: (LiveStreamItem) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
+        // Live Streams Section
+        if (liveStreams.isNotEmpty()) {
+            item {
+                SectionHeader(title = stringResource(Res.string.live_streams))
+            }
+            item {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(liveStreams, key = { "${it.conferenceName}-${it.roomName}" }) { stream ->
+                        LiveStreamCard(
+                            item = stream,
+                            onClick = { onLiveStreamClick(stream) },
+                            modifier = Modifier.width(280.dp)
+                        )
+                    }
+                }
+            }
+        }
+
         // Continue Watching Section
         if (continueWatching.isNotEmpty()) {
             item {
