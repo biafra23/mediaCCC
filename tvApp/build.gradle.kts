@@ -48,11 +48,11 @@ dependencies {
 
     implementation(libs.compose.components.resources)
 
-    implementation("androidx.leanback:leanback:1.2.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation(libs.androidx.leanback)
+    implementation(libs.androidx.appcompat.v170)
 
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation(libs.androidx.core.ktx.v1150)
+    implementation(libs.androidx.activity.compose.v193)
 
     // Use JetBrains Compose (from shared module) instead of AndroidX Compose BOM
     // to avoid version conflicts
@@ -62,16 +62,16 @@ dependencies {
     implementation(libs.compose.uiToolingPreview)
 
     // Material Icons for player controls
-    implementation("androidx.compose.material:material-icons-extended:1.7.6")
+    implementation(libs.androidx.material.icons.extended)
 
     // Explicit AndroidX Compose Foundation for runtime classes like BringIntoViewResponder
-    implementation("androidx.compose.foundation:foundation:1.8.2")
+    implementation(libs.androidx.foundation)
 
     implementation(libs.compose.multiplatform.media.player)
 
     // TV-specific dependencies - using stable 1.0.1 for Compose 1.10+ compatibility
-    implementation("androidx.tv:tv-foundation:1.0.0-alpha12")
-    implementation("androidx.tv:tv-material:1.0.1")
+    implementation(libs.androidx.tv.foundation)
+    implementation(libs.androidx.tv.material)
 
     // Navigation 3
     implementation(libs.navigation3.ui)
@@ -94,5 +94,9 @@ dependencies {
     // Lifecycle
     implementation(libs.androidx.lifecycle.viewmodelCompose)
     implementation(libs.androidx.lifecycle.runtimeCompose)
+
+    // Testing
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.junit)
 }
 

@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -37,7 +36,7 @@ kotlin {
             api(libs.androidx.lifecycle.viewmodel.navigation3)
 
             // SLF4J simple provider for Ktor logging output
-            implementation("org.slf4j:slf4j-simple:2.0.9")
+            implementation(libs.slf4j.simple)
         }
         commonMain.dependencies {
             implementation(project(":api"))
@@ -78,6 +77,8 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.koin.test)
+            implementation(libs.ktor.client.mock)
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }
