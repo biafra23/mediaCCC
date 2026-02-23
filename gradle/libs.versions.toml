@@ -1,4 +1,5 @@
 [versions]
+activityCompose = "1.9.3"
 agp = "8.11.2"
 android-compileSdk = "36"
 android-minSdk = "28"
@@ -9,15 +10,20 @@ androidx-core = "1.17.0"
 androidx-espresso = "3.7.0"
 androidx-lifecycle = "2.9.6"
 androidx-testExt = "1.3.0"
+appcompat = "1.7.0"
 coil = "3.3.0"
 composeMultiplatform = "1.10.0"
 composeMultiplatformMediaPlayer = "1.0.53"
 composeMediaPlayer = "0.8.7"
+coreKtx = "1.15.0"
+foundation = "1.8.2"
 junit = "4.13.2"
 kotlin = "2.3.10"
 ksp = "2.3.6"
+leanback = "1.2.0"
 material3 = "1.10.0-alpha05"
 kotlinStdlib = "2.3.10"
+materialIconsExtended = "1.7.6"
 runner = "1.5.2"
 core = "1.5.0"
 ktor = "3.4.0"
@@ -29,10 +35,22 @@ compose-multiplatform-lifecycle = "2.10.0-alpha08"
 koin = "4.1.1"
 koin-annotations = "2.0.0"
 room = "2.7.0"
+slf4jSimple = "2.0.9"
 sqlite = "2.5.1"
+tvFoundation = "1.0.0-alpha12"
+tvMaterial = "1.0.1"
 
 [libraries]
 # Navigation 3 (JetBrains Compose Multiplatform - KMP compatible)
+androidx-activity-compose-v193 = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidx-appcompat-v170 = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-core-ktx-v1150 = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+androidx-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }
+androidx-leanback = { module = "androidx.leanback:leanback", version.ref = "leanback" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+androidx-tv-foundation = { module = "androidx.tv:tv-foundation", version.ref = "tvFoundation" }
+androidx-tv-material = { module = "androidx.tv:tv-material", version.ref = "tvMaterial" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "multiplatform-nav3-ui" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "compose-multiplatform-lifecycle" }
 jetbrains-material3-adaptiveNavigation3 = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation3", version.ref = "compose-multiplatform-adaptive" }
@@ -49,6 +67,7 @@ koin-ksp-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref =
 
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimple" }
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
