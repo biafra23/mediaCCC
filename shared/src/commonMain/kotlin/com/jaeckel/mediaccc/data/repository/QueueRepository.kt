@@ -66,4 +66,10 @@ class QueueRepository(private val dao: QueueEventDao) {
         val current = dao.getByGuid(currentEventGuid) ?: return null
         return dao.getNext(current.order)
     }
+
+    suspend fun reorder(items: List<QueueEventEntity>) {
+        items.forEachIndexed { index, item ->
+            dao.updateOrder(item.eventGuid, index.toLong())
+        }
+    }
 }

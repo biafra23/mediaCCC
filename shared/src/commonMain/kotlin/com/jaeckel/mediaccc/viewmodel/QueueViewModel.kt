@@ -65,4 +65,10 @@ class QueueViewModel(
             repository.removeFromQueue(eventGuid)
         }
     }
+
+    fun reorderQueue(items: List<QueueEventEntity>) {
+        viewModelScope.launch {
+            repository.reorder(items)
+        }
+    }
 }

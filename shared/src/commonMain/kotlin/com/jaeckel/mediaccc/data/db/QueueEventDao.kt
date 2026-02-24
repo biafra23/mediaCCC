@@ -32,4 +32,7 @@ interface QueueEventDao {
 
     @Query("SELECT * FROM queue_events WHERE `order` > :currentOrder ORDER BY `order` ASC LIMIT 1")
     suspend fun getNext(currentOrder: Long): QueueEventEntity?
+
+    @Query("UPDATE queue_events SET `order` = :order WHERE eventGuid = :eventGuid")
+    suspend fun updateOrder(eventGuid: String, order: Long)
 }
