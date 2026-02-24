@@ -132,4 +132,74 @@ class MediaRepositoryTest {
         val result = repo.getRecording("123").toList().first()
         assertTrue(result.isFailure)
     }
+
+    @Test
+    fun getEventsEmitsSuccess() = runTest {
+        val engine = successEngine("""{"events": [{"guid": "g1", "title": "Event 1", "slug": "s1", "url": "u1"}]}""")
+        val repo = MediaRepository(MediaCCCApi(engine = engine))
+        val result = repo.getEvents().toList().first()
+        assertTrue(result.isSuccess)
+        assertEquals(1, result.getOrNull()?.events?.size)
+        assertEquals("g1", result.getOrNull()?.events?.first()?.guid)
+    }
+
+    @Test
+    fun getEventsEmitsFailureOnError() = runTest {
+        val repo = MediaRepository(MediaCCCApi(engine = errorEngine()))
+        val result = repo.getEvents().toList().first()
+        assertTrue(result.isFailure)
+    }
+
+    @Test
+    fun getUnPopularEventsEmitsSuccess() = runTest {
+        val engine = successEngine("""{"events": []}""")
+        val repo = MediaRepository(MediaCCCApi(engine = engine))
+        val result = repo.getUnPopularEvents(2024).toList().first()
+        assertTrue(result.isSuccess)
+        assertTrue(result.getOrNull()?.events?.isEmpty() == true)
+    }
+
+    @Test
+    fun getUnPopularEventsEmitsFailureOnError() = runTest {
+        val repo = MediaRepository(MediaCCCApi(engine = errorEngine()))
+        val result = repo.getUnPopularEvents(2024).toList().first()
+        assertTrue(result.isFailure)
+    }
+
+    @Test
+    fun getRecordingEmitsSuccess() = runTest {
+        val engine = successEngine("""{"url": "u", "recording_url": "https://example.com/rec.mp4", "mime_type": "video/mp4"}""")
+        val repo = MediaRepository(MediaCCCApi(engine = engine))
+        val result = repo.getRecording("123").toList().first()
+        assertTrue(result.isSuccess)
+        assertEquals("video/mp4", result.getOrNull()?.mimeType)
+    }
+
+    @Test
+    fun getRecentEventsEmitsFailureOnError() = runTest {
+        val repo = MediaRepository(MediaCCCApi(engine = errorEngine()))
+        val result = repo.getRecentEvents().toList().first()
+        assertTrue(result.isFailure)
+    }
+
+    @Test
+    fun getPromotedEventsEmitsFailureOnError() = runTest {
+        val repo = MediaRepository(MediaCCCApi(engine = errorEngine()))
+        val result = repo.getPromotedEvents().toList().first()
+        assertTrue(result.isFailure)
+    }
+
+    @Test
+    fun getPopularEventsEmitsFailureOnError() = runTest {
+        val repo = MediaRepository(MediaCCCApi(engine = errorEngine()))
+        val result = repo.getPopularEvents(2024).toList().first()
+        assertTrue(result.isFailure)
+    }
+
+    @Test
+    fun getRecordingsEmitsFailureOnError() = runTest {
+        val repo = MediaRepository(MediaCCCApi(engine = errorEngine()))
+        val result = repo.getRecordings().toList().first()
+        assertTrue(result.isFailure)
+    }
 }

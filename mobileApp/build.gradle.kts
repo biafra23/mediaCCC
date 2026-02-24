@@ -61,5 +61,9 @@ dependencies {
     // Coil for image loading with SVG support
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
+
+    // Testing
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.junit)
 }
 

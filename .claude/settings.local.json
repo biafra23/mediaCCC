@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /app -type f -name \"KoinModules.kt\" -o -name \"PlatformModule*\" -o -name \"*.db.kt\" 2>/dev/null | head -20)",
+      "Bash(find /app -type d -path \"*/src/*Test*\" 2>/dev/null | sort)",
+      "Bash(wc -l /app/api/src/androidHostTest/resources/public.*.json | tail -1)",
+      "Bash(./gradlew :api:testDebugUnitTest 2>&1 | tail -30)",
+      "Bash(./gradlew :shared:testDebugUnitTest 2>&1 | tail -50)",
+      "Bash(./gradlew :tvApp:testDebugUnitTest 2>&1 | tail -30)",
+      "Bash(./gradlew :mobileApp:testDebugUnitTest 2>&1 | tail -30)",
+      "Bash(./gradlew :api:tasks --group=verification 2>&1 | grep -i test)",
+      "Bash(./gradlew :tvApp:testDebugUnitTest 2>&1 | tail -20)"
+    ]
+  }
+}
