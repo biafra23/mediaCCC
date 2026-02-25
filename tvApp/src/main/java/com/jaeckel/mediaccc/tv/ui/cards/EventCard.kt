@@ -1,13 +1,14 @@
 package com.jaeckel.mediaccc.tv.ui.cards
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,12 +25,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.tv.material3.Button
+import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import coil3.compose.AsyncImage
 import com.jaeckel.mediaccc.api.model.Event
 import com.jaeckel.mediaccc.data.repository.FavoritesRepository
+import com.jaeckel.mediaccc.data.repository.QueueRepository
 import com.jaeckel.mediaccc.tv.R
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -42,7 +47,9 @@ fun EventCard(
     modifier: Modifier = Modifier
 ) {
     val favoritesRepository: FavoritesRepository = koinInject()
+    val queueRepository: QueueRepository = koinInject()
     val isFavorite by favoritesRepository.isFavorite(event.guid).collectAsState(initial = false)
+    val isInQueue by queueRepository.isInQueue(event.guid).collectAsState(initial = false)
     var showMenu by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
@@ -107,24 +114,13 @@ fun EventCard(
             }
         }
 
-        DropdownMenu(
-            expanded = showMenu,
-            onDismissRequest = { showMenu = false }
-        ) {
-            DropdownMenuItem(
-                text = {
-                    Text(
-                        if (isFavorite) stringResource(R.string.remove_from_favorites)
-                        else stringResource(R.string.add_to_favorites)
-                    )
-                },
-                leadingIcon = {
-                    Text(
-                        text = if (isFavorite) "★" else "☆",
-                        color = if (isFavorite) Color(0xFFFFD700) else Color.Unspecified
-                    )
-                },
-                onClick = {
+        if (showMenu) {
+            EventActionDialog(
+                eventTitle = event.title,
+                isFavorite = isFavorite,
+                isInQueue = isInQueue,
+                onDismiss = { showMenu = false },
+                onToggleFavorite = {
                     showMenu = false
                     scope.launch {
                         favoritesRepository.toggleFavorite(
@@ -138,9 +134,121 @@ fun EventCard(
                             duration = event.duration
                         )
                     }
+                },
+                onAddToQueueStart = {
+                    showMenu = false
+                    scope.launch {
+                        queueRepository.addToBeginning(
+                            eventGuid = event.guid,
+                            title = event.title,
+                            thumbUrl = event.thumbUrl,
+                            posterUrl = event.posterUrl,
+                            conferenceTitle = event.conferenceTitle,
+                            persons = event.persons?.joinToString(", "),
+                            duration = event.duration
+                        )
+                    }
+                },
+                onAddToQueueEnd = {
+                    showMenu = false
+                    scope.launch {
+                        queueRepository.addToEnd(
+                            eventGuid = event.guid,
+                            title = event.title,
+                            thumbUrl = event.thumbUrl,
+                            posterUrl = event.posterUrl,
+                            conferenceTitle = event.conferenceTitle,
+                            persons = event.persons?.joinToString(", "),
+                            duration = event.duration
+                        )
+                    }
+                },
+                onRemoveFromQueue = {
+                    showMenu = false
+                    scope.launch { queueRepository.removeFromQueue(event.guid) }
                 }
             )
         }
     }
 }
 
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+fun EventActionDialog(
+    eventTitle: String,
+    isFavorite: Boolean,
+    isInQueue: Boolean,
+    onDismiss: () -> Unit,
+    onToggleFavorite: () -> Unit,
+    onAddToQueueStart: () -> Unit,
+    onAddToQueueEnd: () -> Unit,
+    onRemoveFromQueue: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .width(320.dp)
+                .background(Color(0xFF2A2A3E), RoundedCornerShape(16.dp))
+                .padding(24.dp)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = eventTitle,
+                    style = androidx.tv.material3.MaterialTheme.typography.titleMedium,
+                    color = Color.White,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Button(
+                    onClick = onToggleFavorite,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.colors(
+                        containerColor = if (isFavorite) Color(0xFFFFD700).copy(alpha = 0.2f) else Color.White.copy(alpha = 0.1f),
+                        focusedContainerColor = if (isFavorite) Color(0xFFFFD700).copy(alpha = 0.4f) else Color(0xFF3A3A5E)
+                    )
+                ) {
+                    Text(
+                        text = if (isFavorite) "★ ${stringResource(R.string.remove_from_favorites)}"
+                               else "☆ ${stringResource(R.string.add_to_favorites)}",
+                        color = if (isFavorite) Color(0xFFFFD700) else Color.White
+                    )
+                }
+
+                if (isInQueue) {
+                    Button(
+                        onClick = onRemoveFromQueue,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.colors(
+                            containerColor = Color(0xFF6A2A2A),
+                            focusedContainerColor = Color(0xFF8A3A3A)
+                        )
+                    ) {
+                        Text(stringResource(R.string.queue_remove_action), color = Color.White)
+                    }
+                } else {
+                    Button(
+                        onClick = onAddToQueueStart,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.colors(
+                            containerColor = Color.White.copy(alpha = 0.1f),
+                            focusedContainerColor = Color(0xFF3A3A5E)
+                        )
+                    ) {
+                        Text(stringResource(R.string.queue_add_beginning), color = Color.White)
+                    }
+                    Button(
+                        onClick = onAddToQueueEnd,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.colors(
+                            containerColor = Color.White.copy(alpha = 0.1f),
+                            focusedContainerColor = Color(0xFF3A3A5E)
+                        )
+                    ) {
+                        Text(stringResource(R.string.queue_add_end), color = Color.White)
+                    }
+                }
+            }
+        }
+    }
+}

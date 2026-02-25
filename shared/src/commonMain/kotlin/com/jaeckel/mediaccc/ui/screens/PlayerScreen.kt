@@ -7,12 +7,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -203,21 +209,39 @@ private fun LivePlayerOverlay(
                     .align(Alignment.Center)
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(
-                        if (playerState.isPlaying) Color.Black.copy(alpha = 0.6f)
-                        else MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
-                    )
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.9f))
                     .clickable {
                         onInteract()
                         if (playerState.isPlaying) playerState.pause() else playerState.play()
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = if (playerState.isPlaying) "⏸" else "▶",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = if (playerState.isPlaying) Color.White else MaterialTheme.colorScheme.onPrimary
-                )
+                if (playerState.isPlaying) {
+                    // Two white bars — avoids tint issues with Icons.Filled.Pause
+                    Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                        Box(
+                            modifier = Modifier
+                                .width(7.dp)
+                                .height(26.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(MaterialTheme.colorScheme.onPrimary)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .width(7.dp)
+                                .height(26.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(MaterialTheme.colorScheme.onPrimary)
+                        )
+                    }
+                } else {
+                    Icon(
+                        imageVector = Icons.Filled.PlayArrow,
+                        contentDescription = "Play",
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
             }
 
             // Bottom: seek bar

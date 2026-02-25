@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
@@ -37,6 +38,7 @@ import com.jaeckel.mediaccc.tv.navigation.EventDetailRoute
 import com.jaeckel.mediaccc.tv.navigation.FavoritesRoute
 import com.jaeckel.mediaccc.tv.navigation.HistoryRoute
 import com.jaeckel.mediaccc.tv.navigation.HomeRoute
+import com.jaeckel.mediaccc.tv.navigation.QueueRoute
 import com.jaeckel.mediaccc.tv.navigation.PlayerRoute
 import com.jaeckel.mediaccc.tv.navigation.SearchRoute
 import com.jaeckel.mediaccc.tv.navigation.SettingsRoute
@@ -44,6 +46,7 @@ import com.jaeckel.mediaccc.tv.ui.ConferenceDetailScreen
 import com.jaeckel.mediaccc.tv.ui.EventDetailScreen
 import com.jaeckel.mediaccc.tv.ui.FavoritesScreen
 import com.jaeckel.mediaccc.tv.ui.HistoryScreen
+import com.jaeckel.mediaccc.tv.ui.TvQueueScreen
 import com.jaeckel.mediaccc.tv.ui.SearchScreen
 import com.jaeckel.mediaccc.tv.ui.SettingsScreen
 import com.jaeckel.mediaccc.tv.ui.TvHomeScreen
@@ -76,7 +79,7 @@ fun TvNavHost() {
     val currentRoute by remember { derivedStateOf { backStack.lastOrNull() } }
 
     val isTopLevel = when (currentRoute) {
-        HomeRoute, SearchRoute, ConferencesRoute, FavoritesRoute, HistoryRoute, SettingsRoute -> true
+        HomeRoute, SearchRoute, ConferencesRoute, FavoritesRoute, HistoryRoute, QueueRoute, SettingsRoute -> true
         is ConferenceDetailRoute -> true
         else -> false
     }
@@ -166,6 +169,20 @@ fun TvNavHost() {
                     ) {
                         Text(stringResource(R.string.history))
                     }
+                    NavigationDrawerItem(
+                        selected = currentRoute == QueueRoute,
+                        onClick = {
+                            if (currentRoute != QueueRoute) {
+                                backStack.clear()
+                                backStack.add(HomeRoute)
+                                backStack.add(QueueRoute)
+                            }
+                        },
+                        leadingContent = { Icon(Icons.Default.List, contentDescription = null) },
+                        colors = drawerItemColors
+                    ) {
+                        Text(stringResource(R.string.queue))
+                    }
 
                     Spacer(modifier = Modifier.weight(1f))
 
@@ -248,6 +265,13 @@ fun TvNavDisplay(backStack: MutableList<NavKey>) {
             }
             entry<HistoryRoute> {
                 HistoryScreen(
+                    onEventClick = { guid ->
+                        backStack.add(EventDetailRoute(guid))
+                    }
+                )
+            }
+            entry<QueueRoute> {
+                TvQueueScreen(
                     onEventClick = { guid ->
                         backStack.add(EventDetailRoute(guid))
                     }

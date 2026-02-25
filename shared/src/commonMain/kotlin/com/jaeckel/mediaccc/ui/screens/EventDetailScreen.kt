@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -767,21 +768,37 @@ private fun PlayerControlsOverlay(
                     .align(Alignment.Center)
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(
-                        if (isPlaying) Color.Black.copy(alpha = 0.6f)
-                        else MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
-                    )
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.9f))
                     .clickable {
                         onInteract()
                         if (isPlaying) playerState.pause() else playerState.play()
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = if (isPlaying) "⏸" else "▶",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = if (isPlaying) Color.White else MaterialTheme.colorScheme.onPrimary
-                )
+                if (isPlaying) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                        Box(
+                            modifier = Modifier
+                                .width(7.dp)
+                                .height(26.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(MaterialTheme.colorScheme.onPrimary)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .width(7.dp)
+                                .height(26.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(MaterialTheme.colorScheme.onPrimary)
+                        )
+                    }
+                } else {
+                    Text(
+                        text = "▶",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
             }
 
             Column(

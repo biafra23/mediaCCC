@@ -122,8 +122,12 @@ fun EventDetailScreen(
                     availableLanguages = uiState.availableLanguages,
                     selectedLanguage = uiState.selectedLanguage,
                     isFavorite = uiState.isFavorite,
+                    isInQueue = uiState.isInQueue,
                     onLanguageSelected = { viewModel.selectLanguage(it) },
                     onToggleFavorite = { viewModel.toggleFavorite() },
+                    onAddToQueueStart = { viewModel.addToQueueStart() },
+                    onAddToQueueEnd = { viewModel.addToQueueEnd() },
+                    onRemoveFromQueue = { viewModel.removeFromQueue() },
                     dateTimeFormat = dateTimeFormat,
                     onPlayClick = { guid, videoUrl, title, speakers, date, conference, duration ->
                         viewModel.saveProgress(uiState.savedSliderPos)
@@ -148,8 +152,12 @@ private fun EventDetailContent(
     availableLanguages: List<String>,
     selectedLanguage: String?,
     isFavorite: Boolean,
+    isInQueue: Boolean,
     onLanguageSelected: (String) -> Unit,
     onToggleFavorite: () -> Unit,
+    onAddToQueueStart: () -> Unit,
+    onAddToQueueEnd: () -> Unit,
+    onRemoveFromQueue: () -> Unit,
     dateTimeFormat: DateTimeFormat<LocalDateTime>,
     onPlayClick: (eventGuid: String, videoUrl: String, title: String, speakers: String, date: String, conference: String, duration: Long) -> Unit,
     playButtonFocusRequester: FocusRequester
@@ -342,7 +350,39 @@ private fun EventDetailContent(
                             contentColor = if (isFavorite) Color(0xFFFFD700) else Color.White
                         )
                     ) {
-                        Text(if (isFavorite) "★ ${stringResource(R.string.remove_from_favorites)}" else "☆ ${stringResource(R.string.add_to_favorites)}")
+                        Text(if (isFavorite) "★" else "☆")
+                    }
+
+                    // Queue buttons
+                    if (isInQueue) {
+                        Button(
+                            onClick = onRemoveFromQueue,
+                            colors = ButtonDefaults.colors(
+                                containerColor = Color(0xFF6A2A2A),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text(stringResource(R.string.queue_remove_action))
+                        }
+                    } else {
+                        Button(
+                            onClick = onAddToQueueStart,
+                            colors = ButtonDefaults.colors(
+                                containerColor = Color.White.copy(alpha = 0.15f),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text(stringResource(R.string.queue_add_beginning))
+                        }
+                        Button(
+                            onClick = onAddToQueueEnd,
+                            colors = ButtonDefaults.colors(
+                                containerColor = Color.White.copy(alpha = 0.15f),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text(stringResource(R.string.queue_add_end))
+                        }
                     }
                 }
 

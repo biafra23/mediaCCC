@@ -46,6 +46,16 @@
     <!-- Conference Detail -->
     <string name="events_count">Events (%1$d)</string>
 
+    <!-- Queue -->
+    <string name="queue">Queue</string>
+    <string name="no_queue_yet">No queue yet</string>
+    <string name="queue_reorder_hint">▲▼ Move  •  OK Confirm  •  Back Cancel</string>
+    <string name="queue_now_playing">▶ Now playing</string>
+    <string name="queue_remove">✕</string>
+    <string name="queue_add_beginning">⊕ Play Next</string>
+    <string name="queue_add_end">⊕ Add to Queue</string>
+    <string name="queue_remove_action">✕ Remove from Queue</string>
+
     <!-- Favorites / Settings -->
     <string name="favorites_screen">Favorites Screen</string>
     <string name="no_favorites_yet">No favorites yet</string>

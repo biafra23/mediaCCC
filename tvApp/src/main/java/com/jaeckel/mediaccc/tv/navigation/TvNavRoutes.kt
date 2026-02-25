@@ -19,6 +19,9 @@ data object FavoritesRoute : NavKey
 data object HistoryRoute : NavKey
 
 @Serializable
+data object QueueRoute : NavKey
+
+@Serializable
 data object SettingsRoute : NavKey
 
 @Serializable
