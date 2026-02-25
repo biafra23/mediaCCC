@@ -312,6 +312,7 @@ private fun EventDetailContent(
                     onPlayClick = effectivePlayClick,
                     onExitFullscreen = onExitFullscreen,
                     onToggleFavorite = onToggleFavorite,
+                    onEnterFullscreen = { playerState.toggleFullscreen() },
                     modifier = Modifier
                         .weight(0.4f)
                         .fillMaxHeight()
@@ -379,6 +380,7 @@ private fun EventVideoPane(
     onPlayClick: () -> Unit,
     onExitFullscreen: () -> Unit,
     onToggleFavorite: () -> Unit,
+    onEnterFullscreen: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -430,6 +432,25 @@ private fun EventVideoPane(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
+            }
+        }
+
+        if (isPlaying && !playerState.isFullscreen && onEnterFullscreen != null) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color.Black.copy(alpha = 0.6f))
+                    .clickable { onEnterFullscreen() },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "⛶",
+                    color = Color.White,
+                    fontSize = 20.sp
+                )
             }
         }
     }

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
@@ -166,17 +168,21 @@ private fun DrawerSheetContent(
             .fillMaxHeight()
             .padding(horizontal = 12.dp)
     ) {
-        topDrawerItems.forEach { item ->
-            NavigationDrawerItem(
-                label = { Text(stringResource(item.labelRes)) },
-                icon = { Icon(item.icon, contentDescription = null) },
-                selected = currentRoute == item.route,
-                onClick = { onNavigate(item.route) },
-                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-            )
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+        ) {
+            topDrawerItems.forEach { item ->
+                NavigationDrawerItem(
+                    label = { Text(stringResource(item.labelRes)) },
+                    icon = { Icon(item.icon, contentDescription = null) },
+                    selected = currentRoute == item.route,
+                    onClick = { onNavigate(item.route) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+            }
         }
-
-        Spacer(modifier = Modifier.weight(1f))
 
         HorizontalDivider()
         Spacer(modifier = Modifier.height(8.dp))
