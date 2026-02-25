@@ -2,7 +2,10 @@ package com.jaeckel.mediaccc.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -56,7 +59,8 @@ fun HomeScreen(
     onConferenceClick: (Conference) -> Unit,
     onHistoryEventClick: (String) -> Unit,
     onLiveStreamClick: (LiveStreamItem) -> Unit,
-    onOpenDrawer: () -> Unit
+    onOpenDrawer: () -> Unit,
+    showMenuButton: Boolean = true
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val continueWatching by historyViewModel.continueWatching.collectAsState()
@@ -64,10 +68,14 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(Res.string.app_name)) },
+                title = {
+                    Text(stringResource(if (showMenuButton) Res.string.app_name else Res.string.home))
+                },
                 navigationIcon = {
-                    IconButton(onClick = onOpenDrawer) {
-                        Icon(Icons.Default.Menu, contentDescription = stringResource(Res.string.menu))
+                    if (showMenuButton) {
+                        IconButton(onClick = onOpenDrawer) {
+                            Icon(Icons.Default.Menu, contentDescription = stringResource(Res.string.menu))
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -115,6 +123,7 @@ fun HomeScreen(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun HomeContent(
     liveStreams: List<LiveStreamItem>,
@@ -127,111 +136,211 @@ internal fun HomeContent(
     onHistoryEventClick: (String) -> Unit,
     onLiveStreamClick: (LiveStreamItem) -> Unit
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
-        // Live Streams Section
-        if (liveStreams.isNotEmpty()) {
-            item {
-                SectionHeader(title = stringResource(Res.string.live_streams))
-            }
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(liveStreams, key = { "${it.conferenceName}-${it.roomName}" }) { stream ->
-                        LiveStreamCard(
-                            item = stream,
-                            onClick = { onLiveStreamClick(stream) },
-                            modifier = Modifier.width(280.dp)
-                        )
-                    }
-                }
-            }
-        }
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val isWide = maxWidth >= 600.dp
 
-        // Continue Watching Section
-        if (continueWatching.isNotEmpty()) {
-            item {
-                SectionHeader(title = stringResource(Res.string.continue_watching))
-            }
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(continueWatching.take(10), key = { it.eventGuid }) { entry ->
-                        HistoryCardCompact(
-                            entry = entry,
-                            onClick = { onHistoryEventClick(entry.eventGuid) },
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            // Live Streams Section
+            if (liveStreams.isNotEmpty()) {
+                item {
+                    SectionHeader(title = stringResource(Res.string.live_streams))
+                }
+                item {
+                    if (isWide) {
+                        FlowRow(
                             modifier = Modifier
-                                .width(200.dp)
-                                .height(145.dp)
-                        )
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            liveStreams.forEach { stream ->
+                                LiveStreamCard(
+                                    item = stream,
+                                    onClick = { onLiveStreamClick(stream) },
+                                    modifier = Modifier.width(280.dp)
+                                )
+                            }
+                        }
+                    } else {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(liveStreams, key = { "${it.conferenceName}-${it.roomName}" }) { stream ->
+                                LiveStreamCard(
+                                    item = stream,
+                                    onClick = { onLiveStreamClick(stream) },
+                                    modifier = Modifier.width(280.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }
-        }
 
-        // Promoted Events Section
-        if (promotedEvents.isNotEmpty()) {
-            item { SectionHeader(title = stringResource(Res.string.featured)) }
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(promotedEvents, key = { it.guid }) { event ->
-                        EventCard(
-                            event = event,
-                            onClick = { onEventClick(event) },
-                            modifier = Modifier.width(300.dp)
-                        )
-                    }
+            // Continue Watching Section
+            if (continueWatching.isNotEmpty()) {
+                item {
+                    SectionHeader(title = stringResource(Res.string.continue_watching))
                 }
-            }
-        }
-
-        // Recent Events Section
-        if (recentEvents.isNotEmpty()) {
-            item { SectionHeader(title = stringResource(Res.string.recent)) }
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(recentEvents, key = { it.guid }) { event ->
-                        EventCardCompact(
-                            event = event,
-                            onClick = { onEventClick(event) },
+                item {
+                    if (isWide) {
+                        FlowRow(
                             modifier = Modifier
-                                .width(200.dp)
-                                .height(130.dp)
-                        )
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            continueWatching.take(10).forEach { entry ->
+                                HistoryCardCompact(
+                                    entry = entry,
+                                    onClick = { onHistoryEventClick(entry.eventGuid) },
+                                    modifier = Modifier
+                                        .width(200.dp)
+                                        .height(145.dp)
+                                )
+                            }
+                        }
+                    } else {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(continueWatching.take(10), key = { it.eventGuid }) { entry ->
+                                HistoryCardCompact(
+                                    entry = entry,
+                                    onClick = { onHistoryEventClick(entry.eventGuid) },
+                                    modifier = Modifier
+                                        .width(200.dp)
+                                        .height(145.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }
-        }
 
-        // Conferences Section
-        if (conferences.isNotEmpty()) {
-            item { SectionHeader(title = stringResource(Res.string.conferences)) }
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(conferences, key = { it.acronym }) { conference ->
-                        ConferenceCard(
-                            conference = conference,
-                            onClick = { onConferenceClick(conference) },
+            // Promoted Events Section
+            if (promotedEvents.isNotEmpty()) {
+                item { SectionHeader(title = stringResource(Res.string.featured)) }
+                item {
+                    if (isWide) {
+                        FlowRow(
                             modifier = Modifier
-                                .width(150.dp)
-                                .height(150.dp)
-                        )
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            promotedEvents.forEach { event ->
+                                EventCard(
+                                    event = event,
+                                    onClick = { onEventClick(event) },
+                                    modifier = Modifier.width(300.dp)
+                                )
+                            }
+                        }
+                    } else {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(promotedEvents, key = { it.guid }) { event ->
+                                EventCard(
+                                    event = event,
+                                    onClick = { onEventClick(event) },
+                                    modifier = Modifier.width(300.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Recent Events Section
+            if (recentEvents.isNotEmpty()) {
+                item { SectionHeader(title = stringResource(Res.string.recent)) }
+                item {
+                    if (isWide) {
+                        FlowRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            recentEvents.forEach { event ->
+                                EventCardCompact(
+                                    event = event,
+                                    onClick = { onEventClick(event) },
+                                    modifier = Modifier
+                                        .width(200.dp)
+                                        .height(130.dp)
+                                )
+                            }
+                        }
+                    } else {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(recentEvents, key = { it.guid }) { event ->
+                                EventCardCompact(
+                                    event = event,
+                                    onClick = { onEventClick(event) },
+                                    modifier = Modifier
+                                        .width(200.dp)
+                                        .height(130.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Conferences Section
+            if (conferences.isNotEmpty()) {
+                item { SectionHeader(title = stringResource(Res.string.conferences)) }
+                item {
+                    if (isWide) {
+                        FlowRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            conferences.forEach { conference ->
+                                ConferenceCard(
+                                    conference = conference,
+                                    onClick = { onConferenceClick(conference) },
+                                    modifier = Modifier
+                                        .width(150.dp)
+                                        .height(150.dp)
+                                )
+                            }
+                        }
+                    } else {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(conferences, key = { it.acronym }) { conference ->
+                                ConferenceCard(
+                                    conference = conference,
+                                    onClick = { onConferenceClick(conference) },
+                                    modifier = Modifier
+                                        .width(150.dp)
+                                        .height(150.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -299,4 +408,3 @@ private fun HomeContentPreview() {
         )
     }
 }
-

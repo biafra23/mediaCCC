@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.FlowRowOverflow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -101,39 +103,60 @@ fun ConferencesScreen(
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
                 uiState.conferences.isNotEmpty() -> {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        if (tagCounts.isNotEmpty()) {
-                            FlowRow(
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                                    .horizontalScroll(rememberScrollState()),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalArrangement = Arrangement.spacedBy(4.dp),
-                                maxLines = 1,
-                                overflow = FlowRowOverflow.Clip
+                    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                        val isWide = maxWidth >= 600.dp
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            if (tagCounts.isNotEmpty()) {
+                                if (isWide) {
+                                    FlowRow(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        tagCounts.forEach { (tag, count) ->
+                                            FilterChip(
+                                                selected = selectedTag == tag,
+                                                onClick = { selectedTag = if (selectedTag == tag) null else tag },
+                                                label = { Text("$tag ($count)") }
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    FlowRow(
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                                            .horizontalScroll(rememberScrollState()),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                                        maxLines = 1,
+                                        overflow = FlowRowOverflow.Clip
+                                    ) {
+                                        tagCounts.forEach { (tag, count) ->
+                                            FilterChip(
+                                                selected = selectedTag == tag,
+                                                onClick = { selectedTag = if (selectedTag == tag) null else tag },
+                                                label = { Text("$tag ($count)") }
+                                            )
+                                        }
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+
+                            LazyVerticalGrid(
+                                columns = GridCells.Adaptive(minSize = 150.dp),
+                                contentPadding = PaddingValues(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                tagCounts.forEach { (tag, count) ->
-                                    FilterChip(
-                                        selected = selectedTag == tag,
-                                        onClick = { selectedTag = if (selectedTag == tag) null else tag },
-                                        label = { Text("$tag ($count)") }
+                                items(filteredConferences, key = { it.acronym }) { conference ->
+                                    ConferenceCard(
+                                        conference = conference,
+                                        onClick = { onConferenceClick(conference) }
                                     )
                                 }
-                            }
-                            Spacer(modifier = Modifier.height(4.dp))
-                        }
-
-                        LazyVerticalGrid(
-                            columns = GridCells.Adaptive(minSize = 150.dp),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(filteredConferences, key = { it.acronym }) { conference ->
-                                ConferenceCard(
-                                    conference = conference,
-                                    onClick = { onConferenceClick(conference) }
-                                )
                             }
                         }
                     }

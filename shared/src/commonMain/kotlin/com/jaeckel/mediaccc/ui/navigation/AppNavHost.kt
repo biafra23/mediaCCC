@@ -1,5 +1,6 @@
 package com.jaeckel.mediaccc.ui.navigation
 
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -21,6 +22,8 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.PermanentDrawerSheet
+import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -95,63 +98,99 @@ fun AppNavHost() {
         scope.launch { drawerState.close() }
     }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        gesturesEnabled = isTopLevel,
-        drawerContent = {
-            ModalDrawerSheet(modifier = Modifier.width(280.dp)) {
-                Text(
-                    text = stringResource(Res.string.app_name),
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(horizontal = 28.dp, vertical = 24.dp)
-                )
-                HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
+    BoxWithConstraints {
+        val isWideScreen = maxWidth >= 840.dp
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(horizontal = 12.dp)
-                ) {
-                    topDrawerItems.forEach { item ->
-                        NavigationDrawerItem(
-                            label = { Text(stringResource(item.labelRes)) },
-                            icon = { Icon(item.icon, contentDescription = null) },
-                            selected = currentRoute == item.route,
-                            onClick = { navigateToDrawerRoute(item.route) },
-                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+        if (isWideScreen) {
+            PermanentNavigationDrawer(
+                drawerContent = {
+                    PermanentDrawerSheet(modifier = Modifier.width(280.dp)) {
+                        DrawerSheetContent(
+                            currentRoute = currentRoute,
+                            onNavigate = { navigateToDrawerRoute(it) }
                         )
                     }
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    HorizontalDivider()
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    bottomDrawerItems.forEach { item ->
-                        NavigationDrawerItem(
-                            label = { Text(stringResource(item.labelRes)) },
-                            icon = { Icon(item.icon, contentDescription = null) },
-                            selected = currentRoute == item.route,
-                            onClick = { navigateToDrawerRoute(item.route) },
-                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(12.dp))
                 }
+            ) {
+                AppNavDisplay(
+                    backStack = backStack,
+                    onOpenDrawer = {},
+                    showMenuButton = false
+                )
+            }
+        } else {
+            ModalNavigationDrawer(
+                drawerState = drawerState,
+                gesturesEnabled = isTopLevel,
+                drawerContent = {
+                    ModalDrawerSheet(modifier = Modifier.width(280.dp)) {
+                        DrawerSheetContent(
+                            currentRoute = currentRoute,
+                            onNavigate = { navigateToDrawerRoute(it) }
+                        )
+                    }
+                }
+            ) {
+                AppNavDisplay(
+                    backStack = backStack,
+                    onOpenDrawer = { scope.launch { drawerState.open() } },
+                    showMenuButton = true
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun DrawerSheetContent(
+    currentRoute: NavKey?,
+    onNavigate: (NavKey) -> Unit
+) {
+    Text(
+        text = stringResource(Res.string.app_name),
+        style = MaterialTheme.typography.headlineSmall,
+        modifier = Modifier.padding(horizontal = 28.dp, vertical = 24.dp)
+    )
+    HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
+
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .padding(horizontal = 12.dp)
     ) {
-        AppNavDisplay(
-            backStack = backStack,
-            onOpenDrawer = { scope.launch { drawerState.open() } }
-        )
+        topDrawerItems.forEach { item ->
+            NavigationDrawerItem(
+                label = { Text(stringResource(item.labelRes)) },
+                icon = { Icon(item.icon, contentDescription = null) },
+                selected = currentRoute == item.route,
+                onClick = { onNavigate(item.route) },
+                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        HorizontalDivider()
+        Spacer(modifier = Modifier.height(8.dp))
+
+        bottomDrawerItems.forEach { item ->
+            NavigationDrawerItem(
+                label = { Text(stringResource(item.labelRes)) },
+                icon = { Icon(item.icon, contentDescription = null) },
+                selected = currentRoute == item.route,
+                onClick = { onNavigate(item.route) },
+                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
     }
 }
 
 @Composable
 private fun AppNavDisplay(
     backStack: MutableList<NavKey>,
-    onOpenDrawer: () -> Unit
+    onOpenDrawer: () -> Unit,
+    showMenuButton: Boolean = true
 ) {
     fun popBack() {
         if (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
@@ -184,7 +223,8 @@ private fun AppNavDisplay(
                             )
                         }
                     },
-                    onOpenDrawer = onOpenDrawer
+                    onOpenDrawer = onOpenDrawer,
+                    showMenuButton = showMenuButton
                 )
             }
 

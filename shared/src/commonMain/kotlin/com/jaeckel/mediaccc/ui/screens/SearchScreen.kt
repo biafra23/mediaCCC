@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -81,11 +82,15 @@ fun SearchScreen(
             )
         }
     ) { paddingValues ->
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            val isWide = maxWidth >= 600.dp
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
             OutlinedTextField(
                 value = uiState.query,
                 onValueChange = { viewModel.onQueryChanged(it) },
@@ -108,21 +113,39 @@ fun SearchScreen(
 
             // Tags from search results
             if (uiState.tagCounts.isNotEmpty()) {
-                FlowRow(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    maxLines = 1,
-                    overflow = FlowRowOverflow.Clip
-                ) {
-                    uiState.tagCounts.forEach { (tag, count) ->
-                        FilterChip(
-                            selected = uiState.selectedTag == tag,
-                            onClick = { viewModel.selectTag(tag) },
-                            label = { Text("$tag ($count)") }
-                        )
+                if (isWide) {
+                    FlowRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        uiState.tagCounts.forEach { (tag, count) ->
+                            FilterChip(
+                                selected = uiState.selectedTag == tag,
+                                onClick = { viewModel.selectTag(tag) },
+                                label = { Text("$tag ($count)") }
+                            )
+                        }
+                    }
+                } else {
+                    FlowRow(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        maxLines = 1,
+                        overflow = FlowRowOverflow.Clip
+                    ) {
+                        uiState.tagCounts.forEach { (tag, count) ->
+                            FilterChip(
+                                selected = uiState.selectedTag == tag,
+                                onClick = { viewModel.selectTag(tag) },
+                                label = { Text("$tag ($count)") }
+                            )
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
@@ -165,6 +188,7 @@ fun SearchScreen(
                     }
                 }
             }
+        }
         }
     }
 }
