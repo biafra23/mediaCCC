@@ -68,6 +68,7 @@ fun QueueScreen(
     onBackClick: () -> Unit
 ) {
     val queueItems by viewModel.queueItems.collectAsState()
+    val currentEventGuid by viewModel.currentEventGuid.collectAsState()
 
     // Local mutable copy for drag reordering — synced from DB when not dragging
     val items = remember { mutableStateListOf<QueueEventEntity>() }
@@ -131,6 +132,7 @@ fun QueueScreen(
 
                     QueueItemRow(
                         item = item,
+                        isCurrent = item.eventGuid == currentEventGuid,
                         modifier = Modifier
                             .zIndex(if (isBeingDragged) 1f else 0f)
                             .graphicsLayer {
@@ -187,6 +189,7 @@ fun QueueScreen(
                             )
                         },
                         onClick = {
+                            viewModel.setCurrentEventGuid(item.eventGuid)
                             onEventClick(
                                 "", item.title, item.persons ?: "",
                                 "", item.conferenceTitle ?: "", item.eventGuid
@@ -203,6 +206,7 @@ fun QueueScreen(
 @Composable
 private fun QueueItemRow(
     item: QueueEventEntity,
+    isCurrent: Boolean = false,
     modifier: Modifier = Modifier,
     dragHandleModifier: Modifier = Modifier,
     onClick: () -> Unit,
@@ -215,9 +219,12 @@ private fun QueueItemRow(
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = if (isCurrent)
+                MaterialTheme.colorScheme.primaryContainer
+            else
+                MaterialTheme.colorScheme.surfaceVariant
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isCurrent) 4.dp else 2.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxSize(),
@@ -273,10 +280,17 @@ private fun QueueItemRow(
                     .padding(horizontal = 8.dp),
                 verticalArrangement = Arrangement.Center
             ) {
+                if (isCurrent) {
+                    Text(
+                        text = "▶ ${stringResource(Res.string.currently_playing)}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
                 Text(
                     text = item.title,
                     style = MaterialTheme.typography.bodySmall,
-                    maxLines = 2,
+                    maxLines = if (isCurrent) 1 else 2,
                     overflow = TextOverflow.Ellipsis
                 )
                 item.conferenceTitle?.let { conference ->

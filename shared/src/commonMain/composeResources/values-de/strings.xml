@@ -48,6 +48,9 @@
     <string name="add_to_favorites">Zu Favoriten hinzufügen</string>
     <string name="remove_from_favorites">Aus Favoriten entfernen</string>
 
+    <!-- Queue Screen -->
+    <string name="currently_playing">Wird abgespielt</string>
+
     <!-- Settings Screen -->
     <string name="settings_coming_soon">Einstellungen bald verfügbar</string>
 

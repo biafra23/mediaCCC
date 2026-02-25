@@ -3,8 +3,18 @@ package com.jaeckel.mediaccc.data.repository
 import com.jaeckel.mediaccc.data.db.QueueEventDao
 import com.jaeckel.mediaccc.data.db.QueueEventEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class QueueRepository(private val dao: QueueEventDao) {
+
+    private val _currentEventGuid = MutableStateFlow<String?>(null)
+    val currentEventGuid: StateFlow<String?> = _currentEventGuid.asStateFlow()
+
+    fun setCurrentEventGuid(guid: String) {
+        _currentEventGuid.value = guid
+    }
 
     fun getAll(): Flow<List<QueueEventEntity>> = dao.getAll()
 

@@ -53,6 +53,7 @@
 
     <!-- Queue Screen -->
     <string name="no_queue_yet">No items in queue yet</string>
+    <string name="currently_playing">Now playing</string>
     <string name="add_to_queue_start">Add to beginning of queue</string>
     <string name="add_to_queue_end">Add to end of queue</string>
     <string name="remove_from_queue">Remove from queue</string>

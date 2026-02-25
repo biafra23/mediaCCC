@@ -16,6 +16,12 @@ class QueueViewModel(
     val queueItems: StateFlow<List<QueueEventEntity>> = repository.getAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val currentEventGuid: StateFlow<String?> = repository.currentEventGuid
+
+    fun setCurrentEventGuid(guid: String) {
+        repository.setCurrentEventGuid(guid)
+    }
+
     fun addToBeginning(
         eventGuid: String,
         title: String,
