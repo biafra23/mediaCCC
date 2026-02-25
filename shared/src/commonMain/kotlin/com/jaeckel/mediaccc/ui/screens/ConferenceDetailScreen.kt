@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
@@ -108,73 +109,6 @@ fun ConferenceDetailScreen(
                 uiState.conference != null -> {
                     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                         val isWide = maxWidth >= 600.dp
-                        Column(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                        // Conference description
-                        uiState.conference!!.description?.let { description ->
-                            if (description.isNotBlank()) {
-                                Text(
-                                    text = description,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    maxLines = 3,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.padding(16.dp)
-                                )
-                            }
-                        }
-
-                        // Tags
-                        if (uiState.tagCounts.isNotEmpty()) {
-                            if (isWide) {
-                                FlowRow(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    uiState.tagCounts.forEach { (tag, count) ->
-                                        FilterChip(
-                                            selected = uiState.selectedTag == tag,
-                                            onClick = { viewModel.selectTag(tag) },
-                                            label = { Text("$tag ($count)") }
-                                        )
-                                    }
-                                }
-                            } else {
-                                FlowRow(
-                                    modifier = Modifier
-                                        .padding(horizontal = 16.dp)
-                                        .horizontalScroll(rememberScrollState()),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                                    maxLines = 2,
-                                    overflow = FlowRowOverflow.Clip
-                                ) {
-                                    uiState.tagCounts.forEach { (tag, count) ->
-                                        FilterChip(
-                                            selected = uiState.selectedTag == tag,
-                                            onClick = { viewModel.selectTag(tag) },
-                                            label = { Text("$tag ($count)") }
-                                        )
-                                    }
-                                }
-                            }
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-
-                        // Events count
-                        Text(
-                            text = stringResource(Res.string.events_count, uiState.filteredEvents.size),
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Events grid - adaptive columns for tablet/phone
                         LazyVerticalGrid(
                             columns = GridCells.Adaptive(minSize = 280.dp),
                             contentPadding = PaddingValues(16.dp),
@@ -182,6 +116,70 @@ fun ConferenceDetailScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                             modifier = Modifier.fillMaxSize()
                         ) {
+                            // Conference description
+                            uiState.conference!!.description?.takeIf { it.isNotBlank() }?.let { description ->
+                                item(span = { GridItemSpan(maxLineSpan) }) {
+                                    Text(
+                                        text = description,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 3,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.padding(bottom = 4.dp)
+                                    )
+                                }
+                            }
+
+                            // Tags
+                            if (uiState.tagCounts.isNotEmpty()) {
+                                item(span = { GridItemSpan(maxLineSpan) }) {
+                                    if (isWide) {
+                                        FlowRow(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(bottom = 8.dp),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            uiState.tagCounts.forEach { (tag, count) ->
+                                                FilterChip(
+                                                    selected = uiState.selectedTag == tag,
+                                                    onClick = { viewModel.selectTag(tag) },
+                                                    label = { Text("$tag ($count)") }
+                                                )
+                                            }
+                                        }
+                                    } else {
+                                        FlowRow(
+                                            modifier = Modifier
+                                                .padding(bottom = 8.dp)
+                                                .horizontalScroll(rememberScrollState()),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                                            maxLines = 2,
+                                            overflow = FlowRowOverflow.Clip
+                                        ) {
+                                            uiState.tagCounts.forEach { (tag, count) ->
+                                                FilterChip(
+                                                    selected = uiState.selectedTag == tag,
+                                                    onClick = { viewModel.selectTag(tag) },
+                                                    label = { Text("$tag ($count)") }
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Events count
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                Text(
+                                    text = stringResource(Res.string.events_count, uiState.filteredEvents.size),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.padding(bottom = 4.dp)
+                                )
+                            }
+
                             items(uiState.filteredEvents, key = { it.guid }) { event ->
                                 EventCard(
                                     event = event,
@@ -189,7 +187,6 @@ fun ConferenceDetailScreen(
                                 )
                             }
                         }
-                    }
                     }
                 }
             }
