@@ -57,12 +57,16 @@ fun ConferencesScreen(
 
     val tagCounts by remember(uiState.conferences) {
         derivedStateOf {
+            val total = uiState.conferences.size
             val counts = mutableMapOf<String, Int>()
             for (conf in uiState.conferences) {
                 val tag = conf.slug.substringBefore("/", missingDelimiterValue = "")
                 if (tag.isNotBlank()) counts[tag] = (counts[tag] ?: 0) + 1
             }
-            counts.entries.sortedByDescending { it.value }.map { it.key to it.value }
+            counts.entries
+                .filter { (tag, count) -> tag.toIntOrNull() == null && count < total }
+                .sortedByDescending { it.value }
+                .map { it.key to it.value }
         }
     }
 

@@ -41,13 +41,17 @@ class ConferenceDetailViewModel(
     }
 
     private fun computeTagCounts(events: List<Event>): List<Pair<String, Int>> {
+        val total = events.size
         val counts = mutableMapOf<String, Int>()
         for (event in events) {
             event.tags?.forEach { tag ->
                 if (tag.isNotBlank()) counts[tag] = (counts[tag] ?: 0) + 1
             }
         }
-        return counts.entries.sortedByDescending { it.value }.map { it.key to it.value }
+        return counts.entries
+            .filter { (tag, count) -> tag.toIntOrNull() == null && count < total }
+            .sortedByDescending { it.value }
+            .map { it.key to it.value }
     }
 
     private fun loadConference() {
