@@ -22,7 +22,8 @@ data class EventDetailUiState(
     val selectedLanguage: String? = null,
     val errorMessage: String? = null,
     val savedSliderPos: Float = 0f,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val isInQueue: Boolean = false
 )
 
 class EventDetailViewModel(
@@ -40,12 +41,21 @@ class EventDetailViewModel(
         loadEvent()
         observeSavedPosition()
         observeFavoriteStatus()
+        observeQueueStatus()
     }
 
     private fun observeFavoriteStatus() {
         viewModelScope.launch {
             favoritesRepository.isFavorite(eventGuid).collect { isFav ->
                 _uiState.update { it.copy(isFavorite = isFav) }
+            }
+        }
+    }
+
+    private fun observeQueueStatus() {
+        viewModelScope.launch {
+            queueRepository.isInQueue(eventGuid).collect { inQueue ->
+                _uiState.update { it.copy(isInQueue = inQueue) }
             }
         }
     }
@@ -161,6 +171,12 @@ class EventDetailViewModel(
                 persons = event.persons?.joinToString(", "),
                 duration = event.duration
             )
+        }
+    }
+
+    fun removeFromQueue() {
+        viewModelScope.launch {
+            queueRepository.removeFromQueue(eventGuid)
         }
     }
 

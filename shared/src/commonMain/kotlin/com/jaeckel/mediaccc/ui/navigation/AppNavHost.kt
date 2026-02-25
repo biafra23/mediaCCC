@@ -98,10 +98,12 @@ fun AppNavHost() {
         scope.launch { drawerState.close() }
     }
 
+    val isVideoScreen = currentRoute is EventDetailRoute || currentRoute is PlayerRoute
+
     BoxWithConstraints {
         val isWideScreen = maxWidth >= 840.dp
 
-        if (isWideScreen) {
+        if (isWideScreen && !isVideoScreen) {
             PermanentNavigationDrawer(
                 drawerContent = {
                     PermanentDrawerSheet(modifier = Modifier.width(280.dp)) {
@@ -118,6 +120,12 @@ fun AppNavHost() {
                     showMenuButton = false
                 )
             }
+        } else if (isWideScreen) {
+            AppNavDisplay(
+                backStack = backStack,
+                onOpenDrawer = {},
+                showMenuButton = false
+            )
         } else {
             ModalNavigationDrawer(
                 drawerState = drawerState,

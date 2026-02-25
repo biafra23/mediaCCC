@@ -183,20 +183,30 @@ fun EventDetailScreen(
                                 expanded = showMenu,
                                 onDismissRequest = { showMenu = false }
                             ) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(Res.string.add_to_queue_start)) },
-                                    onClick = {
-                                        showMenu = false
-                                        viewModel.addToQueueStart()
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(Res.string.add_to_queue_end)) },
-                                    onClick = {
-                                        showMenu = false
-                                        viewModel.addToQueueEnd()
-                                    }
-                                )
+                                if (uiState.isInQueue) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(Res.string.remove_from_queue)) },
+                                        onClick = {
+                                            showMenu = false
+                                            viewModel.removeFromQueue()
+                                        }
+                                    )
+                                } else {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(Res.string.add_to_queue_start)) },
+                                        onClick = {
+                                            showMenu = false
+                                            viewModel.addToQueueStart()
+                                        }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(Res.string.add_to_queue_end)) },
+                                        onClick = {
+                                            showMenu = false
+                                            viewModel.addToQueueEnd()
+                                        }
+                                    )
+                                }
                             }
                         }
 

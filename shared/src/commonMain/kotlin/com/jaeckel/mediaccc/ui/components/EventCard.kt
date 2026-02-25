@@ -163,12 +163,12 @@ fun EventCard(
             expanded = showMenu,
             onDismissRequest = { showMenu = false }
         ) {
-            if (onRemoveFromQueue != null) {
+            if (isInQueue) {
                 DropdownMenuItem(
                     text = { Text(stringResource(Res.string.remove_from_queue)) },
                     onClick = {
                         showMenu = false
-                        onRemoveFromQueue()
+                        scope.launch { queueRepository.removeFromQueue(event.guid) }
                     }
                 )
             } else {
@@ -329,12 +329,12 @@ fun EventCardCompact(
             expanded = showMenu,
             onDismissRequest = { showMenu = false }
         ) {
-            if (onRemoveFromQueue != null) {
+            if (isInQueue) {
                 DropdownMenuItem(
                     text = { Text(stringResource(Res.string.remove_from_queue)) },
                     onClick = {
                         showMenu = false
-                        onRemoveFromQueue()
+                        scope.launch { queueRepository.removeFromQueue(event.guid) }
                     }
                 )
             } else {
