@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-    <string name="app_name" translatable="false">MediaCCC TV</string>
+    <string name="app_name" translatable="false">Chaos TV</string>
 
     <!-- Navigation -->
     <string name="home">Home</string>

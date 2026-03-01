@@ -16,7 +16,7 @@
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:logo="@drawable/ic_maneki_neko"
-        android:label="MediaCCC TV"
+        android:label="Chaos TV"
         android:theme="@style/Theme.Leanback">
         <activity
             android:name=".TvActivity"
