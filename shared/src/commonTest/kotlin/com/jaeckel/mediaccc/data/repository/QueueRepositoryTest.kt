@@ -51,6 +51,14 @@ class QueueRepositoryTest {
 
         override suspend fun getNext(currentOrder: Long): QueueEventEntity? =
             items.filter { it.order > currentOrder }.minByOrNull { it.order }
+
+        override suspend fun updateOrder(eventGuid: String, order: Long) {
+            val index = items.indexOfFirst { it.eventGuid == eventGuid }
+            if (index >= 0) {
+                items[index] = items[index].copy(order = order)
+                emitUpdate()
+            }
+        }
     }
 
     @Test

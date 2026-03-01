@@ -34,13 +34,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Android Debug APK
-        run: ./gradlew :composeApp:assembleDebug
+        run: ./gradlew :mobileApp:assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug.apk
-          path: composeApp/build/outputs/apk/debug/*.apk
+          path: mobileApp/build/outputs/apk/debug/*.apk
 
   build-android-tv:
     runs-on: ubuntu-latest
@@ -69,16 +69,16 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Android TV Debug APK
-        run: ./gradlew :androidTvApp:assembleDebug
+        run: ./gradlew :tvApp:assembleDebug
 
       - name: Run Android TV Tests
-        run: ./gradlew :androidTvApp:testDebugUnitTest
+        run: ./gradlew :tvApp:testDebugUnitTest
 
       - name: Upload Android TV APK
         uses: actions/upload-artifact@v4
         with:
           name: androidtv-debug.apk
-          path: androidTvApp/build/outputs/apk/debug/*.apk
+          path: tvApp/build/outputs/apk/debug/*.apk
 
   build-ios:
     runs-on: macos-latest
@@ -110,11 +110,14 @@ jobs:
       - name: Build iOS Framework
         run: ./gradlew linkDebugFrameworkIosSimulatorArm64
 
+      - name: List available simulators
+        run: xcrun simctl list devices available
+
       - name: Build iOS App (xcodebuild)
         run: |
-          xcodebuild \
-            -project iosApp/iosApp.xcodeproj \
-            -scheme iosApp \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
-            -configuration Debug \
-            build
+         xcodebuild \
+          -project iosApp/iosApp.xcodeproj \
+          -scheme iosApp \
+          -destination 'platform=iOS Simulator,OS=latest,name=iPhone 16' \
+          -configuration Debug \
+          build
