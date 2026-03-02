@@ -21,6 +21,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -185,11 +188,20 @@ fun EventActionDialog(
     onRemoveFromQueue: () -> Unit
 ) {
     Dialog(onDismissRequest = onDismiss) {
+        var consumeNextKeyUp by remember { mutableStateOf(true) }
         Box(
             modifier = Modifier
                 .width(320.dp)
                 .background(Color(0xFF2A2A3E), RoundedCornerShape(16.dp))
                 .padding(24.dp)
+                .onPreviewKeyEvent { keyEvent ->
+                    if (consumeNextKeyUp && keyEvent.type == KeyEventType.KeyUp) {
+                        consumeNextKeyUp = false
+                        true
+                    } else {
+                        false
+                    }
+                }
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
