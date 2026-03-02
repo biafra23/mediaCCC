@@ -7,14 +7,20 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
-val keystoreProperties = Properties().apply {
-    load(rootProject.file("keystore.properties").inputStream())
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(keystorePropertiesFile.inputStream())
 }
 
 // Extract version from git tag if available, otherwise use default
-val gitVersionName = providers.exec {
-    commandLine("git", "describe", "--tags", "--always")
-}.standardOutput.asText.get().trim().removePrefix("v")
+val gitVersionName = try {
+    providers.exec {
+        commandLine("git", "describe", "--tags", "--always")
+    }.standardOutput.asText.get().trim().removePrefix("v")
+} catch (e: Exception) {
+    "1.0-manual"
+}
 
 android {
     namespace = "com.jaeckel.mediaccc.tv"
@@ -30,10 +36,12 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(keystoreProperties["storeFile"] as String)
-            storePassword = keystoreProperties["storePassword"] as String
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
+            if (keystoreProperties.containsKey("storeFile")) {
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+            }
         }
     }
 
@@ -48,7 +56,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            // Only apply release signing if properties are present
+            if (keystoreProperties.containsKey("storeFile")) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
     compileOptions {
