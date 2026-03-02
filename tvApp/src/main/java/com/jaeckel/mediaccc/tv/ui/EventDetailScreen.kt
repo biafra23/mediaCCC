@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -55,6 +56,7 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import com.jaeckel.mediaccc.tv.AndroidTVPlayer
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalTvMaterial3Api::class)
@@ -164,6 +166,7 @@ private fun EventDetailContent(
 ) {
     val descriptionScrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+    var isPlaying by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Background image
@@ -295,6 +298,9 @@ private fun EventDetailContent(
                     if (bestRecording != null) {
                         Button(
                             onClick = {
+                                isPlaying = true
+                                // Still calling onPlayClick in case we want to perform other actions
+                                // like saving progress, though AndroidTVPlayer also does this now.
                                 onPlayClick(
                                     event.guid,
                                     bestRecording.recordingUrl ?: "",
@@ -414,15 +420,34 @@ private fun EventDetailContent(
 
             Spacer(modifier = Modifier.width(48.dp))
 
-            // Right side - Poster
-            AsyncImage(
-                model = event.posterUrl ?: event.thumbUrl,
-                contentDescription = event.title,
-                contentScale = ContentScale.Fit,
+            // Right side - Poster OR Video Player
+            Box(
                 modifier = Modifier
                     .weight(0.6f)
-                    .padding(vertical = 24.dp)
-            )
+                    .padding(vertical = 24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isPlaying && bestRecording?.recordingUrl != null) {
+                    AndroidTVPlayer(
+                        eventGuid = event.guid,
+                        videoUrl = bestRecording.recordingUrl!!,
+                        title = event.title,
+                        speakers = event.persons?.joinToString(", ") ?: "",
+                        date = event.date?.let {
+                            dateTimeFormat.format(it.toLocalDateTime(TimeZone.currentSystemDefault()))
+                        } ?: "",
+                        conference = event.conferenceTitle ?: "",
+                        durationFromEvent = event.duration ?: 0L
+                    )
+                } else {
+                    AsyncImage(
+                        model = event.posterUrl ?: event.thumbUrl,
+                        contentDescription = event.title,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
         }
     }
 }

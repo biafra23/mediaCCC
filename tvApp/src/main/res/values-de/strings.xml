@@ -7,16 +7,22 @@
     <string name="favorites">Favoriten</string>
     <string name="history">Verlauf</string>
     <string name="settings">Einstellungen</string>
+    <string name="queue">Warteschlange</string>
 
     <!-- Home Screen -->
     <string name="continue_watching">Weiterschauen</string>
     <string name="recent_events">Aktuelle Events</string>
     <string name="live_streams">Jetzt Live</string>
+    <string name="featured">Empfohlen</string>
+    <string name="recent">Aktuell</string>
+    <string name="menu">Menü</string>
 
     <!-- Search -->
     <string name="search_events">Events suchen</string>
     <string name="search_placeholder">Mind. 3 Zeichen eingeben…</string>
     <string name="no_events_found">Keine Events gefunden.</string>
+    <string name="clear">Löschen</string>
+    <string name="no_results_found">Keine Ergebnisse gefunden</string>
 
     <!-- History -->
     <string name="watch_history">Wiedergabeverlauf</string>
@@ -39,15 +45,36 @@
     <string name="speakers">Sprecher: %1$s</string>
     <string name="duration_min">Dauer: %1$d Min.</string>
     <string name="play">▶ Abspielen</string>
+    <string name="resume">▶ Fortsetzen</string>
+    <string name="resume_icon">▶ Fortsetzen</string>
+    <string name="play_icon">▶</string>
+    <string name="event">Event</string>
     <string name="language">Sprache</string>
 
     <!-- Conference Detail -->
+    <string name="conference">Konferenz</string>
     <string name="events_count">Events (%1$d)</string>
+    <string name="no_conferences_available">Keine Konferenzen verfügbar</string>
 
     <!-- Favorites / Settings -->
     <string name="favorites_screen">Favoriten</string>
     <string name="no_favorites_yet">Noch keine Favoriten</string>
     <string name="add_to_favorites">Zu Favoriten hinzufügen</string>
     <string name="remove_from_favorites">Aus Favoriten entfernen</string>
+    <string name="favorites_coming_soon">Favoriten bald verfügbar</string>
     <string name="settings_screen">Einstellungen</string>
+    <string name="settings_coming_soon">Einstellungen bald verfügbar</string>
+
+    <!-- Queue -->
+    <string name="no_queue_yet">Noch keine Einträge in der Warteschlange</string>
+    <string name="currently_playing">Wird abgespielt</string>
+    <string name="add_to_queue_start">Zum Anfang der Warteschlange hinzufügen</string>
+    <string name="add_to_queue_end">Zum Ende der Warteschlange hinzufügen</string>
+    <string name="remove_from_queue">Aus der Warteschlange entfernen</string>
+    <string name="queue_reorder_hint">▲▼ Verschieben • OK Bestätigen • Zurück Abbrechen</string>
+    <string name="queue_now_playing">▶ Aktuelle Wiedergabe</string>
+    <string name="queue_remove">✕</string>
+    <string name="queue_add_beginning">⊕ Als Nächstes abspielen</string>
+    <string name="queue_add_end">⊕ Zur Warteschlange hinzufügen</string>
+    <string name="queue_remove_action">✕ Aus Warteschlange entfernen</string>
 </resources>

@@ -30,17 +30,17 @@ android {
         }
     }
     buildTypes {
-        release {
-            signingConfig = signingConfigs.getByName("release")
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-DEBUG"
         }
-    }
-    buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -84,4 +84,3 @@ dependencies {
     testImplementation(libs.kotlin.test)
     testImplementation(libs.junit)
 }
-
