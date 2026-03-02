@@ -1,4 +1,4 @@
-# MediaCCC
+# Chaos TV
 
 A Kotlin Multiplatform app for browsing and watching talks from [media.ccc.de](https://media.ccc.de) and live streams from [streaming.media.ccc.de](https://streaming.media.ccc.de). Built with Compose Multiplatform, targeting Android phones, Android TV, and iOS.
 
