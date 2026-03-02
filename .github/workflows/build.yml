@@ -3,6 +3,8 @@ name: Build
 on:
   push:
     branches: [ main, develop ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ main ]
 
@@ -121,3 +123,38 @@ jobs:
           -destination 'platform=iOS Simulator,OS=latest,name=iPhone 16' \
           -configuration Debug \
           build
+
+  release-android:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Create dummy keystore.properties
+        run: |
+          echo "storeFile=keystore.jks" > keystore.properties
+          echo "storePassword=dummy" >> keystore.properties
+          echo "keyAlias=dummy" >> keystore.properties
+          echo "keyPassword=dummy" >> keystore.properties
+
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
+
+      - name: Build release bundles
+        run: |
+          ./gradlew :mobileApp:bundleRelease :tvApp:bundleRelease \
+            -Pandroid.injected.signing.store.file=$PWD/keystore.jks \
+            -Pandroid.injected.signing.store.password=${{ secrets.STORE_PASSWORD }} \
+            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            mobileApp/build/outputs/bundle/release/*.aab
+            tvApp/build/outputs/bundle/release/*.aab
