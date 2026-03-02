@@ -10,6 +10,15 @@ val keystoreProperties = Properties().apply {
     load(rootProject.file("keystore.properties").inputStream())
 }
 
+// Extract version from git tag if available, otherwise use default
+val gitVersionName = try {
+    providers.exec {
+        commandLine("git", "describe", "--tags", "--always")
+    }.standardOutput.asText.get().trim().removePrefix("v")
+} catch (e: Exception) {
+    "1.0-manual"
+}
+
 android {
     namespace = "com.jaeckel.mediaccc.mobile"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -19,7 +28,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = gitVersionName
     }
     signingConfigs {
         create("release") {
