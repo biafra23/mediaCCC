@@ -152,9 +152,9 @@ jobs:
       - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
 
-      - name: Build release bundles
+      - name: Build release APKs
         run: |
-          ./gradlew :mobileApp:bundleRelease :tvApp:bundleRelease \
+          ./gradlew :mobileApp:assembleRelease :tvApp:assembleRelease \
             -Pandroid.injected.signing.store.file=$PWD/keystore.jks \
             -Pandroid.injected.signing.store.password=${{ secrets.STORE_PASSWORD }} \
             -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
@@ -163,6 +163,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          body_path: RELEASE_NOTES.md
           files: |
-            mobileApp/build/outputs/bundle/release/*.aab
-            tvApp/build/outputs/bundle/release/*.aab
+            mobileApp/build/outputs/apk/release/*.apk
+            tvApp/build/outputs/apk/release/*.apk
