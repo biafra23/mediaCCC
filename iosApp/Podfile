@@ -1,0 +1,25 @@
+# Podfile for MediaCCC iOS app
+#
+# This file declares CocoaPods dependencies for the iOS application.
+# Currently it adds the Google Cast SDK to enable Chromecast support.
+#
+# Usage:
+#   1. Install CocoaPods: `sudo gem install cocoapods`
+#   2. Run `pod install` in this directory.
+#   3. Open `iosApp.xcworkspace` (NOT `iosApp.xcodeproj`) in Xcode.
+#
+# After integrating the pod, update CastButton.ios.kt in
+# shared/src/iosMain to use GCKUICastButton instead of the
+# UIButton placeholder:
+#
+#   import platform.GoogleCast.GCKUICastButton
+#   import platform.CoreGraphics.CGRectZero
+#
+#   factory = { GCKUICastButton(frame = CGRectZero.readValue()) }
+
+platform :ios, '16.0'
+use_frameworks!
+
+target 'iosApp' do
+  pod 'google-cast-sdk', '~> 4.8'
+end

@@ -37,6 +37,9 @@ kotlin {
 
             // SLF4J simple provider for Ktor logging output
             implementation(libs.slf4j.simple)
+
+            // Chromecast support (CastButton actual implementation for Android)
+            implementation(libs.play.services.cast.framework)
         }
         commonMain.dependencies {
             implementation(project(":api"))
