@@ -41,7 +41,7 @@ fun CastButton(
     val currentTitle by rememberUpdatedState(title)
     val currentMimeType by rememberUpdatedState(mimeType)
 
-    DisposableEffect(recordingUrl) {
+    DisposableEffect(recordingUrl, currentMimeType) {
         val castContext = runCatching { CastContext.getSharedInstance(context) }.getOrNull()
             ?: return@DisposableEffect onDispose { }
 

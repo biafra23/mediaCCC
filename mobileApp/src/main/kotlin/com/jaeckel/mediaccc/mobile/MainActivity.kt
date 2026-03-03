@@ -19,8 +19,8 @@ class MainActivity : AppCompatActivity() {
         setContent {
             MaterialTheme {
                 AppNavHost(
-                    eventDetailExtraActions = { recordingUrl, mimeType ->
-                        CastButton(recordingUrl = recordingUrl, mimeType = mimeType)
+                    eventDetailExtraActions = { recordingUrl, mimeType, title ->
+                        CastButton(recordingUrl = recordingUrl, mimeType = mimeType, title = title)
                     }
                 )
             }
