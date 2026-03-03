@@ -87,8 +87,8 @@ actual fun CastButton(
 private fun showRoutePicker(routePickerView: AVRoutePickerView) {
     val keyWindow: UIWindow = UIApplication.sharedApplication.connectedScenes
         .filterIsInstance<UIWindowScene>()
-        .flatMap { it.windows }
-        .firstOrNull { it.isKeyWindow }
+        .flatMap { it.windows.filterIsInstance<UIWindow>() }
+        .firstOrNull { it.isKeyWindow() }
         ?: run {
             println("CastButton: key window not found — AirPlay picker cannot be presented")
             return
@@ -111,4 +111,3 @@ private fun showRoutePicker(routePickerView: AVRoutePickerView) {
     }
     internalButton.sendActionsForControlEvents(UIControlEventTouchUpInside)
 }
-
