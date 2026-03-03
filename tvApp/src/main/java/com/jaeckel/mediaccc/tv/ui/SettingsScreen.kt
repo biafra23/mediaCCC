@@ -28,7 +28,7 @@ fun SettingsScreen(versionString: String = "") {
         Spacer(modifier = Modifier.height(24.dp))
         if (versionString.isNotEmpty()) {
             Text(
-                text = "Version",
+                text = stringResource(R.string.settings_version),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

@@ -55,7 +55,7 @@ fun SettingsScreen(
         ) {
             if (versionString.isNotEmpty()) {
                 Text(
-                    text = "Version",
+                    text = stringResource(Res.string.settings_version),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
