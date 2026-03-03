@@ -39,6 +39,7 @@ slf4jSimple = "2.0.9"
 sqlite = "2.5.1"
 tvFoundation = "1.0.0-alpha12"
 tvMaterial = "1.0.1"
+castFramework = "21.5.0"
 
 [libraries]
 # Navigation 3 (JetBrains Compose Multiplatform - KMP compatible)
@@ -50,6 +51,7 @@ androidx-leanback = { module = "androidx.leanback:leanback", version.ref = "lean
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-tv-foundation = { module = "androidx.tv:tv-foundation", version.ref = "tvFoundation" }
 androidx-tv-material = { module = "androidx.tv:tv-material", version.ref = "tvMaterial" }
+play-services-cast-framework = { module = "com.google.android.gms:play-services-cast-framework", version.ref = "castFramework" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "multiplatform-nav3-ui" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "compose-multiplatform-lifecycle" }

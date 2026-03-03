@@ -72,6 +72,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -98,6 +99,9 @@ dependencies {
 
     // Media3 HLS support for live stream playback
     implementation("androidx.media3:media3-exoplayer-hls:1.9.0")
+
+    // Chromecast support
+    implementation(libs.play.services.cast.framework)
 
     // Coil for image loading with SVG support
     implementation(libs.coil.compose)

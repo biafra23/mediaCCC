@@ -77,7 +77,9 @@ private val bottomDrawerItems = listOf(
 )
 
 @Composable
-fun AppNavHost() {
+fun AppNavHost(
+    eventDetailExtraActions: @Composable (recordingUrl: String?, mimeType: String?, title: String?) -> Unit = { _, _, _ -> }
+) {
     val backStack = remember { mutableStateListOf<NavKey>(HomeRoute) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -119,14 +121,16 @@ fun AppNavHost() {
                 AppNavDisplay(
                     backStack = backStack,
                     onOpenDrawer = {},
-                    showMenuButton = false
+                    showMenuButton = false,
+                    eventDetailExtraActions = eventDetailExtraActions
                 )
             }
         } else if (isWideScreen) {
             AppNavDisplay(
                 backStack = backStack,
                 onOpenDrawer = {},
-                showMenuButton = false
+                showMenuButton = false,
+                eventDetailExtraActions = eventDetailExtraActions
             )
         } else {
             ModalNavigationDrawer(
@@ -144,7 +148,8 @@ fun AppNavHost() {
                 AppNavDisplay(
                     backStack = backStack,
                     onOpenDrawer = { scope.launch { drawerState.open() } },
-                    showMenuButton = true
+                    showMenuButton = true,
+                    eventDetailExtraActions = eventDetailExtraActions
                 )
             }
         }
@@ -204,7 +209,8 @@ private fun DrawerSheetContent(
 private fun AppNavDisplay(
     backStack: MutableList<NavKey>,
     onOpenDrawer: () -> Unit,
-    showMenuButton: Boolean = true
+    showMenuButton: Boolean = true,
+    eventDetailExtraActions: @Composable (recordingUrl: String?, mimeType: String?, title: String?) -> Unit = { _, _, _ -> }
 ) {
     fun popBack() {
         if (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
@@ -324,7 +330,8 @@ private fun AppNavDisplay(
                             )
                         )
                     },
-                    onBackClick = ::popBack
+                    onBackClick = ::popBack,
+                    extraTopBarActions = eventDetailExtraActions
                 )
             }
 
