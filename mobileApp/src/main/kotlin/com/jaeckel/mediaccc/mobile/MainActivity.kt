@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.MaterialTheme
+import com.jaeckel.mediaccc.mobile.cast.CastButton
 import com.jaeckel.mediaccc.ui.navigation.AppNavHost
 import com.jaeckel.mediaccc.ui.util.PipState
 
@@ -17,7 +18,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MaterialTheme {
-                AppNavHost()
+                AppNavHost(
+                    eventDetailExtraActions = { recordingUrl ->
+                        CastButton(recordingUrl = recordingUrl)
+                    }
+                )
             }
         }
     }

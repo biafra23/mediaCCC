@@ -77,7 +77,12 @@ import org.koin.core.parameter.parametersOf
 fun EventDetailScreen(
     eventGuid: String,
     onPlayClick: (videoUrl: String, title: String, speakers: String, date: String, conference: String) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    /**
+     * Optional platform-specific actions (e.g. a Cast button) rendered in the TopAppBar.
+     * Receives the current recording URL so callers can act on the media being displayed.
+     */
+    extraTopBarActions: @Composable (recordingUrl: String?) -> Unit = {}
 ) {
     val viewModel: EventDetailViewModel = koinViewModel(
         key = eventGuid,
@@ -220,6 +225,7 @@ fun EventDetailScreen(
                                 .clickable { viewModel.toggleFavorite() }
                         )
                     }
+                    extraTopBarActions(recordingUrl)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,

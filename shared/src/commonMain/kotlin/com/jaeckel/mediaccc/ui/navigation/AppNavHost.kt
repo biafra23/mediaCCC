@@ -77,7 +77,9 @@ private val bottomDrawerItems = listOf(
 )
 
 @Composable
-fun AppNavHost() {
+fun AppNavHost(
+    eventDetailExtraActions: @Composable (recordingUrl: String?) -> Unit = {}
+) {
     val backStack = remember { mutableStateListOf<NavKey>(HomeRoute) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -324,7 +326,8 @@ private fun AppNavDisplay(
                             )
                         )
                     },
-                    onBackClick = ::popBack
+                    onBackClick = ::popBack,
+                    extraTopBarActions = eventDetailExtraActions
                 )
             }
 
