@@ -2,7 +2,10 @@ name: Build
 
 on:
   push:
-    branches: [ main, develop ]
+    branches:
+      - 'main'
+      - 'develop'
+      - 'copilot/**'
     tags:
       - 'v*'
   pull_request:
@@ -88,7 +91,7 @@ jobs:
 
   build-ios:
     runs-on: macos-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || contains(github.ref, 'refs/heads/copilot/'))
 
     steps:
       - name: Checkout
@@ -169,3 +172,31 @@ jobs:
           files: |
             mobileApp/build/outputs/apk/release/*.apk
             tvApp/build/outputs/apk/release/*.apk
+
+  publish-nightly:
+    runs-on: ubuntu-latest
+    needs: [build-android, build-android-tv]
+    permissions:
+      contents: write
+    steps:
+      - name: Download mobile APK
+        uses: actions/download-artifact@v4
+        with:
+          name: app-debug.apk
+          path: artifacts/
+
+      - name: Download TV APK
+        uses: actions/download-artifact@v4
+        with:
+          name: androidtv-debug.apk
+          path: artifacts/
+
+      - name: Publish APK as pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly
+          name: Nightly Build
+          prerelease: true
+          files: artifacts/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
