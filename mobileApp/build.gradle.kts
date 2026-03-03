@@ -33,6 +33,12 @@ android {
         versionName = gitVersionName
     }
     signingConfigs {
+        create("debugShared") {
+            storeFile = rootProject.file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "debug"
+            keyPassword = "android"
+        }
         create("release") {
             if (keystoreProperties.containsKey("storeFile")) {
                 storeFile = file(keystoreProperties["storeFile"] as String)
@@ -46,6 +52,7 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-DEBUG"
+            signingConfig = signingConfigs.getByName("debugShared")
         }
         release {
             isMinifyEnabled = false
