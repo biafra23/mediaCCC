@@ -1,6 +1,7 @@
 package com.jaeckel.mediaccc.mobile
 
 import android.app.Application
+import android.util.Log
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
@@ -24,6 +25,10 @@ class MobileApplication : Application(), SingletonImageLoader.Factory {
 
         // Initialise CastContext eagerly so the Cast button is ready when screens load
         runCatching { CastContext.getSharedInstance(this) }
+            .onFailure { e ->
+                Log.e("MobileApplication", "CastContext initialisation failed — check OPTIONS_PROVIDER_CLASS_NAME in AndroidManifest", e)
+                if (BuildConfig.DEBUG) throw RuntimeException("CastContext init failed", e)
+            }
     }
 
     override fun newImageLoader(context: PlatformContext): ImageLoader {
