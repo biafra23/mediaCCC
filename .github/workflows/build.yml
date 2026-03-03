@@ -2,7 +2,10 @@ name: Build
 
 on:
   push:
-    branches: [ main, develop ]
+    branches:
+      - 'main'
+      - 'develop'
+      - 'copilot/**'
     tags:
       - 'v*'
   pull_request:
@@ -88,7 +91,7 @@ jobs:
 
   build-ios:
     runs-on: macos-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || contains(github.ref, 'refs/heads/copilot/'))
 
     steps:
       - name: Checkout
