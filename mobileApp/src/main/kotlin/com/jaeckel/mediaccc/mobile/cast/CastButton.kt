@@ -64,6 +64,15 @@ fun CastButton(
         }
 
         castContext.sessionManager.addSessionManagerListener(listener, CastSession::class.java)
+
+        // If a session is already active when this effect runs (e.g. the composable entered
+        // composition after a session was established, or recordingUrl just became non-null),
+        // load the media immediately — the session callbacks won't fire in that case.
+        val currentSession = castContext.sessionManager.currentCastSession
+        if (currentSession != null) {
+            loadMediaOnCast(currentSession, recordingUrl, currentMimeType, currentTitle)
+        }
+
         onDispose {
             castContext.sessionManager.removeSessionManagerListener(listener, CastSession::class.java)
         }
