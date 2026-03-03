@@ -3,6 +3,7 @@ package com.jaeckel.mediaccc.ui.cast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
+import kotlinx.cinterop.ExperimentalForeignApi
 import platform.UIKit.UIButton
 import platform.UIKit.UIButtonTypeSystem
 import platform.UIKit.UIControlStateNormal
@@ -33,6 +34,7 @@ import platform.UIKit.UIImage
  * See `iosApp/Podfile` for the configuration. After running `pod install`, open
  * `iosApp.xcworkspace` (NOT `iosApp.xcodeproj`) in Xcode.
  */
+@OptIn(ExperimentalForeignApi::class)
 @Composable
 actual fun CastButton(
     recordingUrl: String?,
