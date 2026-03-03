@@ -67,4 +67,7 @@
     <string name="hours_ago">vor %1$d Std.</string>
     <string name="yesterday">Gestern</string>
     <string name="days_ago">vor %1$d T.</string>
+
+    <!-- Cast / AirPlay button -->
+    <string name="cast_button">AirPlay</string>
 </resources>

@@ -67,4 +67,7 @@
     <string name="hours_ago">hace %1$d h</string>
     <string name="yesterday">Ayer</string>
     <string name="days_ago">hace %1$d d</string>
+
+    <!-- Cast / AirPlay button -->
+    <string name="cast_button">AirPlay</string>
 </resources>
