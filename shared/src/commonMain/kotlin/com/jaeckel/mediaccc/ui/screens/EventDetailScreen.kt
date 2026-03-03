@@ -80,9 +80,9 @@ fun EventDetailScreen(
     onBackClick: () -> Unit,
     /**
      * Optional platform-specific actions (e.g. a Cast button) rendered in the TopAppBar.
-     * Receives the current recording URL so callers can act on the media being displayed.
+     * Receives the current recording URL and MIME type so callers can act on the media being displayed.
      */
-    extraTopBarActions: @Composable (recordingUrl: String?) -> Unit = {}
+    extraTopBarActions: @Composable (recordingUrl: String?, mimeType: String?) -> Unit = { _, _ -> }
 ) {
     val viewModel: EventDetailViewModel = koinViewModel(
         key = eventGuid,
@@ -105,6 +105,7 @@ fun EventDetailScreen(
     }
 
     val recordingUrl = uiState.bestRecording?.recordingUrl
+    val mimeType = uiState.bestRecording?.mimeType
     val savedSliderPos = uiState.savedSliderPos
 
     // Open URI and seek to saved position in one coroutine to guarantee ordering
@@ -225,7 +226,7 @@ fun EventDetailScreen(
                                 .clickable { viewModel.toggleFavorite() }
                         )
                     }
-                    extraTopBarActions(recordingUrl)
+                    extraTopBarActions(recordingUrl, mimeType)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,

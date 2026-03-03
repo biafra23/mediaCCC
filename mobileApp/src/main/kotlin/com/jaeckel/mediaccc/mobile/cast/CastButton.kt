@@ -2,6 +2,8 @@ package com.jaeckel.mediaccc.mobile.cast
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
@@ -23,16 +25,21 @@ import com.google.android.gms.cast.framework.SessionManagerListener
  *
  * @param recordingUrl URL of the media to cast. When non-null, it is loaded as soon as a Cast
  *   session becomes active.
+ * @param mimeType MIME type of the media (e.g. "video/mp4", "video/webm"). When null, falls back
+ *   to "video/mp4".
  * @param title Optional display title sent as Cast media metadata.
  * @param modifier Modifier applied to the underlying [AndroidView].
  */
 @Composable
 fun CastButton(
     recordingUrl: String?,
+    mimeType: String? = null,
     title: String? = null,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val currentTitle by rememberUpdatedState(title)
+    val currentMimeType by rememberUpdatedState(mimeType)
 
     DisposableEffect(recordingUrl) {
         val castContext = runCatching { CastContext.getSharedInstance(context) }.getOrNull()
@@ -40,11 +47,11 @@ fun CastButton(
 
         val listener = object : SessionManagerListener<CastSession> {
             override fun onSessionStarted(session: CastSession, sessionId: String) {
-                loadMediaOnCast(session, recordingUrl, title)
+                loadMediaOnCast(session, recordingUrl, currentMimeType, currentTitle)
             }
 
             override fun onSessionResumed(session: CastSession, wasSuspended: Boolean) {
-                loadMediaOnCast(session, recordingUrl, title)
+                loadMediaOnCast(session, recordingUrl, currentMimeType, currentTitle)
             }
 
             override fun onSessionEnded(session: CastSession, error: Int) {}
@@ -72,20 +79,13 @@ fun CastButton(
     )
 }
 
-private fun loadMediaOnCast(session: CastSession, url: String?, title: String?) {
+private fun loadMediaOnCast(session: CastSession, url: String?, mimeType: String?, title: String?) {
     if (url == null) return
     val metadata = MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE).apply {
         if (!title.isNullOrBlank()) putString(MediaMetadata.KEY_TITLE, title)
     }
-    val mimeType = url.substringBefore('?').substringAfterLast('.').let { ext ->
-        when (ext.lowercase()) {
-            "webm" -> "video/webm"
-            "ogg", "ogv" -> "video/ogg"
-            else -> "video/mp4"
-        }
-    }
     val mediaInfo = MediaInfo.Builder(url)
-        .setContentType(mimeType)
+        .setContentType(mimeType ?: "video/mp4")
         .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
         .setMetadata(metadata)
         .build()
