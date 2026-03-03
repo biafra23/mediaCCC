@@ -75,6 +75,7 @@
 				861F0401AA65AC08AD3CD531 /* Sources */,
 				17B2BD9E85ED9A1ABB8F0E5D /* Frameworks */,
 				F592F7EE04C4F298ED43901A /* Resources */,
+				93A8B9122F57612800A76E28 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -153,6 +154,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
+		};
+		93A8B9122F57612800A76E28 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nHASH=$(git -C \"$SRCROOT\" rev-parse --short HEAD 2>/dev/null || echo \"unknown\")\n/usr/libexec/PlistBuddy -c \"Set :GitCommitHash $HASH\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"    \n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
