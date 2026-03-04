@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    id("org.jetbrains.kotlin.native.cocoapods")
 }
 
 kotlin {
@@ -16,13 +17,24 @@ kotlin {
         }
     }
     
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "Shared"
+    iosArm64()
+    iosSimulatorArm64()
+
+    cocoapods {
+        summary = "Shared module for MediaCCC"
+        homepage = "https://github.com/mediaccc"
+        version = "1.0"
+        ios.deploymentTarget = "16.0"
+        
+        framework {
+            baseName = "shared"
             isStatic = true
+        }
+
+        // The Pod name is 'google-cast-sdk' but the module name is 'GoogleCast'
+        pod("google-cast-sdk") {
+            moduleName = "GoogleCast"
+            version = "4.8.3"
         }
     }
     
@@ -31,14 +43,8 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
-
-            // AndroidX Navigation 3 extensions (Android only)
             api(libs.androidx.lifecycle.viewmodel.navigation3)
-
-            // SLF4J simple provider for Ktor logging output
             implementation(libs.slf4j.simple)
-
-            // Chromecast support (CastButton actual implementation for Android)
             implementation(libs.play.services.cast.framework)
         }
         commonMain.dependencies {
@@ -54,27 +60,17 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.composemediaplayer)
             implementation(libs.ktor.client.mock)
-
-            // Coil 3 for KMP image loading
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
             implementation(libs.coil.svg)
-
-            // Navigation 3 (JetBrains KMP compatible)
-//            api(libs.navigation3.runtime)
             api(libs.navigation3.ui)
-
-            // Koin DI (KMP compatible)
             api(libs.koin.core)
             api(libs.koin.compose)
             api(libs.koin.compose.viewmodel)
             api(libs.koin.compose.viewmodel.navigation)
-
-            // Room KMP
             implementation(libs.room.runtime)
         }
         iosMain.dependencies {
-            // Bundled SQLite driver for Room on iOS
             implementation(libs.sqlite.bundled)
         }
         commonTest.dependencies {
@@ -89,7 +85,6 @@ kotlin {
 android {
     namespace = "com.jaeckel.mediaccc"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
-
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
@@ -124,4 +119,3 @@ compose.resources {
     publicResClass = true
     packageOfResClass = "mediaccc.shared.generated.resources"
 }
-
