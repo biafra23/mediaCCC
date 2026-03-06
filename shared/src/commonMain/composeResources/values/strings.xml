@@ -69,4 +69,7 @@
     <string name="hours_ago">%1$dh ago</string>
     <string name="yesterday">Yesterday</string>
     <string name="days_ago">%1$dd ago</string>
+
+    <!-- Cast / AirPlay button -->
+    <string name="cast_button">AirPlay</string>
 </resources>
