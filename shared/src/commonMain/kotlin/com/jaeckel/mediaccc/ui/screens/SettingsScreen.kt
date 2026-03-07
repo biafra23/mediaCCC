@@ -15,8 +15,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jaeckel.mediaccc.ui.util.MultiplatformPreview
 import mediaccc.shared.generated.resources.Res
 import mediaccc.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -78,7 +78,7 @@ fun SettingsScreen(
     }
 }
 
-@Preview
+@MultiplatformPreview
 @Composable
 private fun SettingsScreenPreview() {
     MaterialTheme {
