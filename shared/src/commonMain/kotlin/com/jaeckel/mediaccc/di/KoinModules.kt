@@ -19,6 +19,7 @@ import com.jaeckel.mediaccc.viewmodel.HomeViewModel
 import com.jaeckel.mediaccc.viewmodel.PlayerViewModel
 import com.jaeckel.mediaccc.viewmodel.QueueViewModel
 import com.jaeckel.mediaccc.viewmodel.SearchViewModel
+import com.jaeckel.mediaccc.viewmodel.SettingsViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -48,6 +49,7 @@ val sharedModule = module {
     viewModel { HistoryViewModel(get<PlaybackHistoryRepository>()) }
     viewModel { FavoritesViewModel(get<FavoritesRepository>()) }
     viewModel { QueueViewModel(get<QueueRepository>()) }
+    viewModel { SettingsViewModel(get<PlaybackHistoryRepository>()) }
     viewModel { (initialVideoUrl: String, initialTitle: String, initialEventGuid: String?) ->
         PlayerViewModel(
             get<MediaRepository>(),

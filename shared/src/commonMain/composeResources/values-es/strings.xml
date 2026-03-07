@@ -58,6 +58,12 @@
 
     <!-- Settings Screen -->
     <string name="settings_coming_soon">Ajustes próximamente</string>
+    <string name="privacy">Privacidad</string>
+    <string name="clear_watch_history">Borrar historial de reproducción</string>
+    <string name="clear_watch_history_description">Eliminar todos los videos del historial de reproducción</string>
+    <string name="clear_watch_history_confirm">¿Seguro que quieres borrar todo el historial de reproducción? Esta acción no se puede deshacer.</string>
+    <string name="watch_history_cleared">Historial de reproducción borrado</string>
+    <string name="cancel">Cancelar</string>
 
     <!-- Error -->
     <string name="error_message">Error: %1$s</string>
