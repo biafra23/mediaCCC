@@ -11,17 +11,13 @@ class SettingsViewModel(
     private val historyRepository: PlaybackHistoryRepository
 ) : ViewModel() {
 
-    private val _historyClearedEvent = MutableStateFlow(false)
-    val historyClearedEvent: StateFlow<Boolean> = _historyClearedEvent
+    private val _historyClearedEvent = MutableSharedFlow<Unit>()
+    val historyClearedEvent = _historyClearedEvent.asSharedFlow()
 
     fun clearWatchHistory() {
         viewModelScope.launch {
             historyRepository.clearHistory()
-            _historyClearedEvent.value = true
+            _historyClearedEvent.emit(Unit)
         }
-    }
-
-    fun onHistoryClearedEventConsumed() {
-        _historyClearedEvent.value = false
     }
 }
