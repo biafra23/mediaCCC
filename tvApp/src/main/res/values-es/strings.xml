@@ -53,7 +53,7 @@
 
     <!-- Conference Detail -->
     <string name="conference">Conferencia</string>
-    <string name="events_count">Events (%1$d)</string>
+    <string name="events_count">Eventos (%1$d)</string>
     <string name="no_conferences_available">No hay conferencias disponibles</string>
 
     <!-- Favorites / Settings -->
@@ -63,6 +63,7 @@
     <string name="remove_from_favorites">Quitar de favoritos</string>
     <string name="favorites_coming_soon">Favoritos próximamente</string>
     <string name="settings_screen">Ajustes</string>
+    <string name="settings_version">Versión</string>
     <string name="settings_coming_soon">Ajustes próximamente</string>
 
     <!-- Queue -->
