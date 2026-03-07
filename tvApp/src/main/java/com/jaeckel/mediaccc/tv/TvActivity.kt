@@ -56,6 +56,7 @@ import androidx.compose.material.icons.filled.VideoLibrary
 import com.jaeckel.mediaccc.tv.navigation.ConferencesRoute
 import com.jaeckel.mediaccc.tv.ui.ConferencesScreen
 import androidx.compose.ui.res.stringResource
+import com.jaeckel.mediaccc.tv.BuildConfig
 
 class TvActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -212,6 +213,7 @@ fun TvNavHost() {
 
 @Composable
 fun TvNavDisplay(backStack: MutableList<NavKey>) {
+    val versionString = "${BuildConfig.APPLICATION_ID} ${BuildConfig.VERSION_NAME}"
     NavDisplay(
         backStack = backStack,
         entryProvider = entryProvider {
@@ -277,7 +279,7 @@ fun TvNavDisplay(backStack: MutableList<NavKey>) {
                     }
                 )
             }
-            entry<SettingsRoute> { SettingsScreen() }
+            entry<SettingsRoute> { SettingsScreen(versionString = versionString) }
 
             entry<ConferenceDetailRoute> { route ->
                 ConferenceDetailScreen(

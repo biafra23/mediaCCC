@@ -20,12 +20,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jaeckel.mediaccc.api.model.Event
 import com.jaeckel.mediaccc.data.db.FavoriteEventEntity
 import com.jaeckel.mediaccc.ui.components.EventCard
 import com.jaeckel.mediaccc.viewmodel.FavoritesViewModel
+import com.jaeckel.mediaccc.ui.util.MultiplatformPreview
 import mediaccc.shared.generated.resources.Res
 import mediaccc.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -35,7 +35,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun FavoritesScreen(
     viewModel: FavoritesViewModel = koinViewModel(),
-    onEventClick: (String) -> Unit = {},
+    onEventClick: (String) -> Unit,
     onBackClick: () -> Unit
 ) {
     val favorites by viewModel.favorites.collectAsState()
@@ -75,18 +75,18 @@ fun FavoritesScreen(
             }
         } else {
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 280.dp),
+                columns = GridCells.Adaptive(minSize = 300.dp),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(favorites, key = { it.eventGuid }) { fav ->
+                items(favorites, key = { it.eventGuid }) { favorite ->
                     EventCard(
-                        event = fav.toEvent(),
-                        onClick = { onEventClick(fav.eventGuid) }
+                        event = favorite.toEvent(),
+                        onClick = { onEventClick(favorite.eventGuid) }
                     )
                 }
             }
@@ -97,19 +97,19 @@ fun FavoritesScreen(
 private fun FavoriteEventEntity.toEvent() = Event(
     guid = eventGuid,
     title = title,
-    slug = "",
-    url = "",
     thumbUrl = thumbUrl,
     posterUrl = posterUrl,
     conferenceTitle = conferenceTitle,
-    persons = persons?.split(", ")?.filter { it.isNotBlank() },
-    duration = duration
+    persons = persons?.split(", "),
+    duration = duration,
+    slug = "",
+    url = ""
 )
 
-@Preview
+@MultiplatformPreview
 @Composable
 private fun FavoritesScreenPreview() {
     MaterialTheme {
-        FavoritesScreen(onBackClick = {})
+        FavoritesScreen(onEventClick = {}, onBackClick = {})
     }
 }

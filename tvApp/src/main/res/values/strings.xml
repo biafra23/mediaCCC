@@ -78,5 +78,6 @@
     <string name="remove_from_favorites">Remove from favorites</string>
     <string name="favorites_coming_soon">Favorites coming soon</string>
     <string name="settings_screen">Settings Screen</string>
+    <string name="settings_version">Version</string>
     <string name="settings_coming_soon">Settings coming soon</string>
 </resources>
