@@ -78,6 +78,7 @@ private val bottomDrawerItems = listOf(
 
 @Composable
 fun AppNavHost(
+    versionString: String = "",
     eventDetailExtraActions: @Composable (recordingUrl: String?, mimeType: String?, title: String?) -> Unit = { _, _, _ -> }
 ) {
     val backStack = remember { mutableStateListOf<NavKey>(HomeRoute) }
@@ -122,6 +123,7 @@ fun AppNavHost(
                     backStack = backStack,
                     onOpenDrawer = {},
                     showMenuButton = false,
+                    versionString = versionString,
                     eventDetailExtraActions = eventDetailExtraActions
                 )
             }
@@ -130,6 +132,7 @@ fun AppNavHost(
                 backStack = backStack,
                 onOpenDrawer = {},
                 showMenuButton = false,
+                versionString = versionString,
                 eventDetailExtraActions = eventDetailExtraActions
             )
         } else {
@@ -149,6 +152,7 @@ fun AppNavHost(
                     backStack = backStack,
                     onOpenDrawer = { scope.launch { drawerState.open() } },
                     showMenuButton = true,
+                    versionString = versionString,
                     eventDetailExtraActions = eventDetailExtraActions
                 )
             }
@@ -210,6 +214,7 @@ private fun AppNavDisplay(
     backStack: MutableList<NavKey>,
     onOpenDrawer: () -> Unit,
     showMenuButton: Boolean = true,
+    versionString: String = "",
     eventDetailExtraActions: @Composable (recordingUrl: String?, mimeType: String?, title: String?) -> Unit = { _, _, _ -> }
 ) {
     fun popBack() {
@@ -303,7 +308,7 @@ private fun AppNavDisplay(
             }
 
             entry<SettingsRoute> {
-                SettingsScreen(onBackClick = ::popBack)
+                SettingsScreen(onBackClick = ::popBack, versionString = versionString)
             }
 
             entry<ConferenceDetailRoute> { route ->

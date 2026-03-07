@@ -57,6 +57,7 @@
     <string name="remove_from_queue">Aus der Warteschlange entfernen</string>
 
     <!-- Settings Screen -->
+    <string name="settings_version">Version</string>
     <string name="settings_coming_soon">Einstellungen bald verfügbar</string>
     <string name="privacy">Datenschutz</string>
     <string name="clear_watch_history">Wiedergabeverlauf löschen</string>

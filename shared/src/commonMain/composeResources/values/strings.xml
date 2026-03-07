@@ -59,6 +59,7 @@
     <string name="remove_from_queue">Remove from queue</string>
 
     <!-- Settings Screen -->
+    <string name="settings_version">Version</string>
     <string name="settings_coming_soon">Settings coming soon</string>
     <string name="privacy">Privacy</string>
     <string name="clear_watch_history">Clear Watch History</string>
