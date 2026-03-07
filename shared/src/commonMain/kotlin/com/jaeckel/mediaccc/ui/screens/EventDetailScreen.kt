@@ -47,7 +47,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -69,6 +68,7 @@ import kotlinx.datetime.toLocalDateTime
 import mediaccc.shared.generated.resources.Res
 import mediaccc.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
+import com.jaeckel.mediaccc.ui.util.MultiplatformPreview
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -587,7 +587,7 @@ private fun EventMetadataPane(
     }
 }
 
-@Preview
+@MultiplatformPreview
 @Composable
 private fun EventDetailContentPreview() {
     val sampleEvent = Event(

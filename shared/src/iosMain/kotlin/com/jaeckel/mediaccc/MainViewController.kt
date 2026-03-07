@@ -13,6 +13,7 @@ import com.jaeckel.mediaccc.di.platformModule
 import com.jaeckel.mediaccc.di.sharedModule
 import com.jaeckel.mediaccc.ui.navigation.AppNavHost
 import org.koin.core.context.startKoin
+import platform.Foundation.NSBundle
 
 fun doInitKoin() {
     startKoin {
@@ -29,7 +30,17 @@ fun MainViewController() = ComposeUIViewController {
             .build()
     }
 
+    val info = NSBundle.mainBundle.infoDictionary
+    val versionName = info?.get("CFBundleShortVersionString") as? String ?: ""
+    val buildNumber = info?.get("CFBundleVersion") as? String ?: ""
+    val bundleId = info?.get("CFBundleIdentifier") as? String ?: ""
+    val gitHash = info?.get("GitCommitHash") as? String ?: ""
+    val versionString = buildString {
+        append("$bundleId $versionName ($buildNumber)")
+        if (gitHash.isNotEmpty() && gitHash != "unknown") append(" [$gitHash]")
+    }
+
     MaterialTheme {
-        AppNavHost()
+        AppNavHost(versionString = versionString)
     }
 }

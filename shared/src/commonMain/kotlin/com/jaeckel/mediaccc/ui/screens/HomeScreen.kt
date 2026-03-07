@@ -32,7 +32,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jaeckel.mediaccc.api.model.Conference
 import com.jaeckel.mediaccc.api.model.Event
@@ -48,6 +47,7 @@ import com.jaeckel.mediaccc.viewmodel.LiveStreamItem
 import mediaccc.shared.generated.resources.Res
 import mediaccc.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
+import com.jaeckel.mediaccc.ui.util.MultiplatformPreview
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -357,7 +357,7 @@ private fun SectionHeader(title: String) {
     )
 }
 
-@Preview
+@MultiplatformPreview
 @Composable
 private fun HomeContentPreview() {
     val sampleEvents = listOf(

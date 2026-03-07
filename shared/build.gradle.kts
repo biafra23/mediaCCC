@@ -17,6 +17,7 @@ kotlin {
     }
     
     listOf(
+        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -109,6 +110,7 @@ android {
 dependencies {
     debugImplementation(libs.compose.uiTooling)
     add("kspAndroid", libs.room.compiler)
+    add("kspIosX64", libs.room.compiler)
     add("kspIosArm64", libs.room.compiler)
     add("kspIosSimulatorArm64", libs.room.compiler)
 }
@@ -121,4 +123,3 @@ compose.resources {
     publicResClass = true
     packageOfResClass = "mediaccc.shared.generated.resources"
 }
-

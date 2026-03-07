@@ -50,7 +50,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
 import com.jaeckel.mediaccc.data.db.QueueEventEntity
@@ -58,6 +57,7 @@ import com.jaeckel.mediaccc.viewmodel.QueueViewModel
 import mediaccc.shared.generated.resources.Res
 import mediaccc.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
+import com.jaeckel.mediaccc.ui.util.MultiplatformPreview
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -358,7 +358,7 @@ private val previewQueueItems = listOf(
     )
 )
 
-@Preview
+@MultiplatformPreview
 @Composable
 private fun QueueItemRowPreview() {
     MaterialTheme {
@@ -371,7 +371,7 @@ private fun QueueItemRowPreview() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
+@MultiplatformPreview
 @Composable
 private fun QueueScreenPreview() {
     MaterialTheme {
@@ -413,7 +413,7 @@ private fun QueueScreenPreview() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
+@MultiplatformPreview
 @Composable
 private fun QueueScreenEmptyPreview() {
     MaterialTheme {

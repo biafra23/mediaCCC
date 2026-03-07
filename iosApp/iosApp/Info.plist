@@ -4,5 +4,7 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>GitCommitHash</key>
+	<string>unknown</string>
 </dict>
 </plist>

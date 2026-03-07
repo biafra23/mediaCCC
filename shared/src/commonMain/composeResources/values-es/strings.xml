@@ -57,6 +57,7 @@
     <string name="remove_from_queue">Quitar de la cola</string>
 
     <!-- Settings Screen -->
+    <string name="settings_version">Versión</string>
     <string name="settings_coming_soon">Ajustes próximamente</string>
     <string name="privacy">Privacidad</string>
     <string name="clear_watch_history">Borrar historial de reproducción</string>
