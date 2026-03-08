@@ -685,7 +685,7 @@ private fun EventDescriptionSide(
     event: Event,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.verticalScroll(rememberScrollState())) {
+    Column(modifier = modifier) {
         event.description?.let { description ->
             if (description.isNotBlank()) {
                 Text(
