@@ -1,0 +1,37 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version tag (e.g., v0.5.0-alpha)'
+        required: true
+      target:
+        description: 'Target commit SHA or branch name'
+        required: true
+        default: 'main'
+      prerelease:
+        description: 'Mark as pre-release'
+        type: boolean
+        default: false
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # Full history is required for softprops/action-gh-release to generate
+      # accurate release notes comparing commits since the previous tag.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.target }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          target_commitish: ${{ github.event.inputs.target }}
+          generate_release_notes: true
+          prerelease: ${{ github.event.inputs.prerelease }}
