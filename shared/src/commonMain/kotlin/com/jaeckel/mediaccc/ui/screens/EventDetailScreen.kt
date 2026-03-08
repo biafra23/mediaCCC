@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -310,33 +311,49 @@ private fun EventDetailContent(
 
         if (isWide) {
             Row(modifier = Modifier.fillMaxSize()) {
-                EventVideoPane(
-                    event = event,
-                    uiState = uiState,
-                    playerState = playerState,
-                    isPlaying = isPlaying,
-                    recordingUrl = recordingUrl,
-                    dateTimeFormat = dateTimeFormat,
-                    onPlayClick = effectivePlayClick,
-                    onExitFullscreen = onExitFullscreen,
-                    onToggleFavorite = onToggleFavorite,
-                    onEnterFullscreen = { playerState.toggleFullscreen() },
+                // Left column: player + metadata (same width)
+                Column(
                     modifier = Modifier
-                        .weight(0.4f)
-                        .fillMaxHeight()
-                )
-                EventMetadataPane(
-                    event = event,
-                    uiState = uiState,
-                    isPlaying = isPlaying,
-                    savedSliderPos = savedSliderPos,
-                    dateTimeFormat = dateTimeFormat,
-                    onPlayClick = effectivePlayClick,
-                    onLanguageSelected = onLanguageSelected,
-                    modifier = Modifier
-                        .weight(0.6f)
+                        .weight(0.55f)
                         .fillMaxHeight()
                         .verticalScroll(rememberScrollState())
+                ) {
+                    EventVideoPane(
+                        event = event,
+                        uiState = uiState,
+                        playerState = playerState,
+                        isPlaying = isPlaying,
+                        recordingUrl = recordingUrl,
+                        dateTimeFormat = dateTimeFormat,
+                        onPlayClick = effectivePlayClick,
+                        onExitFullscreen = onExitFullscreen,
+                        onToggleFavorite = onToggleFavorite,
+                        onEnterFullscreen = { playerState.toggleFullscreen() },
+                        showInlineControls = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(16f / 9f)
+                    )
+                    EventMetadataPane(
+                        event = event,
+                        uiState = uiState,
+                        isPlaying = isPlaying,
+                        savedSliderPos = savedSliderPos,
+                        dateTimeFormat = dateTimeFormat,
+                        onPlayClick = effectivePlayClick,
+                        onLanguageSelected = onLanguageSelected,
+                        showDescription = false,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    )
+                }
+                // Right column: description (full height, scrollable)
+                EventDescriptionSide(
+                    event = event,
+                    modifier = Modifier
+                        .weight(0.45f)
+                        .fillMaxHeight()
                         .padding(16.dp)
                 )
             }
@@ -389,19 +406,20 @@ private fun EventVideoPane(
     onExitFullscreen: () -> Unit,
     onToggleFavorite: () -> Unit,
     onEnterFullscreen: (() -> Unit)? = null,
+    showInlineControls: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val formattedDate = event.date?.let {
+        dateTimeFormat.format(it.toLocalDateTime(TimeZone.currentSystemDefault()))
+    } ?: ""
+    val speakers = event.persons?.joinToString(", ") ?: ""
+
     Box(modifier = modifier) {
         VideoPlayerSurface(
             playerState = playerState,
             modifier = Modifier.fillMaxSize(),
             overlay = {
                 if (playerState.isFullscreen) {
-                    val formattedDate = event.date?.let {
-                        dateTimeFormat.format(it.toLocalDateTime(TimeZone.currentSystemDefault()))
-                    } ?: ""
-                    val speakers = event.persons?.joinToString(", ") ?: ""
-
                     PlayerControlsOverlay(
                         playerState = playerState,
                         title = event.title,
@@ -409,7 +427,21 @@ private fun EventVideoPane(
                         conference = event.conferenceTitle ?: "",
                         date = formattedDate,
                         isFavorite = uiState.isFavorite,
+                        isInline = false,
                         onExitFullscreen = onExitFullscreen,
+                        onToggleFavorite = onToggleFavorite
+                    )
+                } else if (showInlineControls && isPlaying) {
+                    PlayerControlsOverlay(
+                        playerState = playerState,
+                        title = event.title,
+                        speakers = speakers,
+                        conference = event.conferenceTitle ?: "",
+                        date = formattedDate,
+                        isFavorite = uiState.isFavorite,
+                        isInline = true,
+                        onExitFullscreen = onExitFullscreen,
+                        onEnterFullscreen = onEnterFullscreen,
                         onToggleFavorite = onToggleFavorite
                     )
                 }
@@ -443,7 +475,7 @@ private fun EventVideoPane(
             }
         }
 
-        if (isPlaying && !playerState.isFullscreen && onEnterFullscreen != null) {
+        if (isPlaying && !playerState.isFullscreen && onEnterFullscreen != null && !showInlineControls) {
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -473,6 +505,7 @@ private fun EventMetadataPane(
     dateTimeFormat: DateTimeFormat<LocalDateTime>,
     onPlayClick: () -> Unit,
     onLanguageSelected: (String) -> Unit,
+    showDescription: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -568,20 +601,22 @@ private fun EventMetadataPane(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        if (showDescription) {
+            Spacer(modifier = Modifier.height(24.dp))
 
-        event.description?.let { description ->
-            if (description.isNotBlank()) {
-                Text(
-                    text = stringResource(Res.string.description),
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            event.description?.let { description ->
+                if (description.isNotBlank()) {
+                    Text(
+                        text = stringResource(Res.string.description),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
     }
@@ -650,6 +685,29 @@ private fun EventDetailContentPreview() {
 }
 
 @Composable
+private fun EventDescriptionSide(
+    event: Event,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.verticalScroll(rememberScrollState())) {
+        event.description?.let { description ->
+            if (description.isNotBlank()) {
+                Text(
+                    text = stringResource(Res.string.description),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun MetaInfoRow(label: String, text: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -673,7 +731,9 @@ private fun PlayerControlsOverlay(
     conference: String,
     date: String,
     isFavorite: Boolean = false,
+    isInline: Boolean = false,
     onExitFullscreen: () -> Unit,
+    onEnterFullscreen: (() -> Unit)? = null,
     onToggleFavorite: () -> Unit = {}
 ) {
     var showControls by remember { mutableStateOf(true) }
@@ -681,7 +741,7 @@ private fun PlayerControlsOverlay(
 
     LaunchedEffect(showControls, interactionCount) {
         if (showControls) {
-            delay(10_000)
+            delay(8_000)
             showControls = false
         }
     }
@@ -708,17 +768,31 @@ private fun PlayerControlsOverlay(
                     .align(Alignment.TopStart),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "✕",
-                    color = Color.White,
-                    fontSize = 24.sp,
-                    modifier = Modifier
-                        .clickable {
-                            onInteract()
-                            onExitFullscreen()
-                        }
-                        .padding(8.dp)
-                )
+                if (isInline && onEnterFullscreen != null) {
+                    Text(
+                        text = "⛶",
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        modifier = Modifier
+                            .clickable {
+                                onInteract()
+                                onEnterFullscreen()
+                            }
+                            .padding(8.dp)
+                    )
+                } else {
+                    Text(
+                        text = "✕",
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        modifier = Modifier
+                            .clickable {
+                                onInteract()
+                                onExitFullscreen()
+                            }
+                            .padding(8.dp)
+                    )
+                }
 
                 Column(
                     modifier = Modifier

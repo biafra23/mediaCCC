@@ -103,18 +103,39 @@ fun AppNavHost(
         scope.launch { drawerState.close() }
     }
 
-    val isVideoScreen = currentRoute is EventDetailRoute || currentRoute is PlayerRoute
+    val isVideoScreen = currentRoute is PlayerRoute
+    val isEventDetailScreen = currentRoute is EventDetailRoute
 
     BoxWithConstraints {
         val isWideScreen = maxWidth >= 840.dp
 
-        if (isWideScreen && !isVideoScreen) {
+        if (isWideScreen && !isVideoScreen && !isEventDetailScreen) {
             PermanentNavigationDrawer(
                 drawerContent = {
                     PermanentDrawerSheet(modifier = Modifier.width(280.dp)) {
                         DrawerSheetContent(
                             currentRoute = currentRoute,
                             onNavigate = { navigateToDrawerRoute(it) }
+                        )
+                    }
+                }
+            ) {
+                AppNavDisplay(
+                    backStack = backStack,
+                    onOpenDrawer = {},
+                    showMenuButton = false,
+                    versionString = versionString,
+                    eventDetailExtraActions = eventDetailExtraActions
+                )
+            }
+        } else if (isWideScreen && isEventDetailScreen) {
+            PermanentNavigationDrawer(
+                drawerContent = {
+                    PermanentDrawerSheet(modifier = Modifier.width(72.dp)) {
+                        DrawerSheetContent(
+                            currentRoute = currentRoute,
+                            onNavigate = { navigateToDrawerRoute(it) },
+                            iconOnly = true
                         )
                     }
                 }
@@ -163,26 +184,68 @@ fun AppNavHost(
 @Composable
 private fun DrawerSheetContent(
     currentRoute: NavKey?,
-    onNavigate: (NavKey) -> Unit
+    onNavigate: (NavKey) -> Unit,
+    iconOnly: Boolean = false
 ) {
-    Text(
-        text = stringResource(Res.string.app_name),
-        style = MaterialTheme.typography.headlineSmall,
-        modifier = Modifier.padding(horizontal = 28.dp, vertical = 24.dp)
-    )
-    HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
+    if (!iconOnly) {
+        Text(
+            text = stringResource(Res.string.app_name),
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(horizontal = 28.dp, vertical = 24.dp)
+        )
+        HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
+    } else {
+        Spacer(modifier = Modifier.height(16.dp))
+    }
 
     Column(
         modifier = Modifier
             .fillMaxHeight()
-            .padding(horizontal = 12.dp)
+            .padding(horizontal = if (iconOnly) 4.dp else 12.dp),
+        horizontalAlignment = if (iconOnly) androidx.compose.ui.Alignment.CenterHorizontally
+            else androidx.compose.ui.Alignment.Start
     ) {
         Column(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = if (iconOnly) androidx.compose.ui.Alignment.CenterHorizontally
+                else androidx.compose.ui.Alignment.Start
         ) {
             topDrawerItems.forEach { item ->
+                if (iconOnly) {
+                    NavigationDrawerItem(
+                        label = {},
+                        icon = { Icon(item.icon, contentDescription = stringResource(item.labelRes)) },
+                        selected = currentRoute == item.route,
+                        onClick = { onNavigate(item.route) },
+                        modifier = Modifier.padding(vertical = 2.dp)
+                    )
+                } else {
+                    NavigationDrawerItem(
+                        label = { Text(stringResource(item.labelRes)) },
+                        icon = { Icon(item.icon, contentDescription = null) },
+                        selected = currentRoute == item.route,
+                        onClick = { onNavigate(item.route) },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
+                }
+            }
+        }
+
+        HorizontalDivider()
+        Spacer(modifier = Modifier.height(8.dp))
+
+        bottomDrawerItems.forEach { item ->
+            if (iconOnly) {
+                NavigationDrawerItem(
+                    label = {},
+                    icon = { Icon(item.icon, contentDescription = stringResource(item.labelRes)) },
+                    selected = currentRoute == item.route,
+                    onClick = { onNavigate(item.route) },
+                    modifier = Modifier.padding(vertical = 2.dp)
+                )
+            } else {
                 NavigationDrawerItem(
                     label = { Text(stringResource(item.labelRes)) },
                     icon = { Icon(item.icon, contentDescription = null) },
@@ -191,19 +254,6 @@ private fun DrawerSheetContent(
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
             }
-        }
-
-        HorizontalDivider()
-        Spacer(modifier = Modifier.height(8.dp))
-
-        bottomDrawerItems.forEach { item ->
-            NavigationDrawerItem(
-                label = { Text(stringResource(item.labelRes)) },
-                icon = { Icon(item.icon, contentDescription = null) },
-                selected = currentRoute == item.route,
-                onClick = { onNavigate(item.route) },
-                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-            )
         }
         Spacer(modifier = Modifier.height(12.dp))
     }
