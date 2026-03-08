@@ -310,12 +310,14 @@ private fun EventDetailContent(
         }
 
         if (isWide) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Row(modifier = Modifier.fillMaxWidth()) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                // Left column: player + metadata (same width)
+                Column(
+                    modifier = Modifier
+                        .weight(0.55f)
+                        .fillMaxHeight()
+                        .verticalScroll(rememberScrollState())
+                ) {
                     EventVideoPane(
                         event = event,
                         uiState = uiState,
@@ -329,27 +331,29 @@ private fun EventDetailContent(
                         onEnterFullscreen = { playerState.toggleFullscreen() },
                         showInlineControls = true,
                         modifier = Modifier
-                            .weight(0.5f)
+                            .fillMaxWidth()
                             .aspectRatio(16f / 9f)
                     )
-                    EventDescriptionSide(
+                    EventMetadataPane(
                         event = event,
+                        uiState = uiState,
+                        isPlaying = isPlaying,
+                        savedSliderPos = savedSliderPos,
+                        dateTimeFormat = dateTimeFormat,
+                        onPlayClick = effectivePlayClick,
+                        onLanguageSelected = onLanguageSelected,
+                        showDescription = false,
                         modifier = Modifier
-                            .weight(0.5f)
+                            .fillMaxWidth()
                             .padding(16.dp)
                     )
                 }
-                EventMetadataPane(
+                // Right column: description (full height, scrollable)
+                EventDescriptionSide(
                     event = event,
-                    uiState = uiState,
-                    isPlaying = isPlaying,
-                    savedSliderPos = savedSliderPos,
-                    dateTimeFormat = dateTimeFormat,
-                    onPlayClick = effectivePlayClick,
-                    onLanguageSelected = onLanguageSelected,
-                    showDescription = false,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .weight(0.45f)
+                        .fillMaxHeight()
                         .padding(16.dp)
                 )
             }
@@ -685,7 +689,7 @@ private fun EventDescriptionSide(
     event: Event,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         event.description?.let { description ->
             if (description.isNotBlank()) {
                 Text(
