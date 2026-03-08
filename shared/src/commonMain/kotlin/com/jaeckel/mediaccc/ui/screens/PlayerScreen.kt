@@ -54,6 +54,7 @@ fun PlayerScreen(
     onBackClick: () -> Unit
 ) {
     val viewModel: PlayerViewModel = koinViewModel(
+        key = eventGuid?.takeIf { it.isNotBlank() } ?: videoUrl,
         parameters = { parametersOf(videoUrl, title, eventGuid) }
     )
     val uiState by viewModel.uiState.collectAsState()
