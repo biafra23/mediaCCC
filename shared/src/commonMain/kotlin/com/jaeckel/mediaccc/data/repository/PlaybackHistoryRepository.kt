@@ -15,6 +15,8 @@ class PlaybackHistoryRepository(private val dao: PlaybackHistoryDao) {
 
     fun getEntryFlow(guid: String): Flow<PlaybackHistoryEntity?> = dao.getByGuidFlow(guid)
 
+    suspend fun clearHistory() = dao.deleteAll()
+
     suspend fun saveProgress(
         eventGuid: String,
         title: String,

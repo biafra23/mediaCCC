@@ -35,6 +35,11 @@ class PlaybackHistoryRepositoryTest {
 
         override fun getByGuidFlow(guid: String): Flow<PlaybackHistoryEntity?> =
             flow.map { list -> list.find { it.eventGuid == guid } }
+
+        override suspend fun deleteAll() {
+            items.clear()
+            flow.value = emptyList()
+        }
     }
 
     @Test
@@ -130,5 +135,22 @@ class PlaybackHistoryRepositoryTest {
         assertEquals(3600L, saved.duration)
         assertEquals(250f, saved.sliderPos)
         assertTrue(saved.lastPlayedAt > 0)
+    }
+
+    @Test
+    fun clearHistoryCallsDeleteAll() = runTest {
+        val dao = FakePlaybackHistoryDao()
+        val repo = PlaybackHistoryRepository(dao)
+        dao.upsert(
+            PlaybackHistoryEntity(
+                eventGuid = "g1", title = "Talk", thumbUrl = null,
+                conferenceTitle = null, persons = null, duration = null,
+                lastPlayedAt = 1000L, sliderPos = 100f
+            )
+        )
+        assertEquals(1, dao.items.size)
+        repo.clearHistory()
+        assertEquals(0, dao.items.size)
+        assertTrue(repo.getHistory().first().isEmpty())
     }
 }

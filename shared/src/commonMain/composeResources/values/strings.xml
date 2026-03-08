@@ -61,6 +61,12 @@
     <!-- Settings Screen -->
     <string name="settings_version">Version</string>
     <string name="settings_coming_soon">Settings coming soon</string>
+    <string name="privacy">Privacy</string>
+    <string name="clear_watch_history">Clear Watch History</string>
+    <string name="clear_watch_history_description">Remove all videos from your watch history</string>
+    <string name="clear_watch_history_confirm">Are you sure you want to clear your entire watch history? This cannot be undone.</string>
+    <string name="watch_history_cleared">Watch history cleared</string>
+    <string name="cancel">Cancel</string>
 
     <!-- Error -->
     <string name="error_message">Error: %1$s</string>

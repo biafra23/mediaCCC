@@ -22,4 +22,7 @@ interface PlaybackHistoryDao {
 
     @Query("SELECT * FROM playback_history WHERE eventGuid = :guid LIMIT 1")
     fun getByGuidFlow(guid: String): Flow<PlaybackHistoryEntity?>
+
+    @Query("DELETE FROM playback_history")
+    suspend fun deleteAll()
 }
